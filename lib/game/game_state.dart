@@ -267,7 +267,7 @@ class GameState with ChangeNotifier {
               coinMultiplier);
     }
 
-    print(coinsGenerated);
+    // print(coinsGenerated);
 
     if (coinsGenerated > 0) {
       addCoins(coinsGenerated);

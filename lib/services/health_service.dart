@@ -1,5 +1,6 @@
 // lib/services/health_service.dart
 import 'dart:async';
+import 'package:flame/game.dart';
 import 'package:health/health.dart';
 import 'package:flutter/material.dart';
 import '../game/game_state.dart';
@@ -49,12 +50,20 @@ class HealthService {
 
   int parseHealthData(List<HealthDataPoint> healthData, HealthDataType type) {
     final data = healthData.where((data) => data.type == type).toList();
+    if (data.isEmpty) {
+      return 0;
+    }
+    // if (type == HealthDataType.STEPS) {
+    //   for (final point in data) {
+    //     print(
+    //       "${point.dateFrom}-${point.dateTo}: ${(point.value as NumericHealthValue).numericValue.toInt()}",
+    //     );
+    //   }
+    // }
 
-    return data.isEmpty
-        ? 0
-        : data
-            .map((e) => (e.value as NumericHealthValue).numericValue.toInt())
-            .reduce((a, b) => a + b);
+    return data
+        .map((e) => (e.value as NumericHealthValue).numericValue.toInt())
+        .reduce((a, b) => a + b);
   }
 
   Future<(int, int, int)> fetchLatestData(DateTime start, end) async {
@@ -83,30 +92,36 @@ class HealthService {
     return (0, 0, 0);
   }
 
-  Future<void> collectHealth(GameState gameState) async {
-    final now = DateTime.now();
-    if (steps == 0 &&
-        caloriesBurned == 0 &&
-        exerciseMinutes == 0 &&
-        gameState.lastHealthSync > 0) {
-      // on launch, previous is zero
-      // get from start of day to last sync
-      final today = DateTime(now.year, now.month, now.day);
-      final previous = DateTime.fromMillisecondsSinceEpoch(
-        gameState.lastHealthSync,
-      );
-      print("init health fetch $today - $previous");
-      final (
-        newSteps,
-        newCaloriesBurned,
-        newExerciseMinutes,
-      ) = await fetchLatestData(today, previous);
-      steps = newSteps;
-      caloriesBurned = newCaloriesBurned;
-      exerciseMinutes = newExerciseMinutes;
-      collectHealth(gameState);
+  /// for initializing data on health activity widget
+  Future<void> collectHealthToday(GameState gameState, DateTime date) async {
+    if (steps > 0 || caloriesBurned > 0 || exerciseMinutes > 0) {
+      // already collected
       return;
     }
+    if (gameState.lastHealthSync == 0) {
+      // no data at all. run main collector
+      return;
+    }
+    // on launch, previous is zero
+    // get from start of day to last sync
+    final today = DateTime(date.year, date.month, date.day);
+    final previous = DateTime.fromMillisecondsSinceEpoch(
+      gameState.lastHealthSync,
+    );
+    print("init health fetch $today - $previous");
+    final (
+      newSteps,
+      newCaloriesBurned,
+      newExerciseMinutes,
+    ) = await fetchLatestData(today, previous);
+    steps = newSteps;
+    caloriesBurned = newCaloriesBurned;
+    exerciseMinutes = newExerciseMinutes;
+  }
+
+  Future<void> collectHealth(GameState gameState) async {
+    final now = DateTime.now();
+    await collectHealthToday(gameState, now);
 
     final previousSteps = steps;
     final previousCalories = caloriesBurned;
@@ -120,14 +135,14 @@ class HealthService {
         now.year,
         now.month,
         now.day,
-      ).subtract(Duration(days: 2));
+      ); //.subtract(Duration(days: 2));
     }
     final (
       newSteps,
       newCaloriesBurned,
       newExerciseMinutes,
     ) = await fetchLatestData(start, now);
-    print("fetched from $start");
+    print("fetched from $start to $now");
 
     // Calculate deltas
     final stepsDelta = newSteps - previousSteps;
@@ -135,10 +150,15 @@ class HealthService {
     final exerciseDelta = newExerciseMinutes - previousExercise;
 
     // Update game state with new health data
-    if (stepsDelta > 0 || caloriesDelta > 0 || exerciseDelta > 0) {
-      gameState.processHealthData(stepsDelta, caloriesDelta, exerciseDelta);
-      gameState.lastHealthSync = now.millisecondsSinceEpoch;
+    if (caloriesDelta == 0 && stepsDelta == 0 && exerciseDelta == 0) {
+      return;
     }
+    print("got new health data $stepsDelta $caloriesDelta $exerciseDelta");
+    gameState.processHealthData(stepsDelta, caloriesDelta, exerciseDelta);
+    steps = newSteps;
+    caloriesBurned = newCaloriesBurned;
+    exerciseMinutes = newExerciseMinutes;
+    gameState.lastHealthSync = now.millisecondsSinceEpoch;
   }
 
   // void startBackgroundCollection(GameState gameState) {

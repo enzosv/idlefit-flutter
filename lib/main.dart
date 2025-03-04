@@ -85,7 +85,7 @@ class _GameHomePageState extends State<GameHomePage>
     // Initialize health data
     final healthService = Provider.of<HealthService>(context, listen: false);
     final gameState = Provider.of<GameState>(context, listen: false);
-
+    gameState.isPaused = true;
     healthService.initialize().then((_) async {
       // healthService.startBackgroundCollection(gameState);
       await healthService.collectHealth(gameState);
