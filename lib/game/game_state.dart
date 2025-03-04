@@ -19,7 +19,7 @@ class GameState with ChangeNotifier {
 
   // Health Metrics
   int totalSteps = 0;
-  int totalCaloriesBurned = 0;
+  double totalCaloriesBurned = 0;
   int totalExerciseMinutes = 0;
 
   // Game statistics
@@ -142,7 +142,7 @@ class GameState with ChangeNotifier {
     lastHealthSync = savedState['lastHealthSync'] ?? 0;
 
     totalSteps = savedState['totalSteps'] ?? 0;
-    totalCaloriesBurned = savedState['totalCaloriesBurned'] ?? 0;
+    totalCaloriesBurned = savedState['totalCaloriesBurned'] ?? 0.0;
     totalExerciseMinutes = savedState['totalExerciseMinutes'] ?? 0;
 
     totalCoinsEarned = savedState['totalCoinsEarned'] ?? 0;
@@ -276,7 +276,7 @@ class GameState with ChangeNotifier {
     lastGenerated = now;
   }
 
-  void processHealthData(int steps, int calories, int exerciseMinutes) {
+  void processHealthData(int steps, double calories, int exerciseMinutes) {
     // Update totals
     totalSteps += steps;
     totalCaloriesBurned += calories;

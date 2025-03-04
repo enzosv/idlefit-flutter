@@ -45,10 +45,10 @@ class StatsScreen extends StatelessWidget {
                           leading: const Icon(Icons.local_fire_department),
                           title: const Text('Calories Burned'),
                           subtitle: Text(
-                            'Today: ${healthService.caloriesBurned}',
+                            'Today: ${healthService.caloriesBurned.round()}',
                           ),
                           trailing: Text(
-                            'Total: ${gameState.totalCaloriesBurned}',
+                            'Total: ${gameState.totalCaloriesBurned.round()}',
                           ),
                         ),
                         ListTile(
