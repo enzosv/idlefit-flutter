@@ -17,7 +17,7 @@ class HealthService {
 
   // Health data metrics
   int steps = 0;
-  int caloriesBurned = 0;
+  double caloriesBurned = 0;
   int exerciseMinutes = 0;
 
   bool _isAuthorized = false;
@@ -48,26 +48,31 @@ class HealthService {
     }
   }
 
-  int parseHealthData(List<HealthDataPoint> healthData, HealthDataType type) {
+  double parseHealthData(
+    List<HealthDataPoint> healthData,
+    HealthDataType type,
+  ) {
     final data = healthData.where((data) => data.type == type).toList();
+
     if (data.isEmpty) {
       return 0;
     }
-    // if (type == HealthDataType.STEPS) {
-    //   for (final point in data) {
-    //     print(
-    //       "${point.dateFrom}-${point.dateTo}: ${(point.value as NumericHealthValue).numericValue.toInt()}",
-    //     );
-    //   }
-    // }
 
-    return data
-        .map((e) => (e.value as NumericHealthValue).numericValue.toInt())
-        .reduce((a, b) => a + b);
+    // there are many data sources. apple uses the most trusted one. we use the one with the most data.
+    Map<String, double> grouped = {};
+    for (final entry in data) {
+      final value = (entry.value as NumericHealthValue).numericValue.toDouble();
+      grouped[entry.sourceName] = (grouped[entry.sourceName] ?? 0) + value;
+    }
+    String? bestSource =
+        grouped.keys.isEmpty
+            ? null
+            : grouped.keys.reduce((a, b) => grouped[a]! > grouped[b]! ? a : b);
+    return bestSource != null ? grouped[bestSource]! : 0;
   }
 
-  Future<(int, int, int)> fetchLatestData(DateTime start, end) async {
-    if (!_isAuthorized) return (0, 0, 0);
+  Future<(int, double, int)> fetchLatestData(DateTime start, end) async {
+    if (!_isAuthorized) return (0, 0.0, 0);
 
     try {
       final healthData = await health.getHealthDataFromTypes(
@@ -85,11 +90,11 @@ class HealthService {
         healthData,
         HealthDataType.EXERCISE_TIME,
       );
-      return (steps, caloriesBurned, exerciseMinutes);
+      return (steps.round(), caloriesBurned, exerciseMinutes.round());
     } catch (e) {
       debugPrint('Error fetching health data: $e');
     }
-    return (0, 0, 0);
+    return (0, 0.0, 0);
   }
 
   /// for initializing data on health activity widget
@@ -117,19 +122,17 @@ class HealthService {
     steps = newSteps;
     caloriesBurned = newCaloriesBurned;
     exerciseMinutes = newExerciseMinutes;
+    print("today: $steps, $caloriesBurned, $exerciseMinutes");
   }
 
   Future<void> collectHealth(GameState gameState) async {
     final now = DateTime.now();
     await collectHealthToday(gameState, now);
 
-    final previousSteps = steps;
-    final previousCalories = caloriesBurned;
-    final previousExercise = exerciseMinutes;
-
     DateTime start;
     if (gameState.lastHealthSync > 0) {
-      start = DateTime(now.year, now.month, now.day);
+      // start = DateTime(now.year, now.month, now.day);
+      start = DateTime.fromMillisecondsSinceEpoch(gameState.lastHealthSync);
     } else {
       start = DateTime(
         now.year,
@@ -144,20 +147,21 @@ class HealthService {
     ) = await fetchLatestData(start, now);
     print("fetched from $start to $now");
 
-    // Calculate deltas
-    final stepsDelta = newSteps - previousSteps;
-    final caloriesDelta = newCaloriesBurned - previousCalories;
-    final exerciseDelta = newExerciseMinutes - previousExercise;
-
     // Update game state with new health data
-    if (caloriesDelta == 0 && stepsDelta == 0 && exerciseDelta == 0) {
+    if (newCaloriesBurned == 0 && newSteps == 0 && newExerciseMinutes == 0) {
       return;
     }
-    print("got new health data $stepsDelta $caloriesDelta $exerciseDelta");
-    gameState.processHealthData(stepsDelta, caloriesDelta, exerciseDelta);
-    steps = newSteps;
-    caloriesBurned = newCaloriesBurned;
-    exerciseMinutes = newExerciseMinutes;
+    print(
+      "got new health data $newSteps $newCaloriesBurned $newExerciseMinutes",
+    );
+    gameState.processHealthData(
+      newSteps,
+      newCaloriesBurned,
+      newExerciseMinutes,
+    );
+    steps += newSteps;
+    caloriesBurned += newCaloriesBurned;
+    exerciseMinutes += newExerciseMinutes;
     gameState.lastHealthSync = now.millisecondsSinceEpoch;
   }
 
