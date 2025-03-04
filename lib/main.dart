@@ -1,7 +1,5 @@
-import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:health/health.dart';
 import 'package:provider/provider.dart';
 import 'game/game_state.dart';
 import 'screens/main_screen.dart';
@@ -35,7 +33,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +49,7 @@ class MyApp extends StatelessWidget {
 }
 
 class GameHomePage extends StatefulWidget {
-  const GameHomePage({Key? key}) : super(key: key);
+  const GameHomePage({super.key});
 
   @override
   _GameHomePageState createState() => _GameHomePageState();

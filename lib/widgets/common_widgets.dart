@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../game/game_state.dart';
 
 class CurrencyBar extends StatelessWidget {
-  const CurrencyBar({Key? key}) : super(key: key);
+  const CurrencyBar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class CurrencyBar extends StatelessWidget {
             color: Colors.blue.shade800,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),

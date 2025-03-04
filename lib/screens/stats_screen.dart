@@ -5,7 +5,7 @@ import '../services/health_service.dart';
 import '../widgets/common_widgets.dart';
 
 class StatsScreen extends StatelessWidget {
-  const StatsScreen({Key? key}) : super(key: key);
+  const StatsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

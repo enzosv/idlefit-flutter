@@ -387,6 +387,7 @@ class GameState with ChangeNotifier {
     return false;
   }
 
+  @override
   void dispose() {
     _autoSaveTimer?.cancel();
     _generatorTimer?.cancel();
