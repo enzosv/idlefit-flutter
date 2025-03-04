@@ -47,4 +47,8 @@ class ShopItem {
         return value.toStringAsFixed(0);
     }
   }
+
+  Map<String, dynamic> get json {
+    return {'id': id, 'level': level};
+  }
 }

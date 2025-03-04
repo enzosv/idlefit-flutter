@@ -25,4 +25,8 @@ class Generator {
   double get output {
     return baseOutput * count;
   }
+
+  Map<String, dynamic> get json {
+    return {'id': id, 'count': count};
+  }
 }

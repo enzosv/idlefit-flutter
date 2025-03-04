@@ -198,10 +198,8 @@ class GameState with ChangeNotifier {
       'totalEnergySpent': totalEnergySpent,
       'totalSpaceEarned': totalSpaceEarned,
       'totalSpaceSpent': totalSpaceSpent,
-      'generators':
-          generators.map((g) => {'id': g.id, 'count': g.count}).toList(),
-      'shopItems':
-          shopItems.map((s) => {'id': s.id, 'level': s.level}).toList(),
+      'generators': generators.map((g) => g.json).toList(),
+      'shopItems': shopItems.map((s) => s.json).toList(),
     };
   }
 
