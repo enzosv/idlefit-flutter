@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../game/game_state.dart';
 import '../services/health_service.dart';
 import '../widgets/common_widgets.dart';
+import '../util.dart';
 
 class StatsScreen extends StatelessWidget {
   const StatsScreen({super.key});
@@ -83,7 +84,7 @@ class StatsScreen extends StatelessWidget {
                         ListTile(
                           title: const Text('Total Coins Earned'),
                           trailing: Text(
-                            '${gameState.totalCoinsEarned.floor()}',
+                            '${shortNotation(gameState.totalCoinsEarned)}',
                           ),
                         ),
                         ListTile(

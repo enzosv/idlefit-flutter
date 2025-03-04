@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../game/game_state.dart';
+import '../util.dart';
 
 class CurrencyBar extends StatelessWidget {
   const CurrencyBar({super.key});
@@ -28,7 +29,7 @@ class CurrencyBar extends StatelessWidget {
                 context,
                 icon: Icons.monetization_on,
                 label: 'Coins',
-                value: gameState.coins.floor().toString(),
+                value: shortNotation(gameState.coins),
                 color: Colors.amber,
               ),
               _buildCurrencyItem(
