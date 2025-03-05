@@ -134,8 +134,6 @@ class GameState with ChangeNotifier {
 
   Map<String, dynamic> toJson() {
     return {
-      'coins': coins,
-      'space': space,
       'lastGenerated': lastGenerated,
       'lastHealthSync': lastHealthSync,
       'totalSteps': totalSteps,
@@ -183,6 +181,7 @@ class GameState with ChangeNotifier {
     return dif;
   }
 
+  // the main run loop
   void _processGenerators() {
     if (isPaused) {
       return;

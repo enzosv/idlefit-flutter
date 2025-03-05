@@ -50,35 +50,6 @@ final _entities = <obx_int.ModelEntity>[
       relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[]),
   obx_int.ModelEntity(
-      id: const obx_int.IdUid(2, 2493137042954685248),
-      name: 'HealthData',
-      lastPropertyId: const obx_int.IdUid(4, 3238954471475910745),
-      flags: 0,
-      properties: <obx_int.ModelProperty>[
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 2465340859862322629),
-            name: 'id',
-            type: 6,
-            flags: 1),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 2427394359739034951),
-            name: 'today',
-            type: 8,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(3, 3598368693352972001),
-            name: 'total',
-            type: 8,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(4, 3238954471475910745),
-            name: 'dbMetric',
-            type: 6,
-            flags: 0)
-      ],
-      relations: <obx_int.ModelRelation>[],
-      backlinks: <obx_int.ModelBacklink>[]),
-  obx_int.ModelEntity(
       id: const obx_int.IdUid(3, 7897766162698443189),
       name: 'CoinGenerator',
       lastPropertyId: const obx_int.IdUid(4, 3181080062182307300),
@@ -143,12 +114,16 @@ obx_int.ModelDefinition getObjectBoxModel() {
       lastIndexId: const obx_int.IdUid(0, 0),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
-      retiredEntityUids: const [],
+      retiredEntityUids: const [2493137042954685248],
       retiredIndexUids: const [],
       retiredPropertyUids: const [
         1612088624750524307,
         1221735629759989076,
-        7739014744985074402
+        7739014744985074402,
+        2465340859862322629,
+        2427394359739034951,
+        3598368693352972001,
+        3238954471475910745
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -188,40 +163,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
 
           return object;
         }),
-    HealthData: obx_int.EntityDefinition<HealthData>(
-        model: _entities[1],
-        toOneRelations: (HealthData object) => [],
-        toManyRelations: (HealthData object) => {},
-        getId: (HealthData object) => object.id,
-        setId: (HealthData object, int id) {
-          object.id = id;
-        },
-        objectToFB: (HealthData object, fb.Builder fbb) {
-          fbb.startTable(5);
-          fbb.addInt64(0, object.id);
-          fbb.addFloat64(1, object.today);
-          fbb.addFloat64(2, object.total);
-          fbb.addInt64(3, object.dbMetric);
-          fbb.finish(fbb.endTable());
-          return object.id;
-        },
-        objectFromFB: (obx.Store store, ByteData fbData) {
-          final buffer = fb.BufferContext(fbData);
-          final rootOffset = buffer.derefObject(0);
-
-          final object = HealthData()
-            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
-            ..today =
-                const fb.Float64Reader().vTableGet(buffer, rootOffset, 6, 0)
-            ..total =
-                const fb.Float64Reader().vTableGet(buffer, rootOffset, 8, 0)
-            ..dbMetric =
-                const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0);
-
-          return object;
-        }),
     CoinGenerator: obx_int.EntityDefinition<CoinGenerator>(
-        model: _entities[2],
+        model: _entities[1],
         toOneRelations: (CoinGenerator object) => [],
         toManyRelations: (CoinGenerator object) => {},
         getId: (CoinGenerator object) => object.tier,
@@ -272,36 +215,17 @@ class Currency_ {
       obx.QueryIntegerProperty<Currency>(_entities[0].properties[3]);
 }
 
-/// [HealthData] entity fields to define ObjectBox queries.
-class HealthData_ {
-  /// See [HealthData.id].
-  static final id =
-      obx.QueryIntegerProperty<HealthData>(_entities[1].properties[0]);
-
-  /// See [HealthData.today].
-  static final today =
-      obx.QueryDoubleProperty<HealthData>(_entities[1].properties[1]);
-
-  /// See [HealthData.total].
-  static final total =
-      obx.QueryDoubleProperty<HealthData>(_entities[1].properties[2]);
-
-  /// See [HealthData.dbMetric].
-  static final dbMetric =
-      obx.QueryIntegerProperty<HealthData>(_entities[1].properties[3]);
-}
-
 /// [CoinGenerator] entity fields to define ObjectBox queries.
 class CoinGenerator_ {
   /// See [CoinGenerator.count].
   static final count =
-      obx.QueryIntegerProperty<CoinGenerator>(_entities[2].properties[0]);
+      obx.QueryIntegerProperty<CoinGenerator>(_entities[1].properties[0]);
 
   /// See [CoinGenerator.level].
   static final level =
-      obx.QueryIntegerProperty<CoinGenerator>(_entities[2].properties[1]);
+      obx.QueryIntegerProperty<CoinGenerator>(_entities[1].properties[1]);
 
   /// See [CoinGenerator.tier].
   static final tier =
-      obx.QueryIntegerProperty<CoinGenerator>(_entities[2].properties[2]);
+      obx.QueryIntegerProperty<CoinGenerator>(_entities[1].properties[2]);
 }

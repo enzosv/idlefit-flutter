@@ -33,35 +33,6 @@
       "relations": []
     },
     {
-      "id": "2:2493137042954685248",
-      "lastPropertyId": "4:3238954471475910745",
-      "name": "HealthData",
-      "properties": [
-        {
-          "id": "1:2465340859862322629",
-          "name": "id",
-          "type": 6,
-          "flags": 1
-        },
-        {
-          "id": "2:2427394359739034951",
-          "name": "today",
-          "type": 8
-        },
-        {
-          "id": "3:3598368693352972001",
-          "name": "total",
-          "type": 8
-        },
-        {
-          "id": "4:3238954471475910745",
-          "name": "dbMetric",
-          "type": 6
-        }
-      ],
-      "relations": []
-    },
-    {
       "id": "3:7897766162698443189",
       "lastPropertyId": "4:3181080062182307300",
       "name": "CoinGenerator",
@@ -92,12 +63,18 @@
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
-  "retiredEntityUids": [],
+  "retiredEntityUids": [
+    2493137042954685248
+  ],
   "retiredIndexUids": [],
   "retiredPropertyUids": [
     1612088624750524307,
     1221735629759989076,
-    7739014744985074402
+    7739014744985074402,
+    2465340859862322629,
+    2427394359739034951,
+    3598368693352972001,
+    3238954471475910745
   ],
   "retiredRelationUids": [],
   "version": 1
