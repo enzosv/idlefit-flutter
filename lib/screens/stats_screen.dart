@@ -120,7 +120,7 @@ class StatsScreen extends StatelessWidget {
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                         const Divider(),
-                        ...gameState.generators.map(
+                        ...gameState.coinGenerators.map(
                           (generator) => ListTile(
                             title: Text(generator.name),
                             subtitle: Text('${generator.output} coins/sec'),

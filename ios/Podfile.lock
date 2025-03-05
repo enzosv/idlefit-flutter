@@ -4,6 +4,13 @@ PODS:
   - Flutter (1.0.0)
   - health (12.0.0):
     - Flutter
+  - ObjectBox (4.1.0-sync)
+  - objectbox_sync_flutter_libs (0.0.1):
+    - Flutter
+    - ObjectBox (= 4.1.0-sync)
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -12,7 +19,13 @@ DEPENDENCIES:
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
   - health (from `.symlinks/plugins/health/ios`)
+  - objectbox_sync_flutter_libs (from `.symlinks/plugins/objectbox_sync_flutter_libs/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
+
+SPEC REPOS:
+  trunk:
+    - ObjectBox
 
 EXTERNAL SOURCES:
   device_info_plus:
@@ -21,6 +34,10 @@ EXTERNAL SOURCES:
     :path: Flutter
   health:
     :path: ".symlinks/plugins/health/ios"
+  objectbox_sync_flutter_libs:
+    :path: ".symlinks/plugins/objectbox_sync_flutter_libs/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
 
@@ -28,6 +45,9 @@ SPEC CHECKSUMS:
   device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   health: 785a9a388095ea6414755ff081bf46a4a5fb01b2
+  ObjectBox: 82ecd5139c750d0c152f78cbe0440db3bbe5e4a1
+  objectbox_sync_flutter_libs: fa82af74a6ae10113b74a7a541d0951ccdc25fe1
+  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
 
 PODFILE CHECKSUM: 4305caec6b40dde0ae97be1573c53de1882a07e5

@@ -1,5 +1,6 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:idlefit/util.dart';
 import 'package:provider/provider.dart';
 import '../game/game_state.dart';
 import '../widgets/common_widgets.dart';
@@ -33,9 +34,9 @@ class MainScreen extends StatelessWidget {
                   builder: (context, gameState, child) {
                     return ListView.builder(
                       padding: const EdgeInsets.all(16),
-                      itemCount: gameState.generators.length,
+                      itemCount: gameState.coinGenerators.length,
                       itemBuilder: (context, index) {
-                        final generator = gameState.generators[index];
+                        final generator = gameState.coinGenerators[index];
                         return Card(
                           margin: const EdgeInsets.only(bottom: 16),
                           child: Padding(
@@ -52,7 +53,7 @@ class MainScreen extends StatelessWidget {
                                       style:
                                           Theme.of(
                                             context,
-                                          ).textTheme.headlineSmall,
+                                          ).textTheme.titleMedium,
                                     ),
                                     Text('Owned: ${generator.count}'),
                                   ],
@@ -60,7 +61,7 @@ class MainScreen extends StatelessWidget {
                                 const SizedBox(height: 8),
                                 Text(generator.description),
                                 Text(
-                                  'Produces: ${generator.baseOutput} coins/sec',
+                                  'Produces: ${shortNotation(generator.baseOutput)} coins/sec',
                                 ),
                                 const SizedBox(height: 16),
                                 Row(
@@ -68,23 +69,20 @@ class MainScreen extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Cost: ${generator.currentCost} coins',
+                                      'Cost: ${shortNotation(generator.cost)} coins',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color:
-                                            gameState.coins >=
-                                                    generator.currentCost
+                                            gameState.coins >= generator.cost
                                                 ? Colors.green
                                                 : Colors.red,
                                       ),
                                     ),
                                     ElevatedButton(
                                       onPressed:
-                                          gameState.coins >=
-                                                  generator.currentCost
-                                              ? () => gameState.buyGenerator(
-                                                generator,
-                                              )
+                                          gameState.coins >= generator.cost
+                                              ? () => gameState
+                                                  .buyCoinGenerator(generator)
                                               : null,
                                       child: const Text('Buy'),
                                     ),

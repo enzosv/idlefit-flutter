@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:idlefit/game/coin_generator.dart';
+import 'package:objectbox/objectbox.dart';
 import '../services/storage_service.dart';
-import 'generators.dart';
 import 'shop_items.dart';
 import 'dart:math';
 
@@ -33,60 +34,27 @@ class GameState with ChangeNotifier {
   int totalEnergySpent = 0;
 
   // Generators and shop items
-  List<Generator> generators = [];
+  List<CoinGenerator> coinGenerators = [];
   List<ShopItem> shopItems = [];
 
   // For saving/loading
   late StorageService _storageService;
+  late Store _objectBoxService;
   Timer? _autoSaveTimer;
   Timer? _generatorTimer;
 
-  Future<void> initialize(StorageService storageService) async {
+  Future<void> initialize(
+    StorageService storageService,
+    Store objectBoxServivce,
+  ) async {
     _storageService = storageService;
+    _objectBoxService = objectBoxServivce;
 
     // Initialize default generators
-    generators = [
-      Generator(
-        id: 'basic_generator',
-        name: 'Basic Generator',
-        description: 'Generates 0.2 coins per second',
-        baseCost: 10,
-        baseOutput: 0.2,
-        count: 0,
-      ),
-      Generator(
-        id: 'advanced_generator',
-        name: 'Advanced Generator',
-        description: 'Generates 1 coin per second',
-        baseCost: 100,
-        baseOutput: 1,
-        count: 0,
-      ),
-      Generator(
-        id: 'premium_generator',
-        name: 'Premium Generator',
-        description: 'Generates 5 coins per second',
-        baseCost: 1000,
-        baseOutput: 5,
-        count: 0,
-      ),
-      Generator(
-        id: 'premium_generator2',
-        name: 'Premium Generator2',
-        description: 'Generates 20 coins per second',
-        baseCost: 10000,
-        baseOutput: 20,
-        count: 0,
-      ),
-      Generator(
-        id: 'premium_generator3',
-        name: 'Premium Generator3',
-        description: 'Generates 100 coins per second',
-        baseCost: 100000,
-        baseOutput: 100,
-        count: 0,
-      ),
-    ];
+    coinGenerators = await parseCoinGenerators(
+      'assets/coin_generators.json',
+      objectBoxServivce,
+    );
 
     // Initialize shop items
     shopItems = [
@@ -154,18 +122,6 @@ class GameState with ChangeNotifier {
     totalEnergyEarned = savedState['totalEnergyEarned'] ?? 0;
     totalEnergySpent = savedState['totalEnergySpent'] ?? 0;
 
-    // Load generators
-    if (savedState['generators'] != null) {
-      final List<dynamic> genData = savedState['generators'];
-      for (final genJson in genData) {
-        final genId = genJson['id'];
-        final generatorIndex = generators.indexWhere((g) => g.id == genId);
-        if (generatorIndex >= 0) {
-          generators[generatorIndex].count = genJson['count'] ?? 0;
-        }
-      }
-    }
-
     // Load shop items
     if (savedState['shopItems'] != null) {
       final List<dynamic> shopData = savedState['shopItems'];
@@ -198,7 +154,6 @@ class GameState with ChangeNotifier {
       'totalEnergySpent': totalEnergySpent,
       'totalSpaceEarned': totalSpaceEarned,
       'totalSpaceSpent': totalSpaceSpent,
-      'generators': generators.map((g) => g.json).toList(),
       'shopItems': shopItems.map((s) => s.json).toList(),
     };
   }
@@ -256,13 +211,8 @@ class GameState with ChangeNotifier {
       }
     }
     // Process each generator
-    for (final generator in generators) {
-      coinsGenerated +=
-          (dif /
-              tickTime *
-              generator.baseOutput *
-              generator.count *
-              coinMultiplier);
+    for (final generator in coinGenerators) {
+      coinsGenerated += (dif / tickTime * generator.output * coinMultiplier);
     }
 
     // print(coinsGenerated);
@@ -361,12 +311,11 @@ class GameState with ChangeNotifier {
     return false;
   }
 
-  bool buyGenerator(Generator generator) {
-    final cost = generator.currentCost.toDouble();
-    if (spendCoins(cost)) {
+  bool buyCoinGenerator(CoinGenerator generator) {
+    if (spendCoins(generator.cost)) {
       generator.count++;
       notifyListeners();
-      save();
+      _objectBoxService.box<CoinGenerator>().put(generator);
       return true;
     }
     return false;

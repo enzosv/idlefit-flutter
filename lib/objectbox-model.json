@@ -1,0 +1,107 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:8970713413303252018",
+      "lastPropertyId": "5:7739014744985074402",
+      "name": "Currency",
+      "properties": [
+        {
+          "id": "1:1221735629759989076",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:411610756409811407",
+          "name": "count",
+          "type": 8
+        },
+        {
+          "id": "3:2153748619588745951",
+          "name": "totalSpent",
+          "type": 8
+        },
+        {
+          "id": "4:4769501277755131512",
+          "name": "totalEarned",
+          "type": 8
+        },
+        {
+          "id": "5:7739014744985074402",
+          "name": "dbType",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:2493137042954685248",
+      "lastPropertyId": "4:3238954471475910745",
+      "name": "HealthData",
+      "properties": [
+        {
+          "id": "1:2465340859862322629",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2427394359739034951",
+          "name": "today",
+          "type": 8
+        },
+        {
+          "id": "3:3598368693352972001",
+          "name": "total",
+          "type": 8
+        },
+        {
+          "id": "4:3238954471475910745",
+          "name": "dbMetric",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:7897766162698443189",
+      "lastPropertyId": "4:3181080062182307300",
+      "name": "CoinGenerator",
+      "properties": [
+        {
+          "id": "2:8997851123245017231",
+          "name": "count",
+          "type": 6
+        },
+        {
+          "id": "3:5801636019966271860",
+          "name": "level",
+          "type": 6
+        },
+        {
+          "id": "4:3181080062182307300",
+          "name": "tier",
+          "type": 6,
+          "flags": 129
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "3:7897766162698443189",
+  "lastIndexId": "0:0",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [
+    1612088624750524307
+  ],
+  "retiredRelationUids": [],
+  "version": 1
+}
