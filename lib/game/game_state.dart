@@ -147,6 +147,10 @@ class GameState with ChangeNotifier {
     _storageService.saveGameState(toJson());
     final currencyBox = _objectBoxService.box<Currency>();
     currencyBox.put(coins);
+    currencyBox.put(energy);
+    currencyBox.put(gems);
+    currencyBox.put(space);
+    // not saving generators. only changes on buy anyway
   }
 
   void _startAutoSave() {
@@ -244,10 +248,9 @@ class GameState with ChangeNotifier {
       return false;
     }
     generator.count++;
-    notifyListeners();
-    final currencyBox = _objectBoxService.box<Currency>();
-    currencyBox.put(coins);
     _objectBoxService.box<CoinGenerator>().put(generator);
+    save();
+    notifyListeners();
     return true;
   }
 
@@ -259,8 +262,8 @@ class GameState with ChangeNotifier {
     }
 
     item.level++;
-    notifyListeners();
     save();
+    notifyListeners();
     return true;
   }
 

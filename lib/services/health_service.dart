@@ -109,7 +109,7 @@ class HealthService {
 
   Future<void> collectHealth(GameState gameState) async {
     final now = DateTime.now();
-    await collectHealthToday(gameState, now);
+    final promise = collectHealthToday(gameState, now);
 
     DateTime start;
     if (gameState.lastHealthSync > 0) {
@@ -129,6 +129,7 @@ class HealthService {
     ) = await fetchLatestData(start, now);
     print("fetched from $start to $now");
 
+    await promise;
     // Update game state with new health data
     if (newCaloriesBurned == 0 && newSteps == 0 && newExerciseMinutes == 0) {
       return;

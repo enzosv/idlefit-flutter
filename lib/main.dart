@@ -75,6 +75,7 @@ class _GameHomePageState extends State<GameHomePage>
       final healthService = Provider.of<HealthService>(context, listen: false);
       await healthService.collectHealth(gameState);
     } else {
+      // going to background
       gameState.save();
     }
     setState(() {
@@ -92,6 +93,7 @@ class _GameHomePageState extends State<GameHomePage>
     healthService.initialize().then((_) async {
       // healthService.startBackgroundCollection(gameState);
       await healthService.collectHealth(gameState);
+      // should this be in setstate
       gameState.isPaused = false;
     });
     WidgetsBinding.instance.addObserver(this);
