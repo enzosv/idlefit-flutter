@@ -43,7 +43,7 @@ class CurrencyBar extends StatelessWidget {
                 context,
                 icon: Icons.bolt,
                 label: 'Energy',
-                value: (gameState.energy / 60000).floor().toString(),
+                value: (gameState.energy.count / 60000).floor().toString(),
                 color: Colors.greenAccent,
               ),
             ],

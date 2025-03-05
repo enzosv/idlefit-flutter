@@ -13,11 +13,10 @@ class GameState with ChangeNotifier {
 
   final Currency coins = Currency(id: CurrencyType.coin.index, count: 10);
   final Currency gem = Currency(id: CurrencyType.gem.index);
-  final Currency energ = Currency(id: CurrencyType.energy.index);
+  final Currency energy = Currency(id: CurrencyType.energy.index);
   final Currency spaces = Currency(id: CurrencyType.space.index);
   // Currency
   int gems = 0;
-  int energy = 0;
   int space = 0;
   int lastGenerated = 0;
   int lastHealthSync = 0;
@@ -32,8 +31,6 @@ class GameState with ChangeNotifier {
   int totalGemsSpent = 0;
   int totalSpaceEarned = 0;
   int totalSpaceSpent = 0;
-  int totalEnergyEarned = 0;
-  int totalEnergySpent = 0;
 
   // Generators and shop items
   List<CoinGenerator> coinGenerators = [];
@@ -65,7 +62,7 @@ class GameState with ChangeNotifier {
           coins.mirror(currency);
           continue;
         case CurrencyType.energy:
-          energ.mirror(currency);
+          energy.mirror(currency);
           continue;
         case CurrencyType.gem:
           gem.mirror(currency);
@@ -125,7 +122,6 @@ class GameState with ChangeNotifier {
   void _loadFromSavedState(Map<String, dynamic> savedState) {
     // coins = savedState['coins'] ?? 0;
     gems = savedState['gems'] ?? 0;
-    energy = savedState['energy'] ?? 0;
     space = savedState['space'] ?? 0;
     lastGenerated = savedState['lastGenerated'] ?? 0;
     lastHealthSync = savedState['lastHealthSync'] ?? 0;
@@ -140,8 +136,6 @@ class GameState with ChangeNotifier {
     totalGemsSpent = savedState['totalGemsSpent'] ?? 0;
     totalSpaceEarned = savedState['totalSpaceEarned'] ?? 0;
     totalSpaceSpent = savedState['totalSpaceSpent'] ?? 0;
-    totalEnergyEarned = savedState['totalEnergyEarned'] ?? 0;
-    totalEnergySpent = savedState['totalEnergySpent'] ?? 0;
 
     // Load shop items
     if (savedState['shopItems'] != null) {
@@ -160,7 +154,6 @@ class GameState with ChangeNotifier {
     return {
       'coins': coins,
       'gems': gems,
-      'energy': energy,
       'space': space,
       'lastGenerated': lastGenerated,
       'lastHealthSync': lastHealthSync,
@@ -169,8 +162,6 @@ class GameState with ChangeNotifier {
       'totalExerciseMinutes': totalExerciseMinutes,
       'totalGemsEarned': totalGemsEarned,
       'totalGemsSpent': totalGemsSpent,
-      'totalEnergyEarned': totalEnergyEarned,
-      'totalEnergySpent': totalEnergySpent,
       'totalSpaceEarned': totalSpaceEarned,
       'totalSpaceSpent': totalSpaceSpent,
       'shopItems': shopItems.map((s) => s.json).toList(),
@@ -197,7 +188,7 @@ class GameState with ChangeNotifier {
   }
 
   int validTimeSinceLastGenerate(int now, int previous) {
-    if (energy <= 0 || previous <= 0) {
+    if (energy.count <= 0 || previous <= 0) {
       return tickTime;
     }
 
@@ -208,9 +199,9 @@ class GameState with ChangeNotifier {
       // do not consume energy
       return dif;
     }
-    dif = min(dif, energy);
+    dif = min(dif, energy.count.round());
     // smelly to perform modification in get
-    spendEnergy(dif);
+    energy.spend(dif.toDouble());
     print("spent energy $dif");
     return dif;
   }
@@ -261,8 +252,8 @@ class GameState with ChangeNotifier {
       }
     }
 
-    addEnergy(
-      (calories * healthMultiplier * 72000).round(),
+    energy.earn(
+      calories * healthMultiplier * 72000,
     ); // 1 calorie = 72 seconds of idle fuel
     addGems(
       (exerciseMinutes * healthMultiplier / 2).round(),
@@ -306,28 +297,6 @@ class GameState with ChangeNotifier {
     if (gems >= amount) {
       gems -= amount;
       totalGemsSpent += amount;
-      notifyListeners();
-      return true;
-    }
-    return false;
-  }
-
-  void addEnergy(int amount) {
-    // Calculate energy capacity
-    int maxEnergy = 43200000;
-    for (final item in shopItems) {
-      if (item.effect == ShopItemEffect.energyCapacity) {
-        maxEnergy += (item.effectValue * item.level).floor();
-      }
-    }
-
-    energy = (energy + amount).clamp(0, maxEnergy);
-    notifyListeners();
-  }
-
-  bool spendEnergy(int amount) {
-    if (energy >= amount) {
-      energy -= amount;
       notifyListeners();
       return true;
     }
