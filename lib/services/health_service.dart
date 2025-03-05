@@ -1,6 +1,4 @@
-// lib/services/health_service.dart
 import 'dart:async';
-import 'package:flame/game.dart';
 import 'package:health/health.dart';
 import 'package:flutter/material.dart';
 import '../game/game_state.dart';
@@ -21,7 +19,6 @@ class HealthService {
   int exerciseMinutes = 0;
 
   bool _isAuthorized = false;
-  Timer? _refreshTimer;
 
   Future<void> initialize() async {
     try {
@@ -97,28 +94,13 @@ class HealthService {
     return (0, 0.0, 0);
   }
 
-  /// for initializing data on health activity widget
-  Future<void> collectHealthToday(GameState gameState, DateTime date) async {
-    if (steps > 0 || caloriesBurned > 0 || exerciseMinutes > 0) {
-      // already collected
-      return;
-    }
-    if (gameState.lastHealthSync == 0) {
-      // no data at all. run main collector
-      return;
-    }
-    // on launch, previous is zero
-    // get from start of day to last sync
-    final today = DateTime(date.year, date.month, date.day);
-    final previous = DateTime.fromMillisecondsSinceEpoch(
-      gameState.lastHealthSync,
-    );
-    print("init health fetch $today - $previous");
+  Future<void> collectHealthToday(GameState gameState, DateTime now) async {
+    final todayStart = DateTime(now.year, now.month, now.day);
     final (
       newSteps,
       newCaloriesBurned,
       newExerciseMinutes,
-    ) = await fetchLatestData(today, previous);
+    ) = await fetchLatestData(todayStart, now);
     steps = newSteps;
     caloriesBurned = newCaloriesBurned;
     exerciseMinutes = newExerciseMinutes;
@@ -159,20 +141,6 @@ class HealthService {
       newCaloriesBurned,
       newExerciseMinutes,
     );
-    steps += newSteps;
-    caloriesBurned += newCaloriesBurned;
-    exerciseMinutes += newExerciseMinutes;
     gameState.lastHealthSync = now.millisecondsSinceEpoch;
-  }
-
-  // void startBackgroundCollection(GameState gameState) {
-  //   // Check and update health data every minute
-  //   _refreshTimer = Timer.periodic(const Duration(minutes: 15), (timer) async {
-  //     collectHealth(gameState);
-  //   });
-  // }
-
-  void dispose() {
-    _refreshTimer?.cancel();
   }
 }
