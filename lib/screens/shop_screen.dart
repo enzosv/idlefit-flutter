@@ -63,7 +63,8 @@ class ShopScreen extends StatelessWidget {
                                     color:
                                         isMaxLevel
                                             ? Colors.grey
-                                            : gameState.gems >= item.currentCost
+                                            : gameState.gems.count >=
+                                                item.currentCost
                                             ? Colors.green
                                             : Colors.red,
                                   ),
@@ -71,7 +72,8 @@ class ShopScreen extends StatelessWidget {
                                 ElevatedButton(
                                   onPressed:
                                       (isMaxLevel ||
-                                              gameState.gems < item.currentCost)
+                                              gameState.gems.count <
+                                                  item.currentCost)
                                           ? null
                                           : () =>
                                               gameState.upgradeShopItem(item),

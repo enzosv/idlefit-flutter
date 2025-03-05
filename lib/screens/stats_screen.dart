@@ -95,11 +95,11 @@ class StatsScreen extends StatelessWidget {
                         ),
                         ListTile(
                           title: const Text('Total Gems Earned'),
-                          trailing: Text('${gameState.totalGemsEarned}'),
+                          trailing: Text('${gameState.gems.totalEarned}'),
                         ),
                         ListTile(
                           title: const Text('Total Gems Spent'),
-                          trailing: Text('${gameState.totalGemsSpent}'),
+                          trailing: Text('${gameState.gems.totalSpent}'),
                         ),
                       ],
                     ),

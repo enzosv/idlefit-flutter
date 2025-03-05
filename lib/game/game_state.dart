@@ -12,11 +12,10 @@ class GameState with ChangeNotifier {
   bool isPaused = true;
 
   final Currency coins = Currency(id: CurrencyType.coin.index, count: 10);
-  final Currency gem = Currency(id: CurrencyType.gem.index);
+  final Currency gems = Currency(id: CurrencyType.gem.index);
   final Currency energy = Currency(id: CurrencyType.energy.index);
   final Currency spaces = Currency(id: CurrencyType.space.index);
   // Currency
-  int gems = 0;
   int space = 0;
   int lastGenerated = 0;
   int lastHealthSync = 0;
@@ -27,8 +26,6 @@ class GameState with ChangeNotifier {
   int totalExerciseMinutes = 0;
 
   // Game statistics
-  int totalGemsEarned = 0;
-  int totalGemsSpent = 0;
   int totalSpaceEarned = 0;
   int totalSpaceSpent = 0;
 
@@ -65,7 +62,7 @@ class GameState with ChangeNotifier {
           energy.mirror(currency);
           continue;
         case CurrencyType.gem:
-          gem.mirror(currency);
+          gems.mirror(currency);
           continue;
         case CurrencyType.space:
           spaces.mirror(currency);
@@ -120,8 +117,6 @@ class GameState with ChangeNotifier {
   }
 
   void _loadFromSavedState(Map<String, dynamic> savedState) {
-    // coins = savedState['coins'] ?? 0;
-    gems = savedState['gems'] ?? 0;
     space = savedState['space'] ?? 0;
     lastGenerated = savedState['lastGenerated'] ?? 0;
     lastHealthSync = savedState['lastHealthSync'] ?? 0;
@@ -130,10 +125,6 @@ class GameState with ChangeNotifier {
     totalCaloriesBurned = savedState['totalCaloriesBurned'] ?? 0.0;
     totalExerciseMinutes = savedState['totalExerciseMinutes'] ?? 0;
 
-    // totalCoinsEarned = savedState['totalCoinsEarned'] ?? 0;
-    // totalCoinsSpent = savedState['totalCoinsSpent'] ?? 0;
-    totalGemsEarned = savedState['totalGemsEarned'] ?? 0;
-    totalGemsSpent = savedState['totalGemsSpent'] ?? 0;
     totalSpaceEarned = savedState['totalSpaceEarned'] ?? 0;
     totalSpaceSpent = savedState['totalSpaceSpent'] ?? 0;
 
@@ -153,15 +144,12 @@ class GameState with ChangeNotifier {
   Map<String, dynamic> toJson() {
     return {
       'coins': coins,
-      'gems': gems,
       'space': space,
       'lastGenerated': lastGenerated,
       'lastHealthSync': lastHealthSync,
       'totalSteps': totalSteps,
       'totalCaloriesBurned': totalCaloriesBurned,
       'totalExerciseMinutes': totalExerciseMinutes,
-      'totalGemsEarned': totalGemsEarned,
-      'totalGemsSpent': totalGemsSpent,
       'totalSpaceEarned': totalSpaceEarned,
       'totalSpaceSpent': totalSpaceSpent,
       'shopItems': shopItems.map((s) => s.json).toList(),
@@ -255,8 +243,8 @@ class GameState with ChangeNotifier {
     energy.earn(
       calories * healthMultiplier * 72000,
     ); // 1 calorie = 72 seconds of idle fuel
-    addGems(
-      (exerciseMinutes * healthMultiplier / 2).round(),
+    gems.earn(
+      exerciseMinutes * healthMultiplier / 2,
     ); // 2 exercise minutes = 1 gem
     addSpace((steps * healthMultiplier).round());
 
@@ -265,42 +253,10 @@ class GameState with ChangeNotifier {
     notifyListeners();
   }
 
-  // void addCoins(double amount) {
-  //   coins += amount;
-  //   totalCoinsEarned += amount;
-  //   notifyListeners();
-  // }
-
-  // bool spendCoins(double amount) {
-  //   if (coins >= amount) {
-  //     coins -= amount;
-  //     totalCoinsSpent += amount;
-  //     notifyListeners();
-  //     return true;
-  //   }
-  //   return false;
-  // }
-
-  void addGems(int amount) {
-    gems += amount;
-    totalGemsEarned += amount;
-    notifyListeners();
-  }
-
   void addSpace(int amount) {
     space += amount;
     totalSpaceEarned += amount;
     notifyListeners();
-  }
-
-  bool spendGems(int amount) {
-    if (gems >= amount) {
-      gems -= amount;
-      totalGemsSpent += amount;
-      notifyListeners();
-      return true;
-    }
-    return false;
   }
 
   bool buyCoinGenerator(CoinGenerator generator) {
@@ -318,14 +274,14 @@ class GameState with ChangeNotifier {
   bool upgradeShopItem(ShopItem item) {
     if (item.level >= item.maxLevel) return false;
 
-    final cost = item.currentCost;
-    if (spendGems(cost)) {
-      item.level++;
-      notifyListeners();
-      save();
-      return true;
+    if (!gems.spend(item.currentCost.toDouble())) {
+      return false;
     }
-    return false;
+
+    item.level++;
+    notifyListeners();
+    save();
+    return true;
   }
 
   @override
