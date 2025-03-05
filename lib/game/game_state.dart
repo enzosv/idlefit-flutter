@@ -14,9 +14,8 @@ class GameState with ChangeNotifier {
   final Currency coins = Currency(id: CurrencyType.coin.index, count: 10);
   final Currency gems = Currency(id: CurrencyType.gem.index);
   final Currency energy = Currency(id: CurrencyType.energy.index);
-  final Currency spaces = Currency(id: CurrencyType.space.index);
-  // Currency
-  int space = 0;
+  final Currency space = Currency(id: CurrencyType.space.index);
+
   int lastGenerated = 0;
   int lastHealthSync = 0;
 
@@ -24,10 +23,6 @@ class GameState with ChangeNotifier {
   int totalSteps = 0;
   double totalCaloriesBurned = 0;
   int totalExerciseMinutes = 0;
-
-  // Game statistics
-  int totalSpaceEarned = 0;
-  int totalSpaceSpent = 0;
 
   // Generators and shop items
   List<CoinGenerator> coinGenerators = [];
@@ -65,7 +60,7 @@ class GameState with ChangeNotifier {
           gems.mirror(currency);
           continue;
         case CurrencyType.space:
-          spaces.mirror(currency);
+          space.mirror(currency);
           continue;
         default:
           continue;
@@ -117,16 +112,12 @@ class GameState with ChangeNotifier {
   }
 
   void _loadFromSavedState(Map<String, dynamic> savedState) {
-    space = savedState['space'] ?? 0;
     lastGenerated = savedState['lastGenerated'] ?? 0;
     lastHealthSync = savedState['lastHealthSync'] ?? 0;
 
     totalSteps = savedState['totalSteps'] ?? 0;
     totalCaloriesBurned = savedState['totalCaloriesBurned'] ?? 0.0;
     totalExerciseMinutes = savedState['totalExerciseMinutes'] ?? 0;
-
-    totalSpaceEarned = savedState['totalSpaceEarned'] ?? 0;
-    totalSpaceSpent = savedState['totalSpaceSpent'] ?? 0;
 
     // Load shop items
     if (savedState['shopItems'] != null) {
@@ -150,8 +141,6 @@ class GameState with ChangeNotifier {
       'totalSteps': totalSteps,
       'totalCaloriesBurned': totalCaloriesBurned,
       'totalExerciseMinutes': totalExerciseMinutes,
-      'totalSpaceEarned': totalSpaceEarned,
-      'totalSpaceSpent': totalSpaceSpent,
       'shopItems': shopItems.map((s) => s.json).toList(),
     };
   }
@@ -246,16 +235,7 @@ class GameState with ChangeNotifier {
     gems.earn(
       exerciseMinutes * healthMultiplier / 2,
     ); // 2 exercise minutes = 1 gem
-    addSpace((steps * healthMultiplier).round());
-
-    // Add energy based on activity
-
-    notifyListeners();
-  }
-
-  void addSpace(int amount) {
-    space += amount;
-    totalSpaceEarned += amount;
+    space.earn(steps * healthMultiplier);
     notifyListeners();
   }
 
