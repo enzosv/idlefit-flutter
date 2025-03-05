@@ -235,6 +235,7 @@ class GameState with ChangeNotifier {
       exerciseMinutes * healthMultiplier / 2,
     ); // 2 exercise minutes = 1 gem
     space.earn(steps * healthMultiplier);
+    save();
     notifyListeners();
   }
 
