@@ -73,14 +73,16 @@ class MainScreen extends StatelessWidget {
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color:
-                                            gameState.coins >= generator.cost
+                                            gameState.coins.count >=
+                                                    generator.cost
                                                 ? Colors.green
                                                 : Colors.red,
                                       ),
                                     ),
                                     ElevatedButton(
                                       onPressed:
-                                          gameState.coins >= generator.cost
+                                          gameState.coins.count >=
+                                                  generator.cost
                                               ? () => gameState
                                                   .buyCoinGenerator(generator)
                                               : null,

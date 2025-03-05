@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:idlefit/game/coin_generator.dart';
+import 'package:idlefit/game/currency.dart';
 import 'package:objectbox/objectbox.dart';
 import '../services/storage_service.dart';
 import 'shop_items.dart';
@@ -10,8 +11,11 @@ class GameState with ChangeNotifier {
   final tickTime = 1000; // miliseconds
   bool isPaused = true;
 
+  final Currency coins = Currency(id: CurrencyType.coin.index, count: 10);
+  final Currency gem = Currency(id: CurrencyType.gem.index);
+  final Currency energ = Currency(id: CurrencyType.energy.index);
+  final Currency spaces = Currency(id: CurrencyType.space.index);
   // Currency
-  double coins = 10;
   int gems = 0;
   int energy = 0;
   int space = 0;
@@ -24,8 +28,6 @@ class GameState with ChangeNotifier {
   int totalExerciseMinutes = 0;
 
   // Game statistics
-  double totalCoinsEarned = 0;
-  double totalCoinsSpent = 0;
   int totalGemsEarned = 0;
   int totalGemsSpent = 0;
   int totalSpaceEarned = 0;
@@ -55,7 +57,26 @@ class GameState with ChangeNotifier {
       'assets/coin_generators.json',
       objectBoxServivce,
     );
-
+    final currencyBox = objectBoxServivce.box<Currency>();
+    final currencies = currencyBox.getAll().toList();
+    for (final currency in currencies) {
+      switch (currency.type) {
+        case CurrencyType.coin:
+          coins.mirror(currency);
+          continue;
+        case CurrencyType.energy:
+          energ.mirror(currency);
+          continue;
+        case CurrencyType.gem:
+          gem.mirror(currency);
+          continue;
+        case CurrencyType.space:
+          spaces.mirror(currency);
+          continue;
+        default:
+          continue;
+      }
+    }
     // Initialize shop items
     shopItems = [
       ShopItem(
@@ -102,7 +123,7 @@ class GameState with ChangeNotifier {
   }
 
   void _loadFromSavedState(Map<String, dynamic> savedState) {
-    coins = savedState['coins'] ?? 0;
+    // coins = savedState['coins'] ?? 0;
     gems = savedState['gems'] ?? 0;
     energy = savedState['energy'] ?? 0;
     space = savedState['space'] ?? 0;
@@ -113,8 +134,8 @@ class GameState with ChangeNotifier {
     totalCaloriesBurned = savedState['totalCaloriesBurned'] ?? 0.0;
     totalExerciseMinutes = savedState['totalExerciseMinutes'] ?? 0;
 
-    totalCoinsEarned = savedState['totalCoinsEarned'] ?? 0;
-    totalCoinsSpent = savedState['totalCoinsSpent'] ?? 0;
+    // totalCoinsEarned = savedState['totalCoinsEarned'] ?? 0;
+    // totalCoinsSpent = savedState['totalCoinsSpent'] ?? 0;
     totalGemsEarned = savedState['totalGemsEarned'] ?? 0;
     totalGemsSpent = savedState['totalGemsSpent'] ?? 0;
     totalSpaceEarned = savedState['totalSpaceEarned'] ?? 0;
@@ -146,8 +167,6 @@ class GameState with ChangeNotifier {
       'totalSteps': totalSteps,
       'totalCaloriesBurned': totalCaloriesBurned,
       'totalExerciseMinutes': totalExerciseMinutes,
-      'totalCoinsEarned': totalCoinsEarned,
-      'totalCoinsSpent': totalCoinsSpent,
       'totalGemsEarned': totalGemsEarned,
       'totalGemsSpent': totalGemsSpent,
       'totalEnergyEarned': totalEnergyEarned,
@@ -160,6 +179,8 @@ class GameState with ChangeNotifier {
 
   void save() {
     _storageService.saveGameState(toJson());
+    final currencyBox = _objectBoxService.box<Currency>();
+    currencyBox.put(coins);
   }
 
   void _startAutoSave() {
@@ -218,7 +239,9 @@ class GameState with ChangeNotifier {
     // print(coinsGenerated);
 
     if (coinsGenerated > 0) {
-      addCoins(coinsGenerated);
+      // addCoins(coinsGenerated);
+      coins.earn(coinsGenerated);
+      notifyListeners();
     }
 
     lastGenerated = now;
@@ -251,21 +274,21 @@ class GameState with ChangeNotifier {
     notifyListeners();
   }
 
-  void addCoins(double amount) {
-    coins += amount;
-    totalCoinsEarned += amount;
-    notifyListeners();
-  }
+  // void addCoins(double amount) {
+  //   coins += amount;
+  //   totalCoinsEarned += amount;
+  //   notifyListeners();
+  // }
 
-  bool spendCoins(double amount) {
-    if (coins >= amount) {
-      coins -= amount;
-      totalCoinsSpent += amount;
-      notifyListeners();
-      return true;
-    }
-    return false;
-  }
+  // bool spendCoins(double amount) {
+  //   if (coins >= amount) {
+  //     coins -= amount;
+  //     totalCoinsSpent += amount;
+  //     notifyListeners();
+  //     return true;
+  //   }
+  //   return false;
+  // }
 
   void addGems(int amount) {
     gems += amount;
@@ -312,13 +335,15 @@ class GameState with ChangeNotifier {
   }
 
   bool buyCoinGenerator(CoinGenerator generator) {
-    if (spendCoins(generator.cost)) {
-      generator.count++;
-      notifyListeners();
-      _objectBoxService.box<CoinGenerator>().put(generator);
-      return true;
+    if (!coins.spend(generator.cost)) {
+      return false;
     }
-    return false;
+    generator.count++;
+    notifyListeners();
+    final currencyBox = _objectBoxService.box<Currency>();
+    currencyBox.put(coins);
+    _objectBoxService.box<CoinGenerator>().put(generator);
+    return true;
   }
 
   bool upgradeShopItem(ShopItem item) {

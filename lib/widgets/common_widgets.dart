@@ -29,7 +29,7 @@ class CurrencyBar extends StatelessWidget {
                 context,
                 icon: Icons.monetization_on,
                 label: 'Coins',
-                value: shortNotation(gameState.coins),
+                value: shortNotation(gameState.coins.count),
                 color: Colors.amber,
               ),
               _buildCurrencyItem(

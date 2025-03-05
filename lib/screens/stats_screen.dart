@@ -84,13 +84,13 @@ class StatsScreen extends StatelessWidget {
                         ListTile(
                           title: const Text('Total Coins Earned'),
                           trailing: Text(
-                            '${shortNotation(gameState.totalCoinsEarned)}',
+                            shortNotation(gameState.coins.totalEarned),
                           ),
                         ),
                         ListTile(
                           title: const Text('Total Coins Spent'),
                           trailing: Text(
-                            '${gameState.totalCoinsSpent.floor()}',
+                            '${gameState.coins.totalSpent.floor()}',
                           ),
                         ),
                         ListTile(

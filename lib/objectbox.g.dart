@@ -23,14 +23,9 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(1, 8970713413303252018),
       name: 'Currency',
-      lastPropertyId: const obx_int.IdUid(5, 7739014744985074402),
+      lastPropertyId: const obx_int.IdUid(6, 4916751470591575964),
       flags: 0,
       properties: <obx_int.ModelProperty>[
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 1221735629759989076),
-            name: 'id',
-            type: 6,
-            flags: 1),
         obx_int.ModelProperty(
             id: const obx_int.IdUid(2, 411610756409811407),
             name: 'count',
@@ -47,10 +42,10 @@ final _entities = <obx_int.ModelEntity>[
             type: 8,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(5, 7739014744985074402),
-            name: 'dbType',
+            id: const obx_int.IdUid(6, 4916751470591575964),
+            name: 'id',
             type: 6,
-            flags: 0)
+            flags: 129)
       ],
       relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[]),
@@ -150,7 +145,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
       lastSequenceId: const obx_int.IdUid(0, 0),
       retiredEntityUids: const [],
       retiredIndexUids: const [],
-      retiredPropertyUids: const [1612088624750524307],
+      retiredPropertyUids: const [
+        1612088624750524307,
+        1221735629759989076,
+        7739014744985074402
+      ],
       retiredRelationUids: const [],
       modelVersion: 5,
       modelVersionParserMinimum: 5,
@@ -166,29 +165,26 @@ obx_int.ModelDefinition getObjectBoxModel() {
           object.id = id;
         },
         objectToFB: (Currency object, fb.Builder fbb) {
-          fbb.startTable(6);
-          fbb.addInt64(0, object.id);
+          fbb.startTable(7);
           fbb.addFloat64(1, object.count);
           fbb.addFloat64(2, object.totalSpent);
           fbb.addFloat64(3, object.totalEarned);
-          fbb.addInt64(4, object.dbType);
+          fbb.addInt64(5, object.id);
           fbb.finish(fbb.endTable());
           return object.id;
         },
         objectFromFB: (obx.Store store, ByteData fbData) {
           final buffer = fb.BufferContext(fbData);
           final rootOffset = buffer.derefObject(0);
-
-          final object = Currency()
-            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
-            ..count =
-                const fb.Float64Reader().vTableGet(buffer, rootOffset, 6, 0)
+          final idParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0);
+          final countParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 6, 0);
+          final object = Currency(id: idParam, count: countParam)
             ..totalSpent =
                 const fb.Float64Reader().vTableGet(buffer, rootOffset, 8, 0)
             ..totalEarned =
-                const fb.Float64Reader().vTableGet(buffer, rootOffset, 10, 0)
-            ..dbType =
-                const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0);
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 10, 0);
 
           return object;
         }),
@@ -259,25 +255,21 @@ obx_int.ModelDefinition getObjectBoxModel() {
 
 /// [Currency] entity fields to define ObjectBox queries.
 class Currency_ {
-  /// See [Currency.id].
-  static final id =
-      obx.QueryIntegerProperty<Currency>(_entities[0].properties[0]);
-
   /// See [Currency.count].
   static final count =
-      obx.QueryDoubleProperty<Currency>(_entities[0].properties[1]);
+      obx.QueryDoubleProperty<Currency>(_entities[0].properties[0]);
 
   /// See [Currency.totalSpent].
   static final totalSpent =
-      obx.QueryDoubleProperty<Currency>(_entities[0].properties[2]);
+      obx.QueryDoubleProperty<Currency>(_entities[0].properties[1]);
 
   /// See [Currency.totalEarned].
   static final totalEarned =
-      obx.QueryDoubleProperty<Currency>(_entities[0].properties[3]);
+      obx.QueryDoubleProperty<Currency>(_entities[0].properties[2]);
 
-  /// See [Currency.dbType].
-  static final dbType =
-      obx.QueryIntegerProperty<Currency>(_entities[0].properties[4]);
+  /// See [Currency.id].
+  static final id =
+      obx.QueryIntegerProperty<Currency>(_entities[0].properties[3]);
 }
 
 /// [HealthData] entity fields to define ObjectBox queries.

@@ -5,15 +5,9 @@
   "entities": [
     {
       "id": "1:8970713413303252018",
-      "lastPropertyId": "5:7739014744985074402",
+      "lastPropertyId": "6:4916751470591575964",
       "name": "Currency",
       "properties": [
-        {
-          "id": "1:1221735629759989076",
-          "name": "id",
-          "type": 6,
-          "flags": 1
-        },
         {
           "id": "2:411610756409811407",
           "name": "count",
@@ -30,9 +24,10 @@
           "type": 8
         },
         {
-          "id": "5:7739014744985074402",
-          "name": "dbType",
-          "type": 6
+          "id": "6:4916751470591575964",
+          "name": "id",
+          "type": 6,
+          "flags": 129
         }
       ],
       "relations": []
@@ -100,7 +95,9 @@
   "retiredEntityUids": [],
   "retiredIndexUids": [],
   "retiredPropertyUids": [
-    1612088624750524307
+    1612088624750524307,
+    1221735629759989076,
+    7739014744985074402
   ],
   "retiredRelationUids": [],
   "version": 1
