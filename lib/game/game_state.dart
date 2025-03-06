@@ -11,6 +11,7 @@ class GameState with ChangeNotifier {
   final tickTime = 1000; // miliseconds
   bool isPaused = true;
 
+  final inactiveThreshold = 30000; // 30 seconds in milliseocnds
   final Currency coins = Currency(id: CurrencyType.coin.index, count: 10);
   final Currency gems = Currency(id: CurrencyType.gem.index);
   final Currency energy = Currency(id: CurrencyType.energy.index);
@@ -174,7 +175,7 @@ class GameState with ChangeNotifier {
     int dif = now - tickTime;
     dif = now - previous;
     // if last generated > 30s, consume energy
-    if (dif < 30000) {
+    if (dif < inactiveThreshold) {
       // do not consume energy
       return dif;
     }
@@ -191,7 +192,8 @@ class GameState with ChangeNotifier {
       return;
     }
     final now = DateTime.now().millisecondsSinceEpoch;
-    final dif = validTimeSinceLastGenerate(now, lastGenerated);
+    final realDif = lastGenerated - now;
+    final availableDif = validTimeSinceLastGenerate(now, lastGenerated);
 
     double coinsGenerated = 0;
 
@@ -202,16 +204,20 @@ class GameState with ChangeNotifier {
         coinMultiplier += item.effectValue * item.level;
       }
     }
+    if (realDif > inactiveThreshold) {
+      // reduce speed of coin generation in background
+      coinMultiplier /= 2;
+    }
     // Process each generator
     for (final generator in coinGenerators) {
-      coinsGenerated += (dif / tickTime * generator.output * coinMultiplier);
+      coinsGenerated += (availableDif / tickTime * generator.output);
     }
 
     // print(coinsGenerated);
 
     if (coinsGenerated > 0) {
       // addCoins(coinsGenerated);
-      coins.earn(coinsGenerated);
+      coins.earn(coinsGenerated * coinMultiplier);
       notifyListeners();
     }
 
