@@ -61,7 +61,7 @@ class MainScreen extends StatelessWidget {
                                 const SizedBox(height: 8),
                                 Text(generator.description),
                                 Text(
-                                  'Produces: ${shortNotation(generator.baseOutput)} coins/sec',
+                                  'Produces: ${toLettersNotation(generator.baseOutput)} coins/sec',
                                 ),
                                 const SizedBox(height: 16),
                                 Row(
@@ -69,7 +69,7 @@ class MainScreen extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Cost: ${shortNotation(generator.cost)} coins',
+                                      'Cost: ${toLettersNotation(generator.cost)} coins',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color:

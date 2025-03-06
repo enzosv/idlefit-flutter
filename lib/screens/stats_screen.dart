@@ -84,22 +84,26 @@ class StatsScreen extends StatelessWidget {
                         ListTile(
                           title: const Text('Total Coins Earned'),
                           trailing: Text(
-                            shortNotation(gameState.coins.totalEarned),
+                            toLettersNotation(gameState.coins.totalEarned),
                           ),
                         ),
                         ListTile(
                           title: const Text('Total Coins Spent'),
                           trailing: Text(
-                            '${gameState.coins.totalSpent.floor()}',
+                            toLettersNotation(gameState.coins.totalSpent),
                           ),
                         ),
                         ListTile(
                           title: const Text('Total Gems Earned'),
-                          trailing: Text('${gameState.gems.totalEarned}'),
+                          trailing: Text(
+                            toLettersNotation(gameState.gems.totalEarned),
+                          ),
                         ),
                         ListTile(
                           title: const Text('Total Gems Spent'),
-                          trailing: Text('${gameState.gems.totalSpent}'),
+                          trailing: Text(
+                            toLettersNotation(gameState.gems.totalSpent),
+                          ),
                         ),
                       ],
                     ),
@@ -123,7 +127,9 @@ class StatsScreen extends StatelessWidget {
                         ...gameState.coinGenerators.map(
                           (generator) => ListTile(
                             title: Text(generator.name),
-                            subtitle: Text('${generator.output} coins/sec'),
+                            subtitle: Text(
+                              '${toLettersNotation(generator.output)} coins/sec',
+                            ),
                             trailing: Text('Owned: ${generator.count}'),
                           ),
                         ),
