@@ -1,7 +1,12 @@
 import 'dart:async';
 import 'package:health/health.dart';
 import 'package:flutter/material.dart';
+import 'package:idlefit/game/health_data_entry.dart';
+import 'package:idlefit/objectbox.g.dart';
+import 'package:idlefit/services/object_box.dart';
 import '../game/game_state.dart';
+import 'dart:math';
+import 'package:objectbox/objectbox.dart';
 
 class HealthService {
   final Health health = Health();
@@ -64,8 +69,9 @@ class HealthService {
 
       final start = entry.dateFrom.millisecondsSinceEpoch;
       final end = entry.dateTo.millisecondsSinceEpoch;
-      final duration = end - start;
-      final bpm = estimateBPM(value, end - start);
+      int duration = end - start;
+      final bpm = estimateBPM(value, duration);
+      duration = max(1, duration);
       if (bpm > 120) {
         grouped[entry.sourceName] = (grouped[entry.sourceName] ?? 0) + duration;
       }
@@ -100,8 +106,8 @@ class HealthService {
     return bestSource != null ? grouped[bestSource]! : 0;
   }
 
-  Future<(int, double, int)> queryHealthData(DateTime start, end) async {
-    if (!_isAuthorized) return (0, 0.0, 0);
+  Future<(int, double, int, int)> queryHealthData(DateTime start, end) async {
+    if (!_isAuthorized) return (0, 0.0, 0, 0);
 
     try {
       final healthData = await health.getHealthDataFromTypes(
@@ -109,6 +115,12 @@ class HealthService {
         startTime: start,
         endTime: end,
       );
+
+      healthData.sort((a, b) => a.dateTo.compareTo(b.dateTo));
+
+      final latest = healthData.lastOrNull?.dateTo.millisecondsSinceEpoch ?? 0;
+
+      // print('latest health data: ${healthData.last.dateTo}');
 
       final steps = parseHealthData(healthData, HealthDataType.STEPS);
       final caloriesBurned = parseHealthData(
@@ -122,11 +134,11 @@ class HealthService {
       // TODO: if exercise minutes < 1,
       // final exerciseMinutes2 = estimateExerciseTime(healthData);
       // print('$exerciseMinutes vs $exerciseMinutes2');
-      return (steps.round(), caloriesBurned, exerciseMinutes.round());
+      return (steps.round(), caloriesBurned, exerciseMinutes.round(), latest);
     } catch (e) {
       debugPrint('Error fetching health data: $e');
     }
-    return (0, 0.0, 0);
+    return (0, 0.0, 0, 0);
   }
 
   Future<void> collectHealthToday(GameState gameState, DateTime now) async {
@@ -135,6 +147,7 @@ class HealthService {
       newSteps,
       newCaloriesBurned,
       newExerciseMinutes,
+      latestDataEpoch,
     ) = await queryHealthData(todayStart, now);
     steps = newSteps;
     caloriesBurned = newCaloriesBurned;
@@ -144,7 +157,7 @@ class HealthService {
 
   Future<void> collectHealth(GameState gameState) async {
     final now = DateTime.now();
-    final promise = collectHealthToday(gameState, now);
+    // final promise = collectHealthToday(gameState, now);
 
     DateTime start;
     if (gameState.lastHealthSync > 0) {
@@ -161,10 +174,11 @@ class HealthService {
       newSteps,
       newCaloriesBurned,
       newExerciseMinutes,
+      latestDataEpoch,
     ) = await queryHealthData(start, now);
     print("fetched from $start to $now");
 
-    await promise;
+    // await promise;
     // Update game state with new health data
     if (newCaloriesBurned == 0 && newSteps == 0 && newExerciseMinutes == 0) {
       return;
@@ -177,7 +191,7 @@ class HealthService {
       newCaloriesBurned,
       newExerciseMinutes,
     );
-    gameState.lastHealthSync = now.millisecondsSinceEpoch;
+    gameState.lastHealthSync = latestDataEpoch;
   }
 
   // use METs (Metabolic Equivalent of Task) or caloric expenditure formulas.
@@ -195,6 +209,85 @@ class HealthService {
     // Estimate heart rate using rearranged formula
 
     // Calories per minute= ((heartrate * weight * K)/1000)*5
-    return ((caloriesBurned / (durationMinutes * 5)) * 1000) / (weightKg * k);
+    // cpm = 5*(hr*w*k)/1000
+    // (1000*cpm)/5 = hr*w*k
+    // 1000*cpm/5/w/k=hr
+    print("cpm: ${caloriesBurned * 1000 / durationMinutes}");
+    return (1000 * caloriesBurned) / (durationMinutes * 5 * weightKg * k);
+    // return ((caloriesBurned / (durationMinutes * 5)) * 1000) / (weightKg * k);
+  }
+
+  Future<void> syncHealthData(
+    ObjectBox objectBoxService,
+    GameState gameState,
+  ) async {
+    // final store = await openStore(); // Initialize ObjectBox
+    final box = objectBoxService.store.box<HealthDataEntry>();
+
+    final now = DateTime.now();
+
+    // Get the latest saved timestamp (or default to last 7 days)
+    int? lastSavedTimestamp =
+        box
+            .query()
+            .order(HealthDataEntry_.timestamp, flags: Order.descending)
+            .build()
+            .findFirst()
+            ?.timestamp;
+    DateTime lastSavedTime =
+        lastSavedTimestamp != null
+            ? DateTime.fromMillisecondsSinceEpoch(lastSavedTimestamp)
+            : DateTime(now.year, now.month, now.day); //today start
+
+    // Fetch data from 10 minutes before the last saved time to now
+    // to handle late recordings
+    DateTime startTime = lastSavedTime.subtract(Duration(minutes: 10));
+
+    final newData = await health.getHealthDataFromTypes(
+      types: types,
+      startTime: startTime,
+      endTime: now,
+    );
+
+    // Convert to ObjectBox model and deduplicate before inserting
+    final entries =
+        newData
+            .map(
+              (e) => HealthDataEntry(
+                timestamp: e.dateFrom.millisecondsSinceEpoch,
+                value: (e.value as NumericHealthValue).numericValue.toDouble(),
+                type: e.type.name,
+              ),
+            )
+            .toSet() // Remove duplicates
+            .toList();
+
+    // Insert new records into ObjectBox
+    box.putMany(entries);
+
+    final (newSteps, newCalories, newExercise) =
+        await (
+          healthForDay(box, HealthDataType.STEPS.name, now),
+          healthForDay(box, HealthDataType.ACTIVE_ENERGY_BURNED.name, now),
+          healthForDay(box, HealthDataType.EXERCISE_TIME.name, now),
+        ).wait;
+
+    final previousSteps = steps;
+    final previousCalories = caloriesBurned;
+    final previousExercise = exerciseMinutes;
+    print('todaysteps $newSteps');
+    steps = newSteps.round();
+    caloriesBurned = newCalories;
+    exerciseMinutes = newExercise.round();
+
+    final stepsDelta = steps - previousSteps;
+    final caloriesDelta = caloriesBurned - previousCalories;
+    final exerciseDelta = exerciseMinutes - previousExercise;
+
+    if (caloriesDelta == 0 && stepsDelta == 0 && exerciseDelta == 0) {
+      return;
+    }
+    print("got new health data $newSteps $caloriesDelta $exerciseDelta");
+    gameState.processHealthData(stepsDelta, caloriesDelta, exerciseDelta);
   }
 }

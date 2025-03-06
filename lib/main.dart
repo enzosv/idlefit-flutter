@@ -28,7 +28,7 @@ void main() async {
         ChangeNotifierProvider.value(value: gameState),
         Provider.value(value: healthService),
         Provider.value(value: storageService),
-        // Provider.value(value: objectBox),
+        Provider.value(value: objectBox),
       ],
       child: const MyApp(),
     ),
@@ -73,7 +73,9 @@ class _GameHomePageState extends State<GameHomePage>
     final gameState = Provider.of<GameState>(context, listen: false);
     if (state == AppLifecycleState.resumed) {
       final healthService = Provider.of<HealthService>(context, listen: false);
-      await healthService.collectHealth(gameState);
+      final objectBoxService = Provider.of<ObjectBox>(context, listen: false);
+      // await healthService.collectHealth(gameState);
+      await healthService.syncHealthData(objectBoxService, gameState);
     } else {
       // going to background
       gameState.save();
@@ -89,10 +91,12 @@ class _GameHomePageState extends State<GameHomePage>
     // Initialize health data
     final healthService = Provider.of<HealthService>(context, listen: false);
     final gameState = Provider.of<GameState>(context, listen: false);
+    final objectBoxService = Provider.of<ObjectBox>(context, listen: false);
     gameState.isPaused = true;
     healthService.initialize().then((_) async {
       // healthService.startBackgroundCollection(gameState);
-      await healthService.collectHealth(gameState);
+      // await healthService.collectHealth(gameState);
+      await healthService.syncHealthData(objectBoxService, gameState);
       // should this be in setstate
       gameState.isPaused = false;
     });
