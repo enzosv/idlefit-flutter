@@ -21,5 +21,11 @@ String toLettersNotation(double number) {
     letterIndex = letterIndex ~/ 26 - 1;
   }
 
-  return '${mantissa.toStringAsPrecision(2)}$letters';
+  if (mantissa == mantissa.floor()) {
+    return '${mantissa.toStringAsFixed(0)}$letters';
+  }
+  if (mantissa * 10 == (mantissa * 10).floor()) {
+    return '${mantissa.toStringAsFixed(1)}$letters';
+  }
+  return '${mantissa.toStringAsFixed(2)}$letters';
 }
