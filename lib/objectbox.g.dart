@@ -16,6 +16,7 @@ import 'package:objectbox_sync_flutter_libs/objectbox_sync_flutter_libs.dart';
 
 import 'game/coin_generator.dart';
 import 'game/currency.dart';
+import 'game/health_data_entry.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -72,6 +73,36 @@ final _entities = <obx_int.ModelEntity>[
             flags: 129)
       ],
       relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(4, 219102169117428336),
+      name: 'HealthDataEntry',
+      lastPropertyId: const obx_int.IdUid(4, 1298175783779309702),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 7990707600546979225),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 8940347419837491692),
+            name: 'timestamp',
+            type: 6,
+            flags: 8,
+            indexId: const obx_int.IdUid(1, 5931764017390220093)),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 7308206853943299864),
+            name: 'value',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 1298175783779309702),
+            name: 'type',
+            type: 9,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
 ];
 
@@ -110,8 +141,8 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(3, 7897766162698443189),
-      lastIndexId: const obx_int.IdUid(0, 0),
+      lastEntityId: const obx_int.IdUid(4, 219102169117428336),
+      lastIndexId: const obx_int.IdUid(1, 5931764017390220093),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
       retiredEntityUids: const [2493137042954685248],
@@ -190,6 +221,39 @@ obx_int.ModelDefinition getObjectBoxModel() {
                 const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
 
           return object;
+        }),
+    HealthDataEntry: obx_int.EntityDefinition<HealthDataEntry>(
+        model: _entities[2],
+        toOneRelations: (HealthDataEntry object) => [],
+        toManyRelations: (HealthDataEntry object) => {},
+        getId: (HealthDataEntry object) => object.id,
+        setId: (HealthDataEntry object, int id) {
+          object.id = id;
+        },
+        objectToFB: (HealthDataEntry object, fb.Builder fbb) {
+          final typeOffset = fbb.writeString(object.type);
+          fbb.startTable(5);
+          fbb.addInt64(0, object.id);
+          fbb.addInt64(1, object.timestamp);
+          fbb.addFloat64(2, object.value);
+          fbb.addOffset(3, typeOffset);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final timestampParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
+          final valueParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 8, 0);
+          final typeParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 10, '');
+          final object = HealthDataEntry(
+              timestamp: timestampParam, value: valueParam, type: typeParam)
+            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+
+          return object;
         })
   };
 
@@ -228,4 +292,23 @@ class CoinGenerator_ {
   /// See [CoinGenerator.tier].
   static final tier =
       obx.QueryIntegerProperty<CoinGenerator>(_entities[1].properties[2]);
+}
+
+/// [HealthDataEntry] entity fields to define ObjectBox queries.
+class HealthDataEntry_ {
+  /// See [HealthDataEntry.id].
+  static final id =
+      obx.QueryIntegerProperty<HealthDataEntry>(_entities[2].properties[0]);
+
+  /// See [HealthDataEntry.timestamp].
+  static final timestamp =
+      obx.QueryIntegerProperty<HealthDataEntry>(_entities[2].properties[1]);
+
+  /// See [HealthDataEntry.value].
+  static final value =
+      obx.QueryDoubleProperty<HealthDataEntry>(_entities[2].properties[2]);
+
+  /// See [HealthDataEntry.type].
+  static final type =
+      obx.QueryStringProperty<HealthDataEntry>(_entities[2].properties[3]);
 }

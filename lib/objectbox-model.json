@@ -55,10 +55,41 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "4:219102169117428336",
+      "lastPropertyId": "4:1298175783779309702",
+      "name": "HealthDataEntry",
+      "properties": [
+        {
+          "id": "1:7990707600546979225",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8940347419837491692",
+          "name": "timestamp",
+          "type": 6,
+          "flags": 8,
+          "indexId": "1:5931764017390220093"
+        },
+        {
+          "id": "3:7308206853943299864",
+          "name": "value",
+          "type": 8
+        },
+        {
+          "id": "4:1298175783779309702",
+          "name": "type",
+          "type": 9
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "3:7897766162698443189",
-  "lastIndexId": "0:0",
+  "lastEntityId": "4:219102169117428336",
+  "lastIndexId": "1:5931764017390220093",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
