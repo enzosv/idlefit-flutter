@@ -61,6 +61,8 @@ class HealthService {
       final value = (entry.value as NumericHealthValue).numericValue.toDouble();
       grouped[entry.sourceName] = (grouped[entry.sourceName] ?? 0) + value;
     }
+    // TODO: if no exercise minutes, check calories burned time
+    // if lots burned in short time, count that as exercise time
     String? bestSource =
         grouped.keys.isEmpty
             ? null
