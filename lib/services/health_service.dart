@@ -157,7 +157,7 @@ class HealthService {
 
   Future<void> collectHealth(GameState gameState) async {
     final now = DateTime.now();
-    // final promise = collectHealthToday(gameState, now);
+    final promise = collectHealthToday(gameState, now);
 
     DateTime start;
     if (gameState.lastHealthSync > 0) {
@@ -178,7 +178,7 @@ class HealthService {
     ) = await queryHealthData(start, now);
     print("fetched from $start to $now");
 
-    // await promise;
+    await promise;
     // Update game state with new health data
     if (newCaloriesBurned == 0 && newSteps == 0 && newExerciseMinutes == 0) {
       return;
@@ -217,6 +217,43 @@ class HealthService {
     // return ((caloriesBurned / (durationMinutes * 5)) * 1000) / (weightKg * k);
   }
 
+  Future<List<HealthDataEntry>> queryHealthEntries(
+    DateTime startTime,
+    endTime,
+  ) async {
+    final newData = await health.getHealthDataFromTypes(
+      types: types,
+      startTime: startTime,
+      endTime: endTime,
+    );
+
+    Map<String, double> grouped = {};
+    for (final entry in newData) {
+      final value = (entry.value as NumericHealthValue).numericValue.toDouble();
+      grouped[entry.sourceId] = (grouped[entry.sourceId] ?? 0) + value;
+    }
+    String? bestSource =
+        grouped.keys.isEmpty
+            ? null
+            : grouped.keys.reduce((a, b) => grouped[a]! > grouped[b]! ? a : b);
+
+    // Convert to ObjectBox model and deduplicate
+    return newData
+        .where((e) => e.sourceId == bestSource)
+        .map(
+          (e) => HealthDataEntry(
+            timestamp: e.dateFrom.millisecondsSinceEpoch,
+            duration:
+                e.dateTo.millisecondsSinceEpoch -
+                e.dateFrom.millisecondsSinceEpoch,
+            value: (e.value as NumericHealthValue).numericValue.toDouble(),
+            type: e.type.name,
+          ),
+        )
+        .toSet() // Remove duplicates
+        .toList();
+  }
+
   Future<void> syncHealthData(
     ObjectBox objectBoxService,
     GameState gameState,
@@ -226,56 +263,41 @@ class HealthService {
 
     final now = DateTime.now();
 
-    // Get the latest saved timestamp (or default to last 7 days)
-    int? lastSavedTimestamp =
-        box
-            .query()
-            .order(HealthDataEntry_.timestamp, flags: Order.descending)
-            .build()
-            .findFirst()
-            ?.timestamp;
-    DateTime lastSavedTime =
-        lastSavedTimestamp != null
-            ? DateTime.fromMillisecondsSinceEpoch(lastSavedTimestamp)
-            : DateTime(now.year, now.month, now.day); //today start
-
+    DateTime startTime =
+        await HealthDataEntry.latestEntryDate(box) ??
+        DateTime(now.year, now.month, now.day);
     // Fetch data from 10 minutes before the last saved time to now
     // to handle late recordings
-    DateTime startTime = lastSavedTime.subtract(Duration(minutes: 10));
-
-    final newData = await health.getHealthDataFromTypes(
-      types: types,
-      startTime: startTime,
-      endTime: now,
-    );
-
-    // Convert to ObjectBox model and deduplicate before inserting
-    final entries =
-        newData
-            .map(
-              (e) => HealthDataEntry(
-                timestamp: e.dateFrom.millisecondsSinceEpoch,
-                value: (e.value as NumericHealthValue).numericValue.toDouble(),
-                type: e.type.name,
-              ),
-            )
-            .toSet() // Remove duplicates
-            .toList();
-
+    startTime = startTime.subtract(Duration(minutes: 10));
+    final entries = await queryHealthEntries(startTime, now);
     // Insert new records into ObjectBox
     box.putMany(entries);
+    updateHealthState(box, gameState, now);
+  }
 
+  void updateHealthState(
+    Box<HealthDataEntry> box,
+    GameState gameState,
+    DateTime now,
+  ) async {
     final (newSteps, newCalories, newExercise) =
         await (
-          healthForDay(box, HealthDataType.STEPS.name, now),
-          healthForDay(box, HealthDataType.ACTIVE_ENERGY_BURNED.name, now),
-          healthForDay(box, HealthDataType.EXERCISE_TIME.name, now),
+          HealthDataEntry.healthForDay(box, HealthDataType.STEPS.name, now),
+          HealthDataEntry.healthForDay(
+            box,
+            HealthDataType.ACTIVE_ENERGY_BURNED.name,
+            now,
+          ),
+          HealthDataEntry.healthForDay(
+            box,
+            HealthDataType.EXERCISE_TIME.name,
+            now,
+          ),
         ).wait;
 
     final previousSteps = steps;
     final previousCalories = caloriesBurned;
     final previousExercise = exerciseMinutes;
-    print('todaysteps $newSteps');
     steps = newSteps.round();
     caloriesBurned = newCalories;
     exerciseMinutes = newExercise.round();

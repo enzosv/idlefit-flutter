@@ -16,30 +16,44 @@ class HealthDataEntry {
     required this.value,
     required this.type,
   });
-}
 
-Future<double> healthForDay(
-  Box<HealthDataEntry> box,
-  String type,
-  DateTime day,
-) async {
-  final now = DateTime.now();
-  final start = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
-  final entries =
-      await box
-          .query(
-            HealthDataEntry_.type
-                .equals(type)
-                .and(
-                  HealthDataEntry_.timestamp.lessThan(
-                    now.millisecondsSinceEpoch,
-                  ),
-                )
-                .and(HealthDataEntry_.timestamp.greaterOrEqual(start)),
-          )
-          .build()
-          .findAsync();
-  if (entries.isEmpty) return 0;
-  // print(entries);
-  return entries.fold<double>(0, (a, b) => a + b.value);
+  static Future<double> healthForDay(
+    Box<HealthDataEntry> box,
+    String type,
+    DateTime day,
+  ) async {
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+    final entries =
+        await box
+            .query(
+              HealthDataEntry_.type
+                  .equals(type)
+                  .and(
+                    HealthDataEntry_.timestamp.lessThan(
+                      now.millisecondsSinceEpoch,
+                    ),
+                  )
+                  .and(HealthDataEntry_.timestamp.greaterOrEqual(start)),
+            )
+            .build()
+            .findAsync();
+    if (entries.isEmpty) return 0;
+    // print(entries);
+    return entries.fold<double>(0, (a, b) => a + b.value);
+  }
+
+  /// Get the latest saved timestamp
+  static Future<DateTime?> latestEntryDate(Box<HealthDataEntry> box) async {
+    final entry =
+        await box
+            .query()
+            .order(HealthDataEntry_.timestamp, flags: Order.descending)
+            .build()
+            .findFirstAsync();
+    if (entry == null) {
+      return null;
+    }
+    return DateTime.fromMillisecondsSinceEpoch(entry.timestamp);
+  }
 }
