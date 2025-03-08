@@ -162,7 +162,11 @@ class HealthService {
     DateTime start;
     if (gameState.lastHealthSync > 0) {
       // start = DateTime(now.year, now.month, now.day);
-      start = DateTime.fromMillisecondsSinceEpoch(gameState.lastHealthSync);
+      start = DateTime.fromMillisecondsSinceEpoch(
+        gameState.lastHealthSync,
+      ).subtract(
+        Duration(minutes: 10),
+      ); //subtract 10 minutes to capture late recording
     } else {
       start = DateTime(
         now.year,
@@ -261,14 +265,15 @@ class HealthService {
     // final store = await openStore(); // Initialize ObjectBox
     final box = objectBoxService.store.box<HealthDataEntry>();
 
-    final now = DateTime.now();
-
-    DateTime startTime =
-        await HealthDataEntry.latestEntryDate(box) ??
-        DateTime(now.year, now.month, now.day);
     // Fetch data from 10 minutes before the last saved time to now
     // to handle late recordings
-    startTime = startTime.subtract(Duration(minutes: 10));
+    final startTime =
+        (await HealthDataEntry.latestEntryDate(
+          box,
+        ))?.subtract(Duration(minutes: 10)) ??
+        DateTime.fromMillisecondsSinceEpoch(gameState.startHealthSync);
+
+    final now = DateTime.now();
     final entries = await queryHealthEntries(startTime, now);
     // Insert new records into ObjectBox
     box.putMany(entries);

@@ -19,6 +19,7 @@ class GameState with ChangeNotifier {
 
   int lastGenerated = 0;
   int lastHealthSync = 0;
+  int startHealthSync = 0;
 
   // Health Metrics
   int totalSteps = 0;
@@ -115,10 +116,18 @@ class GameState with ChangeNotifier {
   void _loadFromSavedState(Map<String, dynamic> savedState) {
     lastGenerated = savedState['lastGenerated'] ?? 0;
     lastHealthSync = savedState['lastHealthSync'] ?? 0;
+    startHealthSync = savedState['startHealthSync'] ?? 0;
+    if (startHealthSync == 0) {
+      final now = DateTime.now();
+      startHealthSync =
+          DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+    }
 
     totalSteps = savedState['totalSteps'] ?? 0;
     totalCaloriesBurned = savedState['totalCaloriesBurned'] ?? 0.0;
     totalExerciseMinutes = savedState['totalExerciseMinutes'] ?? 0;
+
+    print('loaded $totalSteps $totalCaloriesBurned $totalExerciseMinutes');
 
     // Load shop items
     if (savedState['shopItems'] != null) {
@@ -137,6 +146,7 @@ class GameState with ChangeNotifier {
     return {
       'lastGenerated': lastGenerated,
       'lastHealthSync': lastHealthSync,
+      'startHealthSync': startHealthSync,
       'totalSteps': totalSteps,
       'totalCaloriesBurned': totalCaloriesBurned,
       'totalExerciseMinutes': totalExerciseMinutes,
