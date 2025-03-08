@@ -20,8 +20,7 @@ String toLettersNotation(double number) {
     letters = String.fromCharCode(charCode) + letters;
     letterIndex = letterIndex ~/ 26 - 1;
   }
-
-  if (mantissa == mantissa.floor()) {
+  if (mantissa.toStringAsFixed(2).endsWith('.00')) {
     return '${mantissa.toStringAsFixed(0)}$letters';
   }
   if (mantissa * 10 == (mantissa * 10).floor()) {
