@@ -10,6 +10,9 @@ class HealthDataEntry {
   double value;
   String type; // e.g., "STEPS", "ACTIVE_ENERGY_BURNED"
 
+  @Unique(onConflict: ConflictStrategy.fail)
+  String get uniqueKey => '$type|$timestamp';
+
   HealthDataEntry({
     required this.timestamp,
     required this.duration,

@@ -1,51 +1,85 @@
+import 'package:health/health.dart';
 import 'package:idlefit/models/health_data_entry.dart';
 import 'package:idlefit/objectbox.g.dart';
+
+class HealthStats {
+  double steps = 0;
+  double calories = 0;
+  double exerciseMinutes = 0;
+}
 
 class HealthDataRepo {
   final Box<HealthDataEntry> box;
 
   HealthDataRepo({required this.box});
 
-  Future<double> total(String type) async {
-    return box
-        .query(HealthDataEntry_.type.equals(type))
-        .build()
-        .property(HealthDataEntry_.value)
-        .sum();
+  Future<HealthStats> total() async {
+    final query = box.query().build();
+    final stats = await _groupQuery(query);
+    query.close();
+    return stats;
   }
 
-  Future<double> newStats(String type, int since) async {
-    return box
-        .query(
-          HealthDataEntry_.type
-              .equals(type)
-              .and(HealthDataEntry_.recordedAt.greaterThan(since)),
-        )
-        .build()
-        .property(HealthDataEntry_.value)
-        .sum();
-  }
-
-  Future<double> healthForDay(String type, DateTime day) async {
-    final now = DateTime.now();
-    final start = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
-    final entries =
+  Future<List<HealthDataEntry>> newFromList(
+    List<HealthDataEntry> entries,
+    DateTime since,
+  ) async {
+    final existing =
         await box
             .query(
-              HealthDataEntry_.type
-                  .equals(type)
-                  .and(
-                    HealthDataEntry_.timestamp.lessThan(
-                      now.millisecondsSinceEpoch,
-                    ),
-                  )
-                  .and(HealthDataEntry_.timestamp.greaterOrEqual(start)),
+              HealthDataEntry_.timestamp.greaterOrEqual(
+                since.millisecondsSinceEpoch,
+              ),
             )
             .build()
             .findAsync();
-    if (entries.isEmpty) return 0;
-    // print(entries);
-    return entries.fold<double>(0, (a, b) => a + b.value);
+    if (existing.isEmpty) {
+      return entries;
+    }
+    final uniqueKeys = existing.map((e) => e.uniqueKey);
+    return entries.where((e) => !uniqueKeys.contains(e.uniqueKey)).toList();
+  }
+
+  Future<HealthStats> today(DateTime day) async {
+    final start = DateTime(day.year, day.month, day.day);
+    final end = start.add(Duration(days: 1));
+    final query =
+        box
+            .query(
+              HealthDataEntry_.timestamp
+                  .greaterOrEqual(start.millisecondsSinceEpoch)
+                  .and(
+                    HealthDataEntry_.timestamp.lessThan(
+                      end.millisecondsSinceEpoch,
+                    ),
+                  ),
+            )
+            .build();
+    final stats = await _groupQuery(query);
+    query.close();
+    return stats;
+  }
+
+  Future<HealthStats> _groupQuery(Query<HealthDataEntry> query) async {
+    final stats = HealthStats();
+    for (final entry in query.find()) {
+      if (entry.type == HealthDataType.STEPS.name) {
+        stats.steps += entry.value;
+      } else if (entry.type == HealthDataType.EXERCISE_TIME.name) {
+        stats.exerciseMinutes += entry.value;
+      } else if (entry.type == HealthDataType.ACTIVE_ENERGY_BURNED.name) {
+        stats.calories += entry.value;
+      }
+    }
+    return stats;
+  }
+
+  Future<HealthStats> newStats(int since) async {
+    final query =
+        box.query(HealthDataEntry_.recordedAt.greaterThan(since)).build();
+    final stats = await _groupQuery(query);
+    query.close();
+    return stats;
   }
 
   /// Get the latest saved timestamp

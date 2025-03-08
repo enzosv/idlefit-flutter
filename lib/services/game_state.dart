@@ -226,7 +226,7 @@ class GameState with ChangeNotifier {
     lastGenerated = now;
   }
 
-  void processHealthData(int steps, double calories, int exerciseMinutes) {
+  void convertHealthStats(double steps, calories, exerciseMinutes) {
     // Calculate health multiplier from upgrades
     double healthMultiplier = 1.0;
     for (final item in shopItems) {
