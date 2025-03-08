@@ -14,9 +14,9 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_sync_flutter_libs/objectbox_sync_flutter_libs.dart';
 
-import 'game/coin_generator.dart';
-import 'game/currency.dart';
-import 'game/health_data_entry.dart';
+import 'models/coin_generator.dart';
+import 'models/currency.dart';
+import 'models/health_data_entry.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 

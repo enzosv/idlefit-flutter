@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../game/game_state.dart';
+import '../services/game_state.dart';
 import '../util.dart';
 
 class CurrencyBar extends StatelessWidget {
