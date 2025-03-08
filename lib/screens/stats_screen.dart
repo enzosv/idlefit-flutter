@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/models/health_data_entry.dart';
+import 'package:idlefit/services/object_box.dart';
+import 'package:idlefit/widgets/health_stats_card.dart';
 import 'package:provider/provider.dart';
 import '../services/game_state.dart';
-import '../services/health_service.dart';
 import '../widgets/common_widgets.dart';
 import '../util.dart';
 
@@ -12,8 +12,6 @@ class StatsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gameState = Provider.of<GameState>(context);
-    final healthService = Provider.of<HealthService>(context, listen: false);
-
     return SafeArea(
       child: Column(
         children: [
@@ -26,50 +24,8 @@ class StatsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               children: [
                 // Health data card
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Health Activity',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        const Divider(),
-                        ListTile(
-                          leading: const Icon(Icons.directions_walk),
-                          title: const Text('Steps'),
-                          subtitle: Text('Today: ${healthService.steps}'),
-                          trailing: Text('Total: ${gameState.totalSteps}'),
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.local_fire_department),
-                          title: const Text('Calories Burned'),
-                          subtitle: Text(
-                            'Today: ${healthService.caloriesBurned.round()}',
-                          ),
-                          trailing: Text(
-                            'Total: ${gameState.totalCaloriesBurned.round()}',
-                          ),
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.fitness_center),
-                          title: const Text('Exercise Minutes'),
-                          subtitle: Text(
-                            'Today: ${healthService.exerciseMinutes}',
-                          ),
-                          trailing: Text(
-                            'Total: ${gameState.totalExerciseMinutes}',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
+                HealthStatsCard(),
                 const SizedBox(height: 16),
-
                 // Game stats card
                 Card(
                   child: Padding(
