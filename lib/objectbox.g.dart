@@ -75,36 +75,41 @@ final _entities = <obx_int.ModelEntity>[
       relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[]),
   obx_int.ModelEntity(
-      id: const obx_int.IdUid(4, 219102169117428336),
+      id: const obx_int.IdUid(5, 604859576841525103),
       name: 'HealthDataEntry',
-      lastPropertyId: const obx_int.IdUid(5, 5086729266335392220),
+      lastPropertyId: const obx_int.IdUid(6, 5977650328934603192),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 7990707600546979225),
+            id: const obx_int.IdUid(1, 4745966459735341277),
             name: 'id',
             type: 6,
             flags: 1),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 8940347419837491692),
+            id: const obx_int.IdUid(2, 81048633074782967),
             name: 'timestamp',
             type: 6,
             flags: 8,
-            indexId: const obx_int.IdUid(1, 5931764017390220093)),
+            indexId: const obx_int.IdUid(2, 6046711262050609894)),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(3, 7308206853943299864),
+            id: const obx_int.IdUid(3, 7708077465627102502),
+            name: 'duration',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 4892005414219992245),
+            name: 'recordedAt',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 6816389771923756793),
             name: 'value',
             type: 8,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(4, 1298175783779309702),
+            id: const obx_int.IdUid(6, 5977650328934603192),
             name: 'type',
             type: 9,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(5, 5086729266335392220),
-            name: 'duration',
-            type: 6,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -146,11 +151,11 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(4, 219102169117428336),
-      lastIndexId: const obx_int.IdUid(1, 5931764017390220093),
+      lastEntityId: const obx_int.IdUid(5, 604859576841525103),
+      lastIndexId: const obx_int.IdUid(2, 6046711262050609894),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
-      retiredEntityUids: const [2493137042954685248],
+      retiredEntityUids: const [2493137042954685248, 219102169117428336],
       retiredIndexUids: const [],
       retiredPropertyUids: const [
         1612088624750524307,
@@ -159,7 +164,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         2465340859862322629,
         2427394359739034951,
         3598368693352972001,
-        3238954471475910745
+        3238954471475910745,
+        7990707600546979225,
+        8940347419837491692,
+        7308206853943299864,
+        1298175783779309702,
+        5086729266335392220
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -237,12 +247,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
         },
         objectToFB: (HealthDataEntry object, fb.Builder fbb) {
           final typeOffset = fbb.writeString(object.type);
-          fbb.startTable(6);
+          fbb.startTable(7);
           fbb.addInt64(0, object.id);
           fbb.addInt64(1, object.timestamp);
-          fbb.addFloat64(2, object.value);
-          fbb.addOffset(3, typeOffset);
-          fbb.addInt64(4, object.duration);
+          fbb.addInt64(2, object.duration);
+          fbb.addInt64(3, object.recordedAt);
+          fbb.addFloat64(4, object.value);
+          fbb.addOffset(5, typeOffset);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -252,16 +263,19 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final timestampParam =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
           final durationParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0);
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
           final valueParam =
-              const fb.Float64Reader().vTableGet(buffer, rootOffset, 8, 0);
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 12, 0);
           final typeParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 10, '');
+              .vTableGet(buffer, rootOffset, 14, '');
+          final recordedAtParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0);
           final object = HealthDataEntry(
               timestamp: timestampParam,
               duration: durationParam,
               value: valueParam,
-              type: typeParam)
+              type: typeParam,
+              recordedAt: recordedAtParam)
             ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
 
           return object;
@@ -315,15 +329,19 @@ class HealthDataEntry_ {
   static final timestamp =
       obx.QueryIntegerProperty<HealthDataEntry>(_entities[2].properties[1]);
 
+  /// See [HealthDataEntry.duration].
+  static final duration =
+      obx.QueryIntegerProperty<HealthDataEntry>(_entities[2].properties[2]);
+
+  /// See [HealthDataEntry.recordedAt].
+  static final recordedAt =
+      obx.QueryIntegerProperty<HealthDataEntry>(_entities[2].properties[3]);
+
   /// See [HealthDataEntry.value].
   static final value =
-      obx.QueryDoubleProperty<HealthDataEntry>(_entities[2].properties[2]);
+      obx.QueryDoubleProperty<HealthDataEntry>(_entities[2].properties[4]);
 
   /// See [HealthDataEntry.type].
   static final type =
-      obx.QueryStringProperty<HealthDataEntry>(_entities[2].properties[3]);
-
-  /// See [HealthDataEntry.duration].
-  static final duration =
-      obx.QueryIntegerProperty<HealthDataEntry>(_entities[2].properties[4]);
+      obx.QueryStringProperty<HealthDataEntry>(_entities[2].properties[5]);
 }

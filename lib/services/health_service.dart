@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:health/health.dart';
 import 'package:flutter/material.dart';
 import 'package:idlefit/game/health_data_entry.dart';
+import 'package:idlefit/game/health_data_repo.dart';
 import 'package:idlefit/objectbox.g.dart';
 import 'package:idlefit/services/object_box.dart';
 import '../game/game_state.dart';
@@ -162,11 +163,7 @@ class HealthService {
     DateTime start;
     if (gameState.lastHealthSync > 0) {
       // start = DateTime(now.year, now.month, now.day);
-      start = DateTime.fromMillisecondsSinceEpoch(
-        gameState.lastHealthSync,
-      ).subtract(
-        Duration(minutes: 10),
-      ); //subtract 10 minutes to capture late recording
+      start = DateTime.fromMillisecondsSinceEpoch(gameState.lastHealthSync);
     } else {
       start = DateTime(
         now.year,
@@ -225,6 +222,7 @@ class HealthService {
     DateTime startTime,
     endTime,
   ) async {
+    print("getting health data from $startTime to $endTime");
     final newData = await health.getHealthDataFromTypes(
       types: types,
       startTime: startTime,
@@ -267,37 +265,28 @@ class HealthService {
 
     // Fetch data from 10 minutes before the last saved time to now
     // to handle late recordings
+    final repo = HealthDataRepo(box: box);
     final startTime =
-        (await HealthDataEntry.latestEntryDate(
-          box,
-        ))?.subtract(Duration(minutes: 10)) ??
+        (await repo.latestEntryDate())?.subtract(Duration(minutes: 10)) ??
         DateTime.fromMillisecondsSinceEpoch(gameState.startHealthSync);
 
     final now = DateTime.now();
     final entries = await queryHealthEntries(startTime, now);
     // Insert new records into ObjectBox
     box.putMany(entries);
-    updateHealthState(box, gameState, now);
+    updateHealthState(repo, gameState, now);
   }
 
   void updateHealthState(
-    Box<HealthDataEntry> box,
+    HealthDataRepo repo,
     GameState gameState,
     DateTime now,
   ) async {
     final (newSteps, newCalories, newExercise) =
         await (
-          HealthDataEntry.healthForDay(box, HealthDataType.STEPS.name, now),
-          HealthDataEntry.healthForDay(
-            box,
-            HealthDataType.ACTIVE_ENERGY_BURNED.name,
-            now,
-          ),
-          HealthDataEntry.healthForDay(
-            box,
-            HealthDataType.EXERCISE_TIME.name,
-            now,
-          ),
+          repo.healthForDay(HealthDataType.STEPS.name, now),
+          repo.healthForDay(HealthDataType.ACTIVE_ENERGY_BURNED.name, now),
+          repo.healthForDay(HealthDataType.EXERCISE_TIME.name, now),
         ).wait;
 
     final previousSteps = steps;
