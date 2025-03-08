@@ -1,4 +1,4 @@
-import 'package:idlefit/game/health_data_entry.dart';
+import 'package:idlefit/models/health_data_entry.dart';
 import 'package:idlefit/objectbox.g.dart';
 
 class HealthDataRepo {

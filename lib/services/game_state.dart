@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:idlefit/game/coin_generator.dart';
-import 'package:idlefit/game/currency.dart';
+import 'package:idlefit/models/coin_generator.dart';
+import 'package:idlefit/models/currency.dart';
 import 'package:objectbox/objectbox.dart';
-import '../services/storage_service.dart';
-import 'shop_items.dart';
+import 'storage_service.dart';
+import '../models/shop_items.dart';
 import 'dart:math';
 
 class GameState with ChangeNotifier {
@@ -21,11 +21,6 @@ class GameState with ChangeNotifier {
   int lastHealthSync = 0;
   int startHealthSync = 0;
 
-  // Health Metrics
-  int totalSteps = 0;
-  double totalCaloriesBurned = 0;
-  int totalExerciseMinutes = 0;
-
   // Generators and shop items
   List<CoinGenerator> coinGenerators = [];
   List<ShopItem> shopItems = [];
@@ -38,17 +33,26 @@ class GameState with ChangeNotifier {
 
   Future<void> initialize(
     StorageService storageService,
-    Store objectBoxServivce,
+    Store objectBoxService,
   ) async {
     _storageService = storageService;
-    _objectBoxService = objectBoxServivce;
+    _objectBoxService = objectBoxService;
+
+    if (startHealthSync == 0) {
+      final now = DateTime.now();
+      startHealthSync =
+          DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+    }
 
     // Initialize default generators
-    coinGenerators = await parseCoinGenerators(
-      'assets/coin_generators.json',
-      objectBoxServivce,
+
+    final coinRepo = CoinGeneratorRepo(
+      box: objectBoxService.box<CoinGenerator>(),
     );
-    final currencyBox = objectBoxServivce.box<Currency>();
+    coinGenerators = await coinRepo.parseCoinGenerators(
+      'assets/coin_generators.json',
+    );
+    final currencyBox = objectBoxService.box<Currency>();
     final currencies = currencyBox.getAll().toList();
     for (final currency in currencies) {
       switch (currency.type) {
@@ -123,12 +127,6 @@ class GameState with ChangeNotifier {
           DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
     }
 
-    totalSteps = savedState['totalSteps'] ?? 0;
-    totalCaloriesBurned = savedState['totalCaloriesBurned'] ?? 0.0;
-    totalExerciseMinutes = savedState['totalExerciseMinutes'] ?? 0;
-
-    print('loaded $totalSteps $totalCaloriesBurned $totalExerciseMinutes');
-
     // Load shop items
     if (savedState['shopItems'] != null) {
       final List<dynamic> shopData = savedState['shopItems'];
@@ -147,9 +145,6 @@ class GameState with ChangeNotifier {
       'lastGenerated': lastGenerated,
       'lastHealthSync': lastHealthSync,
       'startHealthSync': startHealthSync,
-      'totalSteps': totalSteps,
-      'totalCaloriesBurned': totalCaloriesBurned,
-      'totalExerciseMinutes': totalExerciseMinutes,
       'shopItems': shopItems.map((s) => s.json).toList(),
     };
   }
@@ -157,10 +152,7 @@ class GameState with ChangeNotifier {
   void save() {
     _storageService.saveGameState(toJson());
     final currencyBox = _objectBoxService.box<Currency>();
-    currencyBox.put(coins);
-    currencyBox.put(energy);
-    currencyBox.put(gems);
-    currencyBox.put(space);
+    currencyBox.putMany([coins, energy, gems, space]);
     // not saving generators. only changes on buy anyway
   }
 
@@ -235,11 +227,6 @@ class GameState with ChangeNotifier {
   }
 
   void processHealthData(int steps, double calories, int exerciseMinutes) {
-    // Update totals
-    totalSteps += steps;
-    totalCaloriesBurned += calories;
-    totalExerciseMinutes += exerciseMinutes;
-
     // Calculate health multiplier from upgrades
     double healthMultiplier = 1.0;
     for (final item in shopItems) {

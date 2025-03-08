@@ -1,9 +1,7 @@
 import 'dart:math';
-import 'package:idlefit/game/currency.dart';
 import 'package:objectbox/objectbox.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:idlefit/services/object_box.dart';
 
 @Entity()
 class CoinGenerator {
@@ -70,22 +68,23 @@ class CoinGenerator {
   }
 }
 
-Future<List<CoinGenerator>> parseCoinGenerators(
-  String jsonString,
-  Store objectBoxService,
-) async {
-  final String response = await rootBundle.loadString(jsonString);
-  final List<dynamic> data = jsonDecode(response);
+class CoinGeneratorRepo {
+  final Box<CoinGenerator> box;
+  CoinGeneratorRepo({required this.box});
 
-  final generatorStore = objectBoxService.box<CoinGenerator>();
-  return data.map((item) {
-    CoinGenerator generator = CoinGenerator.fromJson(item);
-    final stored = generatorStore.get(generator.tier);
-    if (stored == null) {
+  Future<List<CoinGenerator>> parseCoinGenerators(String jsonString) async {
+    final String response = await rootBundle.loadString(jsonString);
+    final List<dynamic> data = jsonDecode(response);
+
+    return data.map((item) {
+      CoinGenerator generator = CoinGenerator.fromJson(item);
+      final stored = box.get(generator.tier);
+      if (stored == null) {
+        return generator;
+      }
+      generator.count = stored.count;
+      generator.level = stored.level;
       return generator;
-    }
-    generator.count = stored.count;
-    generator.level = stored.level;
-    return generator;
-  }).toList();
+    }).toList();
+  }
 }

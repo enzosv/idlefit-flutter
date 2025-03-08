@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
-import 'game/game_state.dart';
+import 'services/game_state.dart';
 import 'screens/main_screen.dart';
 import 'screens/stats_screen.dart';
 import 'screens/shop_screen.dart';
@@ -94,7 +94,6 @@ class _GameHomePageState extends State<GameHomePage>
     final objectBoxService = Provider.of<ObjectBox>(context, listen: false);
     gameState.isPaused = true;
     healthService.initialize().then((_) async {
-      // healthService.startBackgroundCollection(gameState);
       // await healthService.collectHealth(gameState);
       await healthService.syncHealthData(objectBoxService, gameState);
       // should this be in setstate

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/models/health_data_entry.dart';
 import 'package:provider/provider.dart';
-import '../game/game_state.dart';
+import '../services/game_state.dart';
 import '../services/health_service.dart';
 import '../widgets/common_widgets.dart';
 import '../util.dart';
