@@ -58,7 +58,7 @@
     },
     {
       "id": "4:219102169117428336",
-      "lastPropertyId": "4:1298175783779309702",
+      "lastPropertyId": "5:5086729266335392220",
       "name": "HealthDataEntry",
       "properties": [
         {
@@ -83,6 +83,11 @@
           "id": "4:1298175783779309702",
           "name": "type",
           "type": 9
+        },
+        {
+          "id": "5:5086729266335392220",
+          "name": "duration",
+          "type": 6
         }
       ],
       "relations": []

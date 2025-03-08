@@ -6,11 +6,13 @@ class HealthDataEntry {
   int id = 0; // ObjectBox automatically assigns a unique ID
   @Index()
   int timestamp; // Store as milliseconds since epoch
+  int duration;
   double value;
   String type; // e.g., "STEPS", "ACTIVE_ENERGY_BURNED"
 
   HealthDataEntry({
     required this.timestamp,
+    required this.duration,
     required this.value,
     required this.type,
   });

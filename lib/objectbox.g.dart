@@ -77,7 +77,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(4, 219102169117428336),
       name: 'HealthDataEntry',
-      lastPropertyId: const obx_int.IdUid(4, 1298175783779309702),
+      lastPropertyId: const obx_int.IdUid(5, 5086729266335392220),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -100,6 +100,11 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(4, 1298175783779309702),
             name: 'type',
             type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 5086729266335392220),
+            name: 'duration',
+            type: 6,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -232,11 +237,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         },
         objectToFB: (HealthDataEntry object, fb.Builder fbb) {
           final typeOffset = fbb.writeString(object.type);
-          fbb.startTable(5);
+          fbb.startTable(6);
           fbb.addInt64(0, object.id);
           fbb.addInt64(1, object.timestamp);
           fbb.addFloat64(2, object.value);
           fbb.addOffset(3, typeOffset);
+          fbb.addInt64(4, object.duration);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -245,12 +251,17 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final rootOffset = buffer.derefObject(0);
           final timestampParam =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
+          final durationParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0);
           final valueParam =
               const fb.Float64Reader().vTableGet(buffer, rootOffset, 8, 0);
           final typeParam = const fb.StringReader(asciiOptimization: true)
               .vTableGet(buffer, rootOffset, 10, '');
           final object = HealthDataEntry(
-              timestamp: timestampParam, value: valueParam, type: typeParam)
+              timestamp: timestampParam,
+              duration: durationParam,
+              value: valueParam,
+              type: typeParam)
             ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
 
           return object;
@@ -311,4 +322,8 @@ class HealthDataEntry_ {
   /// See [HealthDataEntry.type].
   static final type =
       obx.QueryStringProperty<HealthDataEntry>(_entities[2].properties[3]);
+
+  /// See [HealthDataEntry.duration].
+  static final duration =
+      obx.QueryIntegerProperty<HealthDataEntry>(_entities[2].properties[4]);
 }
