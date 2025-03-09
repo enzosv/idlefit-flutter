@@ -165,14 +165,6 @@ class HealthService {
 
     print("new: ${newEntries.length}, from: ${entries.length}");
     updateHealthState(newEntries, gameState);
-
-    final allEntries = box.getAll();
-    for (final entry in allEntries) {
-      if (entry.type != "STEPS") {
-        continue;
-      }
-      print("${entry.id}: ${entry.uniqueKey}");
-    }
   }
 
   void updateHealthState(

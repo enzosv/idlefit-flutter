@@ -1,8 +1,14 @@
 import 'dart:math';
 
 String toLettersNotation(double number) {
+  if (number < 0.1) {
+    final result = number.toStringAsFixed(2);
+    if (result == "0.00") {
+      return "0";
+    }
+  }
   if (number < 1) {
-    return number.toStringAsPrecision(1);
+    return number.toStringAsFixed(1);
   }
   if (number < 1000) {
     return number.toStringAsFixed(0);
