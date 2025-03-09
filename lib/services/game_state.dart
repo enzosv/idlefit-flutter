@@ -2,19 +2,30 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
+import 'package:idlefit/util.dart';
 import 'package:objectbox/objectbox.dart';
 import 'storage_service.dart';
 import '../models/shop_items.dart';
 import 'dart:math';
 
 class GameState with ChangeNotifier {
-  final tickTime = 1000; // miliseconds
+  static const _tickTime = 1000; // miliseconds
+  static const _inactiveThreshold = 30000; // 30 seconds in milliseocnds
+  static const _calorieToEnergyMultiplier =
+      72000.0; // 1 calorie = 72 seconds of idle fuel
+
   bool isPaused = true;
 
-  final inactiveThreshold = 30000; // 30 seconds in milliseocnds
-  final Currency coins = Currency(id: CurrencyType.coin.index, count: 10);
+  final Currency coins = Currency(
+    id: CurrencyType.coin.index,
+    count: 10,
+    max: 1000,
+  );
   final Currency gems = Currency(id: CurrencyType.gem.index);
-  final Currency energy = Currency(id: CurrencyType.energy.index);
+  final Currency energy = Currency(
+    id: CurrencyType.energy.index,
+    max: 43200000,
+  );
   final Currency space = Currency(id: CurrencyType.space.index);
 
   int lastGenerated = 0;
@@ -72,6 +83,8 @@ class GameState with ChangeNotifier {
           continue;
       }
     }
+    print("loaded ${coins.max}");
+
     // Initialize shop items
     shopItems = [
       ShopItem(
@@ -163,7 +176,7 @@ class GameState with ChangeNotifier {
   }
 
   void _startGenerators() {
-    final duration = Duration(milliseconds: tickTime);
+    final duration = Duration(milliseconds: _tickTime);
     _generatorTimer = Timer.periodic(duration, (_) {
       _processGenerators();
     });
@@ -171,13 +184,13 @@ class GameState with ChangeNotifier {
 
   int validTimeSinceLastGenerate(int now, int previous) {
     if (energy.count <= 0 || previous <= 0) {
-      return tickTime;
+      return _tickTime;
     }
 
-    int dif = now - tickTime;
+    int dif = now - _tickTime;
     dif = now - previous;
     // if last generated > 30s, consume energy
-    if (dif < inactiveThreshold) {
+    if (dif < _inactiveThreshold) {
       // do not consume energy
       return dif;
     }
@@ -196,7 +209,7 @@ class GameState with ChangeNotifier {
     final now = DateTime.now().millisecondsSinceEpoch;
     final realDif = lastGenerated - now;
     final availableDif = validTimeSinceLastGenerate(now, lastGenerated);
-
+    final usesEnergy = realDif > _inactiveThreshold;
     double coinsGenerated = 0;
 
     // Calculate coin multiplier from upgrades
@@ -206,20 +219,21 @@ class GameState with ChangeNotifier {
         coinMultiplier += item.effectValue * item.level;
       }
     }
-    if (realDif > inactiveThreshold) {
+
+    if (usesEnergy) {
       // reduce speed of coin generation in background
       coinMultiplier /= 2;
     }
     // Process each generator
     for (final generator in coinGenerators) {
-      coinsGenerated += (availableDif / tickTime * generator.output);
+      coinsGenerated += (availableDif / _tickTime * generator.output);
     }
 
     // print(coinsGenerated);
 
     if (coinsGenerated > 0) {
       // addCoins(coinsGenerated);
-      coins.earn(coinsGenerated * coinMultiplier);
+      coins.earn(coinsGenerated * coinMultiplier, usesEnergy);
       notifyListeners();
     }
 
@@ -235,9 +249,7 @@ class GameState with ChangeNotifier {
       }
     }
 
-    energy.earn(
-      calories * healthMultiplier * 72000,
-    ); // 1 calorie = 72 seconds of idle fuel
+    energy.earn(calories * healthMultiplier * _calorieToEnergyMultiplier);
     gems.earn(
       exerciseMinutes * healthMultiplier / 2,
     ); // 2 exercise minutes = 1 gem
@@ -251,6 +263,17 @@ class GameState with ChangeNotifier {
       return false;
     }
     generator.count++;
+    coins.max = max(coins.max, (200 * pow(10, generator.tier - 1).toDouble()));
+
+    if (generator.tier % 10 == 0) {
+      // raise gem limit every 10
+      gems.max += 10;
+    }
+    if (generator.tier % 3 == 0) {
+      // raise energy limit every 3
+      energy.max += 3600000;
+    }
+    // TODO: raise space limit
     _objectBoxService.box<CoinGenerator>().put(generator);
     save();
     notifyListeners();
