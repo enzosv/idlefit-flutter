@@ -24,7 +24,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(1, 8970713413303252018),
       name: 'Currency',
-      lastPropertyId: const obx_int.IdUid(6, 4916751470591575964),
+      lastPropertyId: const obx_int.IdUid(7, 5407859144525862516),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -46,7 +46,12 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(6, 4916751470591575964),
             name: 'id',
             type: 6,
-            flags: 129)
+            flags: 129),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(7, 5407859144525862516),
+            name: 'max',
+            type: 8,
+            flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[]),
@@ -186,11 +191,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
           object.id = id;
         },
         objectToFB: (Currency object, fb.Builder fbb) {
-          fbb.startTable(7);
+          fbb.startTable(8);
           fbb.addFloat64(1, object.count);
           fbb.addFloat64(2, object.totalSpent);
           fbb.addFloat64(3, object.totalEarned);
           fbb.addInt64(5, object.id);
+          fbb.addFloat64(6, object.max);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -201,7 +207,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0);
           final countParam =
               const fb.Float64Reader().vTableGet(buffer, rootOffset, 6, 0);
-          final object = Currency(id: idParam, count: countParam)
+          final maxParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 16, 0);
+          final object = Currency(id: idParam, count: countParam, max: maxParam)
             ..totalSpent =
                 const fb.Float64Reader().vTableGet(buffer, rootOffset, 8, 0)
             ..totalEarned =
@@ -302,6 +310,10 @@ class Currency_ {
   /// See [Currency.id].
   static final id =
       obx.QueryIntegerProperty<Currency>(_entities[0].properties[3]);
+
+  /// See [Currency.max].
+  static final max =
+      obx.QueryDoubleProperty<Currency>(_entities[0].properties[4]);
 }
 
 /// [CoinGenerator] entity fields to define ObjectBox queries.

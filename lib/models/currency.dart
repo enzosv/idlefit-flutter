@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:objectbox/objectbox.dart';
 
 enum CurrencyType { unknown, coin, gem, space, energy }
@@ -10,8 +12,9 @@ class Currency {
   double count = 0;
   double totalSpent = 0;
   double totalEarned = 0;
+  double max = 100;
 
-  Currency({required this.id, this.count = 0});
+  Currency({required this.id, this.count = 0, this.max = 100});
 
   CurrencyType get type {
     _ensureStableEnumValues();
@@ -24,9 +27,17 @@ class Currency {
     count = currency.count;
     totalEarned = currency.totalEarned;
     totalSpent = currency.totalSpent;
+    max = currency.max;
   }
 
-  void earn(double amount) {
+  void earn(double amount, [bool allowExcess = false]) {
+    if (!allowExcess) {
+      amount = min(amount, max - count);
+    }
+    if (amount <= 0) {
+      // TODO: convert unearned coins to energy
+      return;
+    }
     count += amount;
     totalEarned += amount;
   }

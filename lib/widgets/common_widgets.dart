@@ -29,21 +29,24 @@ class CurrencyBar extends StatelessWidget {
                 context,
                 icon: Icons.monetization_on,
                 label: 'Coins',
-                value: toLettersNotation(gameState.coins.count),
+                value:
+                    '${toLettersNotation(gameState.coins.count)}/${toLettersNotation(gameState.coins.max)}',
                 color: Colors.amber,
               ),
               _buildCurrencyItem(
                 context,
                 icon: Icons.diamond,
                 label: 'Gems',
-                value: toLettersNotation(gameState.gems.count),
+                value:
+                    '${toLettersNotation(gameState.gems.count)}/${toLettersNotation(gameState.gems.max)}',
                 color: Colors.purpleAccent,
               ),
               _buildCurrencyItem(
                 context,
                 icon: Icons.bolt,
                 label: 'Energy',
-                value: toLettersNotation(gameState.energy.count / 60000),
+                value:
+                    '${(gameState.energy.count / 60000).toStringAsFixed(0)}mins/${(gameState.energy.max / 3600000).toStringAsFixed(0)}hrs',
                 color: Colors.greenAccent,
               ),
             ],
@@ -63,15 +66,20 @@ class CurrencyBar extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: color, size: 28),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+        Row(
+          children: [
+            Icon(icon, color: color, size: 28),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
+
+        // const SizedBox(height: 4),
         Text(value, style: const TextStyle(color: Colors.white, fontSize: 16)),
       ],
     );
