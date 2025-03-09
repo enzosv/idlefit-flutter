@@ -43,9 +43,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Health Idle Game',
       theme: ThemeData(
+        brightness: Brightness.dark,
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        /* dark theme settings */
+      ),
+      themeMode: ThemeMode.dark,
       home: const GameHomePage(),
     );
   }
