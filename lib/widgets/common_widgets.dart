@@ -1,28 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/widgets/current_coins.dart';
 import 'package:provider/provider.dart';
 import '../services/game_state.dart';
 import '../util.dart';
 import '../models/shop_items.dart';
-
-class CurrentCoins extends StatelessWidget {
-  const CurrentCoins({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<GameState>(
-      builder: (context, gameState, child) {
-        return Text(
-          toLettersNotation(gameState.coins.count),
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        );
-      },
-    );
-  }
-}
 
 class CoinsInfo extends StatelessWidget {
   const CoinsInfo({super.key});
@@ -51,18 +32,12 @@ class CoinsInfo extends StatelessWidget {
           children: [
             Text(
               '/${toLettersNotation(gameState.coins.max)}',
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-              ),
+              style: const TextStyle(color: Colors.white70, fontSize: 14),
             ),
             const SizedBox(width: 8),
             Text(
               '${toLettersNotation(totalCoinsPerSecond)}/s',
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-              ),
+              style: const TextStyle(color: Colors.white70, fontSize: 14),
             ),
           ],
         );
@@ -102,19 +77,22 @@ class OtherCurrencies extends StatelessWidget {
             _buildCurrencyItem(
               context,
               icon: Icons.diamond,
-              value: '${toLettersNotation(gameState.gems.count)}/${toLettersNotation(gameState.gems.max)}',
+              value:
+                  '${toLettersNotation(gameState.gems.count)}/${toLettersNotation(gameState.gems.max)}',
               color: Colors.purpleAccent,
             ),
             _buildCurrencyItem(
               context,
               icon: Icons.bolt,
-              value: '${durationNotation(gameState.energy.count)}/${durationNotation(gameState.energy.max)}',
+              value:
+                  '${durationNotation(gameState.energy.count)}/${durationNotation(gameState.energy.max)}',
               color: Colors.greenAccent,
             ),
             _buildCurrencyItem(
               context,
               icon: Icons.space_dashboard,
-              value: '${toLettersNotation(gameState.space.count)}/${toLettersNotation(gameState.space.max)}',
+              value:
+                  '${toLettersNotation(gameState.space.count)}/${toLettersNotation(gameState.space.max)}',
               color: Colors.blueAccent,
             ),
           ],
@@ -134,13 +112,7 @@ class OtherCurrencies extends StatelessWidget {
       children: [
         Icon(icon, color: color, size: 20),
         const SizedBox(width: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-          ),
-        ),
+        Text(value, style: const TextStyle(color: Colors.white, fontSize: 14)),
       ],
     );
   }
