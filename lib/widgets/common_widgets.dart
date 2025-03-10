@@ -2,55 +2,122 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/game_state.dart';
 import '../util.dart';
+import '../models/shop_items.dart';
 
-class CurrencyBar extends StatelessWidget {
-  const CurrencyBar({super.key});
+class CurrentCoins extends StatelessWidget {
+  const CurrentCoins({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Consumer<GameState>(
       builder: (context, gameState, child) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.blue.shade800,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
+        return Text(
+          toLettersNotation(gameState.coins.count),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildCurrencyItem(
-                context,
-                icon: Icons.monetization_on,
-                label: 'Coins',
-                value:
-                    '${toLettersNotation(gameState.coins.count)}/${toLettersNotation(gameState.coins.max)}',
-                color: Colors.amber,
+        );
+      },
+    );
+  }
+}
+
+class CoinsInfo extends StatelessWidget {
+  const CoinsInfo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<GameState>(
+      builder: (context, gameState, child) {
+        // Calculate total coins per second
+        double totalCoinsPerSecond = 0;
+        for (final generator in gameState.coinGenerators) {
+          totalCoinsPerSecond += generator.output;
+        }
+
+        // Apply coin multiplier from upgrades
+        double coinMultiplier = 1.0;
+        for (final item in gameState.shopItems) {
+          if (item.effect == ShopItemEffect.coinMultiplier) {
+            coinMultiplier += item.effectValue * item.level;
+          }
+        }
+        totalCoinsPerSecond *= coinMultiplier;
+
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '/${toLettersNotation(gameState.coins.max)}',
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
               ),
-              _buildCurrencyItem(
-                context,
-                icon: Icons.diamond,
-                label: 'Gems',
-                value:
-                    '${toLettersNotation(gameState.gems.count)}/${toLettersNotation(gameState.gems.max)}',
-                color: Colors.purpleAccent,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '${toLettersNotation(totalCoinsPerSecond)}/s',
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
               ),
-              _buildCurrencyItem(
-                context,
-                icon: Icons.bolt,
-                label: 'Energy',
-                value:
-                    '${durationNotation(gameState.energy.count)}/${durationNotation(gameState.energy.max)}',
-                color: Colors.greenAccent,
-              ),
-            ],
-          ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class CoinsDisplay extends StatelessWidget {
+  const CoinsDisplay({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.monetization_on, color: Colors.amber, size: 20),
+        const SizedBox(width: 4),
+        const CurrentCoins(),
+        const SizedBox(width: 4),
+        const CoinsInfo(),
+      ],
+    );
+  }
+}
+
+class OtherCurrencies extends StatelessWidget {
+  const OtherCurrencies({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<GameState>(
+      builder: (context, gameState, child) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildCurrencyItem(
+              context,
+              icon: Icons.diamond,
+              value: '${toLettersNotation(gameState.gems.count)}/${toLettersNotation(gameState.gems.max)}',
+              color: Colors.purpleAccent,
+            ),
+            _buildCurrencyItem(
+              context,
+              icon: Icons.bolt,
+              value: '${durationNotation(gameState.energy.count)}/${durationNotation(gameState.energy.max)}',
+              color: Colors.greenAccent,
+            ),
+            _buildCurrencyItem(
+              context,
+              icon: Icons.space_dashboard,
+              value: '${toLettersNotation(gameState.space.count)}/${toLettersNotation(gameState.space.max)}',
+              color: Colors.blueAccent,
+            ),
+          ],
         );
       },
     );
@@ -59,29 +126,51 @@ class CurrencyBar extends StatelessWidget {
   Widget _buildCurrencyItem(
     BuildContext context, {
     required IconData icon,
-    required String label,
     required String value,
     required Color color,
   }) {
-    return Column(
+    return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            Icon(icon, color: color, size: 28),
-            Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+        Icon(icon, color: color, size: 20),
+        const SizedBox(width: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+          ),
         ),
-
-        // const SizedBox(height: 4),
-        Text(value, style: const TextStyle(color: Colors.white, fontSize: 16)),
       ],
+    );
+  }
+}
+
+class CurrencyBar extends StatelessWidget {
+  const CurrencyBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.blueGrey.shade800,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const CoinsDisplay(),
+          const SizedBox(height: 8),
+          const OtherCurrencies(),
+        ],
+      ),
     );
   }
 }
