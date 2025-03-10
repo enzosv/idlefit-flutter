@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/shop_items_repo.dart';
+import 'package:idlefit/models/currency_repo.dart';
 import 'package:objectbox/objectbox.dart';
 import 'storage_service.dart';
 import '../models/shop_items.dart';
@@ -16,17 +17,10 @@ class GameState with ChangeNotifier {
 
   bool isPaused = true;
 
-  final Currency coins = Currency(
-    id: CurrencyType.coin.index,
-    count: 10,
-    baseMax: 100,
-  );
-  final Currency gems = Currency(id: CurrencyType.gem.index);
-  final Currency energy = Currency(
-    id: CurrencyType.energy.index,
-    baseMax: 43200000,
-  );
-  final Currency space = Currency(id: CurrencyType.space.index);
+  late final Currency coins;
+  late final Currency gems;
+  late final Currency energy;
+  late final Currency space;
 
   int lastGenerated = 0;
   int lastHealthSync = 0;
@@ -39,6 +33,7 @@ class GameState with ChangeNotifier {
   // For saving/loading
   late StorageService _storageService;
   late Store _objectBoxService;
+  late CurrencyRepo _currencyRepo;
   Timer? _autoSaveTimer;
   Timer? _generatorTimer;
 
@@ -48,6 +43,7 @@ class GameState with ChangeNotifier {
   ) async {
     _storageService = storageService;
     _objectBoxService = objectBoxService;
+    _currencyRepo = CurrencyRepo(box: objectBoxService.box<Currency>());
 
     if (startHealthSync == 0) {
       final now = DateTime.now();
@@ -56,36 +52,27 @@ class GameState with ChangeNotifier {
     }
 
     // Initialize default generators
-    final coinRepo = CoinGeneratorRepo(
+    final generatorRepo = CoinGeneratorRepo(
       box: objectBoxService.box<CoinGenerator>(),
     );
-    coinGenerators = await coinRepo.parseCoinGenerators(
+    coinGenerators = await generatorRepo.parseCoinGenerators(
       'assets/coin_generators.json',
     );
     final shopItemRepo = ShopItemsRepo(box: objectBoxService.box<ShopItem>());
     shopItems = await shopItemRepo.parseShopItems(
       'assets/shop_items.json',
     );
-    final currencyBox = objectBoxService.box<Currency>();
-    final currencies = currencyBox.getAll().toList();
-    for (final currency in currencies) {
-      switch (currency.type) {
-        case CurrencyType.coin:
-          coins.mirror(currency);
-          continue;
-        case CurrencyType.energy:
-          energy.mirror(currency);
-          continue;
-        case CurrencyType.gem:
-          gems.mirror(currency);
-          continue;
-        case CurrencyType.space:
-          space.mirror(currency);
-          continue;
-        default:
-          continue;
-      }
-    }
+
+    // Ensure default currencies exist
+    _currencyRepo.ensureDefaultCurrencies();
+    
+    // Load currencies
+    final currencies = _currencyRepo.loadCurrencies();
+    coins = currencies[CurrencyType.coin]!;
+    gems = currencies[CurrencyType.gem]!;
+    energy = currencies[CurrencyType.energy]!;
+    space = currencies[CurrencyType.space]!;
+
     print("loaded ${coins.max}");
 
     // Try to load saved state
@@ -119,9 +106,8 @@ class GameState with ChangeNotifier {
 
   void save() {
     _storageService.saveGameState(toJson());
-    final currencyBox = _objectBoxService.box<Currency>();
-    currencyBox.putMany([coins, energy, gems, space]);
-        // not saving generators. only changes on buy anyway
+    _currencyRepo.saveCurrencies([coins, energy, gems, space]);
+    // not saving generators. only changes on buy anyway
   }
 
   void _startAutoSave() {
