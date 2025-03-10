@@ -19,12 +19,12 @@ class GameState with ChangeNotifier {
   final Currency coins = Currency(
     id: CurrencyType.coin.index,
     count: 10,
-    max: 1000,
+    baseMax: 1000,
   );
   final Currency gems = Currency(id: CurrencyType.gem.index);
   final Currency energy = Currency(
     id: CurrencyType.energy.index,
-    max: 43200000,
+    baseMax: 43200000,
   );
   final Currency space = Currency(id: CurrencyType.space.index);
 
@@ -267,18 +267,18 @@ class GameState with ChangeNotifier {
 
       // 200*pow(10, generator.tier-1) or next tier cost * 1.8
       final next = coinGenerators[generator.tier].cost;
-      coins.max = max(
+      coins.baseMax = max(
         next * 1.8,
-        max(coins.max, (200 * pow(10, generator.tier - 1).toDouble())),
+        (200 * pow(10, generator.tier - 1).toDouble()),
       );
 
     if (generator.tier % 10 == 0) {
       // raise gem limit every 10
-      gems.max += 10;
+        gems.baseMax += 10;
     }
     if (generator.tier % 3 == 0) {
         // raise energy limit by 1hr every 3
-        energy.max += 360000;
+        energy.baseMax += 3600000;
     }
     // TODO: raise space limit
     }

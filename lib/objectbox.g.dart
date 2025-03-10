@@ -24,7 +24,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(1, 8970713413303252018),
       name: 'Currency',
-      lastPropertyId: const obx_int.IdUid(7, 5407859144525862516),
+      lastPropertyId: const obx_int.IdUid(9, 1103942004918786733),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -48,8 +48,13 @@ final _entities = <obx_int.ModelEntity>[
             type: 6,
             flags: 129),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(7, 5407859144525862516),
-            name: 'max',
+            id: const obx_int.IdUid(8, 6709896111414846563),
+            name: 'baseMax',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(9, 1103942004918786733),
+            name: 'maxMultiplier',
             type: 8,
             flags: 0)
       ],
@@ -174,7 +179,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         8940347419837491692,
         7308206853943299864,
         1298175783779309702,
-        5086729266335392220
+        5086729266335392220,
+        5407859144525862516
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -191,12 +197,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
           object.id = id;
         },
         objectToFB: (Currency object, fb.Builder fbb) {
-          fbb.startTable(8);
+          fbb.startTable(10);
           fbb.addFloat64(1, object.count);
           fbb.addFloat64(2, object.totalSpent);
           fbb.addFloat64(3, object.totalEarned);
           fbb.addInt64(5, object.id);
-          fbb.addFloat64(6, object.max);
+          fbb.addFloat64(7, object.baseMax);
+          fbb.addFloat64(8, object.maxMultiplier);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -207,13 +214,16 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0);
           final countParam =
               const fb.Float64Reader().vTableGet(buffer, rootOffset, 6, 0);
-          final maxParam =
-              const fb.Float64Reader().vTableGet(buffer, rootOffset, 16, 0);
-          final object = Currency(id: idParam, count: countParam, max: maxParam)
+          final baseMaxParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 18, 0);
+          final object = Currency(
+              id: idParam, count: countParam, baseMax: baseMaxParam)
             ..totalSpent =
                 const fb.Float64Reader().vTableGet(buffer, rootOffset, 8, 0)
             ..totalEarned =
-                const fb.Float64Reader().vTableGet(buffer, rootOffset, 10, 0);
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 10, 0)
+            ..maxMultiplier =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 20, 0);
 
           return object;
         }),
@@ -311,9 +321,13 @@ class Currency_ {
   static final id =
       obx.QueryIntegerProperty<Currency>(_entities[0].properties[3]);
 
-  /// See [Currency.max].
-  static final max =
+  /// See [Currency.baseMax].
+  static final baseMax =
       obx.QueryDoubleProperty<Currency>(_entities[0].properties[4]);
+
+  /// See [Currency.maxMultiplier].
+  static final maxMultiplier =
+      obx.QueryDoubleProperty<Currency>(_entities[0].properties[5]);
 }
 
 /// [CoinGenerator] entity fields to define ObjectBox queries.

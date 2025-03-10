@@ -12,9 +12,10 @@ class Currency {
   double count = 0;
   double totalSpent = 0;
   double totalEarned = 0;
-  double max = 100;
+  double baseMax = 100;
+  double maxMultiplier = 1;
 
-  Currency({required this.id, this.count = 0, this.max = 100});
+  Currency({required this.id, this.count = 0, this.baseMax = 100});
 
   CurrencyType get type {
     _ensureStableEnumValues();
@@ -23,11 +24,16 @@ class Currency {
         : CurrencyType.unknown;
   }
 
+  double get max {
+    return baseMax * maxMultiplier;
+  }
+
   void mirror(Currency currency) {
     count = currency.count;
     totalEarned = currency.totalEarned;
     totalSpent = currency.totalSpent;
-    max = currency.max;
+    baseMax = currency.baseMax;
+    maxMultiplier = currency.maxMultiplier;
   }
 
   void earn(double amount, [bool allowExcess = false]) {
