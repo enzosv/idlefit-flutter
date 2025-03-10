@@ -32,13 +32,19 @@ class MainScreen extends StatelessWidget {
               Expanded(
                 child: Consumer<GameState>(
                   builder: (context, gameState, child) {
+                    // Filter affordable generators and sort by price
+                    final affordableGenerators = gameState.coinGenerators
+                        .where((generator) => generator.cost <= gameState.coins.max)
+                        .toList()
+                      ..sort((a, b) => b.cost.compareTo(a.cost));
+
                     return ListView.builder(
                       padding: const EdgeInsets.all(16),
-                      itemCount: gameState.coinGenerators.length,
+                      itemCount: affordableGenerators.length,
                       itemBuilder: (context, index) {
                         return GeneratorCard(
                           gameState: gameState,
-                          generatorIndex: index,
+                          generatorIndex: gameState.coinGenerators.indexOf(affordableGenerators[index]),
                         );
                       },
                     );
