@@ -81,15 +81,17 @@ class StatsScreen extends StatelessWidget {
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                         const Divider(),
-                        ...gameState.coinGenerators.map(
-                          (generator) => ListTile(
-                            title: Text(generator.name),
-                            subtitle: Text(
-                              '${toLettersNotation(generator.output)} coins/sec',
+                        ...gameState.coinGenerators
+                            .where((generator) => generator.count > 0)
+                            .map(
+                              (generator) => ListTile(
+                                title: Text(generator.name),
+                                subtitle: Text(
+                                  '${toLettersNotation(generator.output)} coins/sec',
+                                ),
+                                trailing: Text('Owned: ${generator.count}'),
+                              ),
                             ),
-                            trailing: Text('Owned: ${generator.count}'),
-                          ),
-                        ),
                       ],
                     ),
                   ),
