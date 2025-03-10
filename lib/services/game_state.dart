@@ -262,18 +262,28 @@ class GameState with ChangeNotifier {
     if (!coins.spend(generator.cost)) {
       return false;
     }
-    generator.count++;
-    coins.max = max(coins.max, (200 * pow(10, generator.tier - 1).toDouble()));
+    if (generator.count == 0) {
+      // raise maximums
+
+      // 200*pow(10, generator.tier-1) or next tier cost * 1.8
+      final next = coinGenerators[generator.tier].cost;
+      coins.max = max(
+        next * 1.8,
+        max(coins.max, (200 * pow(10, generator.tier - 1).toDouble())),
+      );
 
     if (generator.tier % 10 == 0) {
       // raise gem limit every 10
       gems.max += 10;
     }
     if (generator.tier % 3 == 0) {
-      // raise energy limit every 3
-      energy.max += 3600000;
+        // raise energy limit by 1hr every 3
+        energy.max += 360000;
     }
     // TODO: raise space limit
+    }
+    generator.count++;
+
     _objectBoxService.box<CoinGenerator>().put(generator);
     save();
     notifyListeners();
