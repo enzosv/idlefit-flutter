@@ -46,7 +46,7 @@ class CurrencyBar extends StatelessWidget {
                 icon: Icons.bolt,
                 label: 'Energy',
                 value:
-                    '${(gameState.energy.count / 60000).toStringAsFixed(0)}mins/${(gameState.energy.max / 3600000).toStringAsFixed(0)}hrs',
+                    '${durationNotation(gameState.energy.count)}/${durationNotation(gameState.energy.max)}hrs',
                 color: Colors.greenAccent,
               ),
             ],

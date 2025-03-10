@@ -1,5 +1,14 @@
 import 'dart:math';
 
+String durationNotation(double milliseconds) {
+  if (milliseconds < 600000) {
+    final mins = (milliseconds / 600000);
+    return "${toLettersNotation(mins)}mins";
+  }
+  final hrs = milliseconds / 3600000;
+  return "${toLettersNotation(hrs)}hrs";
+}
+
 String toLettersNotation(double number) {
   if (number < 0.1) {
     final result = number.toStringAsFixed(2);
