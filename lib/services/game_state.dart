@@ -19,7 +19,7 @@ class GameState with ChangeNotifier {
   final Currency coins = Currency(
     id: CurrencyType.coin.index,
     count: 10,
-    baseMax: 1000,
+    baseMax: 100,
   );
   final Currency gems = Currency(id: CurrencyType.gem.index);
   final Currency energy = Currency(
