@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:idlefit/util.dart';
+import 'package:idlefit/widgets/common_widgets.dart';
 
 class GeneratorCard extends StatefulWidget {
   final GameState gameState;
@@ -24,6 +25,8 @@ class _GeneratorCardState extends State<GeneratorCard>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _positionAnimation;
   final duration = 500;
+  Offset? _tapLocation;
+
   @override
   void initState() {
     super.initState();
@@ -38,17 +41,21 @@ class _GeneratorCardState extends State<GeneratorCard>
 
     _positionAnimation = Tween<Offset>(
       begin: Offset.zero,
-      end: Offset(-2, -3), // Move diagonally towards top-left
+      end: Offset.zero, // Will be set dynamically based on tap location
     ).animate(
       CurvedAnimation(parent: _iconController, curve: Curves.easeInOutCubic),
     );
   }
 
-  void startProgress() {
+  void startProgress(TapDownDetails details) {
     if (showProgress ||
         widget.gameState.coinGenerators[widget.generatorIndex].count < 1) {
       return;
     }
+
+    // Store tap location
+    _tapLocation = details.localPosition;
+
     setState(() {
       progress = 0.0; // Reset progress
       showProgress = true; // Show progress bar
@@ -77,15 +84,36 @@ class _GeneratorCardState extends State<GeneratorCard>
   }
 
   void _showFloatingIcon(BuildContext context) {
-    if (!mounted) return;
+    if (!mounted || _tapLocation == null) return;
+    
     final size = 24.0;
     final overlay = Overlay.of(context);
     final RenderBox? cardRenderBox = context.findRenderObject() as RenderBox?;
-    if (cardRenderBox == null) return;
+    final RenderBox? currencyBarRenderBox = CurrencyBar.currencyBarKey.currentContext?.findRenderObject() as RenderBox?;
+    
+    if (cardRenderBox == null || currencyBarRenderBox == null) return;
 
+    // Get global positions
     final cardPosition = cardRenderBox.localToGlobal(Offset.zero);
-    final cardCenterX = cardPosition.dx + (cardRenderBox.size.width / 2);
-    final cardCenterY = cardPosition.dy + (cardRenderBox.size.height / 2);
+    final currencyBarPosition = currencyBarRenderBox.localToGlobal(Offset.zero);
+    
+    // Calculate start and end positions
+    final startX = cardPosition.dx + _tapLocation!.dx;
+    final startY = cardPosition.dy + _tapLocation!.dy;
+    final endX = currencyBarPosition.dx + (currencyBarRenderBox.size.width / 2);
+    final endY = currencyBarPosition.dy + (currencyBarRenderBox.size.height / 2);
+    
+    // Calculate the animation path
+    final dx = (endX - startX) / 100; // Divide by 100 to make the movement smoother
+    final dy = (endY - startY) / 100;
+
+    // Update the position animation
+    _positionAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: Offset(dx, dy),
+    ).animate(
+      CurvedAnimation(parent: _iconController, curve: Curves.easeInOutCubic),
+    );
 
     final overlayEntry = OverlayEntry(
       builder: (context) {
@@ -93,12 +121,12 @@ class _GeneratorCardState extends State<GeneratorCard>
           animation: _iconController,
           builder: (context, child) {
             return Positioned(
-              left: cardCenterX,
-              top: cardCenterY,
+              left: startX,
+              top: startY,
               child: Transform.translate(
                 offset: Offset(
-                  _positionAnimation.value.dx * 48,
-                  _positionAnimation.value.dy * 160,
+                  _positionAnimation.value.dx * 100,
+                  _positionAnimation.value.dy * 100,
                 ),
                 child: Opacity(
                   opacity: _fadeAnimation.value,
@@ -134,7 +162,7 @@ class _GeneratorCardState extends State<GeneratorCard>
           elevation: 4,
           margin: const EdgeInsets.only(bottom: 16),
           child: InkWell(
-            onTap: showProgress || generator.count < 1 ? null : startProgress,
+            onTapDown: showProgress || generator.count < 1 ? null : startProgress,
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -175,7 +203,22 @@ class _GeneratorCardState extends State<GeneratorCard>
                                 ? () =>
                                     widget.gameState.buyCoinGenerator(generator)
                                 : null,
-                        child: const Text('Buy'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green.shade400,
+                          foregroundColor: Colors.black,
+                          elevation: 2,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          'Buy',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
                       ),
                     ],
                   ),

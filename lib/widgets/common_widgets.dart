@@ -147,11 +147,13 @@ class OtherCurrencies extends StatelessWidget {
 }
 
 class CurrencyBar extends StatelessWidget {
+  static final GlobalKey currencyBarKey = GlobalKey();
   const CurrencyBar({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      key: currencyBarKey,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.blueGrey.shade800,
