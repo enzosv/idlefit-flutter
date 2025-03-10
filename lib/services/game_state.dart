@@ -32,8 +32,9 @@ class GameState with ChangeNotifier {
 
   // For saving/loading
   late StorageService _storageService;
-  late Store _objectBoxService;
   late CurrencyRepo _currencyRepo;
+  late CoinGeneratorRepo _generatorRepo;
+  late ShopItemsRepo _shopItemRepo;
   Timer? _autoSaveTimer;
   Timer? _generatorTimer;
 
@@ -42,8 +43,13 @@ class GameState with ChangeNotifier {
     Store objectBoxService,
   ) async {
     _storageService = storageService;
-    _objectBoxService = objectBoxService;
+
+    // Initialize repositories
     _currencyRepo = CurrencyRepo(box: objectBoxService.box<Currency>());
+    _generatorRepo = CoinGeneratorRepo(
+      box: objectBoxService.box<CoinGenerator>(),
+    );
+    _shopItemRepo = ShopItemsRepo(box: objectBoxService.box<ShopItem>());
 
     if (startHealthSync == 0) {
       final now = DateTime.now();
@@ -51,22 +57,16 @@ class GameState with ChangeNotifier {
           DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
     }
 
-    // Initialize default generators
-    final generatorRepo = CoinGeneratorRepo(
-      box: objectBoxService.box<CoinGenerator>(),
-    );
-    coinGenerators = await generatorRepo.parseCoinGenerators(
+    // Load data from repositories
+    coinGenerators = await _generatorRepo.parseCoinGenerators(
       'assets/coin_generators.json',
     );
-    final shopItemRepo = ShopItemsRepo(box: objectBoxService.box<ShopItem>());
-    shopItems = await shopItemRepo.parseShopItems(
+    shopItems = await _shopItemRepo.parseShopItems(
       'assets/shop_items.json',
     );
 
-    // Ensure default currencies exist
+    // Ensure default currencies exist and load them
     _currencyRepo.ensureDefaultCurrencies();
-    
-    // Load currencies
     final currencies = _currencyRepo.loadCurrencies();
     coins = currencies[CurrencyType.coin]!;
     gems = currencies[CurrencyType.gem]!;
@@ -107,7 +107,7 @@ class GameState with ChangeNotifier {
   void save() {
     _storageService.saveGameState(toJson());
     _currencyRepo.saveCurrencies([coins, energy, gems, space]);
-    // not saving generators. only changes on buy anyway
+    // not saving generators and shopitems. only changes on buy anyway
   }
 
   void _startAutoSave() {
@@ -225,7 +225,7 @@ class GameState with ChangeNotifier {
     }
     generator.count++;
 
-    _objectBoxService.box<CoinGenerator>().put(generator);
+    _generatorRepo.saveCoinGenerator(generator);
     save();
     notifyListeners();
     return true;
@@ -240,6 +240,7 @@ class GameState with ChangeNotifier {
 
     item.level++;
     save();
+    _shopItemRepo.saveShopItem(item);
     notifyListeners();
     return true;
   }

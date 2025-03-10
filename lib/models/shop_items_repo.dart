@@ -21,4 +21,8 @@ class ShopItemsRepo {
       return item;
     }).toList();
   }
+
+  saveShopItem(ShopItem item) {
+    box.put(item);
+  }
 }

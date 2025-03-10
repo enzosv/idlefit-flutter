@@ -91,4 +91,8 @@ class CoinGeneratorRepo {
       return generator;
     }).toList();
   }
+
+  saveCoinGenerator(CoinGenerator generator) {
+    box.put(generator);
+  }
 }
