@@ -57,7 +57,7 @@ class ShopScreen extends StatelessWidget {
                                 Text(
                                   isMaxLevel
                                       ? 'MAXED OUT'
-                                      : 'Cost: ${item.currentCost} gems',
+                                      : 'Cost: ${item.currentCost} ${item.costUnit.name}',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color:
@@ -72,7 +72,7 @@ class ShopScreen extends StatelessWidget {
                                 ElevatedButton(
                                   onPressed:
                                       (isMaxLevel ||
-                                              gameState.gems.count <
+                                              gameState.space.count <
                                                   item.currentCost)
                                           ? null
                                           : () =>

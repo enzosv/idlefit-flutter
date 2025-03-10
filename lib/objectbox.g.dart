@@ -17,6 +17,7 @@ import 'package:objectbox_sync_flutter_libs/objectbox_sync_flutter_libs.dart';
 import 'models/coin_generator.dart';
 import 'models/currency.dart';
 import 'models/health_data_entry.dart';
+import 'models/shop_items.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -123,6 +124,25 @@ final _entities = <obx_int.ModelEntity>[
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(6, 3093373672220765882),
+      name: 'ShopItem',
+      lastPropertyId: const obx_int.IdUid(8, 2249982543274755836),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 677716417256338725),
+            name: 'id',
+            type: 6,
+            flags: 129),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(8, 2249982543274755836),
+            name: 'level',
+            type: 6,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
 ];
 
@@ -161,7 +181,7 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(5, 604859576841525103),
+      lastEntityId: const obx_int.IdUid(6, 3093373672220765882),
       lastIndexId: const obx_int.IdUid(2, 6046711262050609894),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
@@ -180,7 +200,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
         7308206853943299864,
         1298175783779309702,
         5086729266335392220,
-        5407859144525862516
+        5407859144525862516,
+        4297493175054291291,
+        944104226892207343,
+        2037289546189049172,
+        2255176740307486357,
+        745509794462133064,
+        6946102241664551198
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -297,6 +323,32 @@ obx_int.ModelDefinition getObjectBoxModel() {
             ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
 
           return object;
+        }),
+    ShopItem: obx_int.EntityDefinition<ShopItem>(
+        model: _entities[3],
+        toOneRelations: (ShopItem object) => [],
+        toManyRelations: (ShopItem object) => {},
+        getId: (ShopItem object) => object.id,
+        setId: (ShopItem object, int id) {
+          object.id = id;
+        },
+        objectToFB: (ShopItem object, fb.Builder fbb) {
+          fbb.startTable(9);
+          fbb.addInt64(0, object.id);
+          fbb.addInt64(7, object.level);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final idParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+          final levelParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0);
+          final object = ShopItem(id: idParam, level: levelParam);
+
+          return object;
         })
   };
 
@@ -370,4 +422,15 @@ class HealthDataEntry_ {
   /// See [HealthDataEntry.type].
   static final type =
       obx.QueryStringProperty<HealthDataEntry>(_entities[2].properties[5]);
+}
+
+/// [ShopItem] entity fields to define ObjectBox queries.
+class ShopItem_ {
+  /// See [ShopItem.id].
+  static final id =
+      obx.QueryIntegerProperty<ShopItem>(_entities[3].properties[0]);
+
+  /// See [ShopItem.level].
+  static final level =
+      obx.QueryIntegerProperty<ShopItem>(_entities[3].properties[1]);
 }

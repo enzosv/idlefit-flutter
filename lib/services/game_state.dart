@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
-import 'package:idlefit/util.dart';
+import 'package:idlefit/models/shop_items_repo.dart';
 import 'package:objectbox/objectbox.dart';
 import 'storage_service.dart';
 import '../models/shop_items.dart';
@@ -56,12 +56,15 @@ class GameState with ChangeNotifier {
     }
 
     // Initialize default generators
-
     final coinRepo = CoinGeneratorRepo(
       box: objectBoxService.box<CoinGenerator>(),
     );
     coinGenerators = await coinRepo.parseCoinGenerators(
       'assets/coin_generators.json',
+    );
+    final shopItemRepo = ShopItemsRepo(box: objectBoxService.box<ShopItem>());
+    shopItems = await shopItemRepo.parseShopItems(
+      'assets/shop_items.json',
     );
     final currencyBox = objectBoxService.box<Currency>();
     final currencies = currencyBox.getAll().toList();
@@ -85,46 +88,11 @@ class GameState with ChangeNotifier {
     }
     print("loaded ${coins.max}");
 
-    // Initialize shop items
-    shopItems = [
-      ShopItem(
-        id: 'coin_boost',
-        name: 'Coin Boost',
-        description: 'Increases all coin generation by 10%',
-        cost: 10,
-        effect: ShopItemEffect.coinMultiplier,
-        effectValue: 0.1,
-        maxLevel: 10,
-        level: 0,
-      ),
-      ShopItem(
-        id: 'health_boost',
-        name: 'Health Converter',
-        description: 'Get more coins from health activities',
-        cost: 15,
-        effect: ShopItemEffect.healthMultiplier,
-        effectValue: 0.2,
-        maxLevel: 5,
-        level: 0,
-      ),
-      ShopItem(
-        id: 'energy_capacity',
-        name: 'Energy Capacity',
-        description: 'Increases max energy by 50',
-        cost: 20,
-        effect: ShopItemEffect.energyCapacity,
-        effectValue: 50,
-        maxLevel: 10,
-        level: 0,
-      ),
-    ];
-
     // Try to load saved state
     final savedState = await _storageService.loadGameState();
     if (savedState != null) {
       _loadFromSavedState(savedState);
     }
-
     // Start timers
     _startAutoSave();
     _startGenerators();
@@ -139,18 +107,6 @@ class GameState with ChangeNotifier {
       startHealthSync =
           DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
     }
-
-    // Load shop items
-    if (savedState['shopItems'] != null) {
-      final List<dynamic> shopData = savedState['shopItems'];
-      for (final itemJson in shopData) {
-        final itemId = itemJson['id'];
-        final itemIndex = shopItems.indexWhere((s) => s.id == itemId);
-        if (itemIndex >= 0) {
-          shopItems[itemIndex].level = itemJson['level'] ?? 0;
-        }
-      }
-    }
   }
 
   Map<String, dynamic> toJson() {
@@ -158,7 +114,6 @@ class GameState with ChangeNotifier {
       'lastGenerated': lastGenerated,
       'lastHealthSync': lastHealthSync,
       'startHealthSync': startHealthSync,
-      'shopItems': shopItems.map((s) => s.json).toList(),
     };
   }
 
@@ -166,7 +121,7 @@ class GameState with ChangeNotifier {
     _storageService.saveGameState(toJson());
     final currencyBox = _objectBoxService.box<Currency>();
     currencyBox.putMany([coins, energy, gems, space]);
-    // not saving generators. only changes on buy anyway
+        // not saving generators. only changes on buy anyway
   }
 
   void _startAutoSave() {

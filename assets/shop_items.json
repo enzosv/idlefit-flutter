@@ -1,0 +1,11 @@
+[
+    {
+        "id": 1,
+        "name": "Energy Boost",
+        "description": "Increases energy capacity by 10%",
+        "baseCost": 1000,
+        "effect": "energyCapacity",
+        "effectValue": 0.1,
+        "maxLevel": 10
+    }
+]
