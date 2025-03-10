@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:idlefit/util.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter/scheduler.dart';
 
 class GeneratorCard extends StatefulWidget {
   final GameState gameState;
   final int generatorIndex;
   const GeneratorCard({
-    Key? key,
+    super.key,
     required this.gameState,
     required this.generatorIndex,
-  }) : super(key: key);
+  });
 
   @override
   _GeneratorCardState createState() => _GeneratorCardState();
@@ -21,13 +18,12 @@ class GeneratorCard extends StatefulWidget {
 class _GeneratorCardState extends State<GeneratorCard>
     with SingleTickerProviderStateMixin {
   double progress = 0.0;
-  int duration = 1;
   bool showProgress = false;
   bool showIcon = false;
   late AnimationController _iconController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _positionAnimation;
-
+  final duration = 500;
   @override
   void initState() {
     super.initState();
@@ -62,7 +58,8 @@ class _GeneratorCardState extends State<GeneratorCard>
       setState(() => progress = 1.0);
     });
 
-    Future.delayed(Duration(seconds: duration), () {
+    Future.delayed(Duration(milliseconds: duration), () {
+      if (!mounted) return;
       setState(() {
         showProgress = false;
         showIcon = true;
@@ -70,7 +67,7 @@ class _GeneratorCardState extends State<GeneratorCard>
       _iconController.forward(from: 0.0); // Start icon animation
       _showFloatingIcon(context);
 
-      Future.delayed(Duration(milliseconds: 1000), () {
+      Future.delayed(Duration(milliseconds: duration), () {
         setState(() => showIcon = false); // Hide icon after animation
       });
 
@@ -80,6 +77,7 @@ class _GeneratorCardState extends State<GeneratorCard>
   }
 
   void _showFloatingIcon(BuildContext context) {
+    if (!mounted) return;
     final size = 24.0;
     final overlay = Overlay.of(context);
     final RenderBox? cardRenderBox = context.findRenderObject() as RenderBox?;
@@ -183,7 +181,7 @@ class _GeneratorCardState extends State<GeneratorCard>
                   ),
                   if (showProgress)
                     AnimatedContainer(
-                      duration: Duration(seconds: duration),
+                      duration: Duration(milliseconds: duration),
                       height: 5,
                       width: progress * (screenWidth - 32), // Expanding bar
                       color: Colors.blue,
