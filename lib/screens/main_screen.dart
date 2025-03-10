@@ -1,6 +1,5 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:idlefit/util.dart';
 import 'package:idlefit/widgets/generator_card.dart';
 import 'package:provider/provider.dart';
 import '../services/game_state.dart';

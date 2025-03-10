@@ -36,6 +36,10 @@ class CoinGenerator {
     return baseOutput * count * pow(2, level);
   }
 
+  double get tapOutput {
+    return baseOutput * pow(2, level);
+  }
+
   double upgradeCost(BigInt baseCost, int level) {
     const List<int> multipliers = [
       100,
