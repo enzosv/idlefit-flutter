@@ -77,30 +77,37 @@ class _GameHomePageState extends State<GameHomePage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
+    print("new state: $state");
+    if (![
+      AppLifecycleState.paused,
+      AppLifecycleState.resumed,
+    ].contains(state)) {
+      return;
+    }
     final gameState = Provider.of<GameState>(context, listen: false);
     if (state == AppLifecycleState.paused) {
       // going to background
+      gameState.isPaused = true;
       gameState.save();
       gameState.saveBackgroundState();
-    } else if (state == AppLifecycleState.resumed) {
-      final healthService = Provider.of<HealthService>(context, listen: false);
-      final objectBoxService = Provider.of<ObjectBox>(context, listen: false);
-      await healthService.syncHealthData(objectBoxService, gameState);
-
-      // Show background earnings popup
-      // final earnings = gameState.getBackgroundDifferences();
-      // if (earnings.values.any((value) => value > 0)) {
-      if (mounted) {
+      return;
+    }
+    // going to foreground
+    final healthService = Provider.of<HealthService>(context, listen: false);
+    final objectBoxService = Provider.of<ObjectBox>(context, listen: false);
+    await healthService.syncHealthData(objectBoxService, gameState);
+    gameState.isPaused = false;
+    await Future.delayed(const Duration(seconds: 2)).then((_) {
+      if (!mounted) {
+        return;
+      }
+      final earnings = gameState.getBackgroundDifferences();
+      if (earnings.values.any((value) => value > 0)) {
         showDialog(
           context: context,
-          barrierDismissible: false,
-          builder: (context) => BackgroundEarningsPopup(),
+          builder: (context) => BackgroundEarningsPopup(earnings: earnings),
         );
       }
-      // }
-    }
-    setState(() {
-      gameState.isPaused = state != AppLifecycleState.resumed;
     });
   }
 
@@ -114,16 +121,23 @@ class _GameHomePageState extends State<GameHomePage>
     gameState.isPaused = true;
     healthService.initialize().then((_) async {
       await healthService.syncHealthData(objectBoxService, gameState);
-      gameState.isPaused = false;
+      setState(() {
+        gameState.isPaused = false;
+      });
+      await Future.delayed(const Duration(seconds: 2)).then((_) {
+        if (!mounted) {
+          return;
+        }
+        // Show initial earnings popup
 
-      // Show initial earnings popup
-      if (mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => BackgroundEarningsPopup(),
-        );
-      }
+        final earnings = gameState.getBackgroundDifferences();
+        if (earnings.values.any((value) => value > 0)) {
+          showDialog(
+            context: context,
+            builder: (context) => BackgroundEarningsPopup(earnings: earnings),
+          );
+        }
+      });
     });
     WidgetsBinding.instance.addObserver(this);
   }
