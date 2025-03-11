@@ -38,15 +38,15 @@ class CoinGenerator {
 
   // Base CPS formula: CPS = CPS_0 * N
   double get output {
-    return baseOutput * count * (1 + level * 0.1);
+    return singleOutput * count;
+  }
+
+  double get singleOutput {
+    return baseOutput * (1 + level * 0.1);
   }
 
   double outputAtLevel(int lvl) {
     return baseOutput * count * (1 + lvl * 0.1);
-  }
-
-  double get tapOutput {
-    return baseOutput * pow(2, level);
   }
 
   double get upgradeCost {
@@ -54,7 +54,7 @@ class CoinGenerator {
   }
 
   double get upgradeUnlockCost {
-    return 1000.0; // Fixed space cost for upgrades
+    return 1000.0; // Fixed space cost for unlocking upgrades
   }
 
   factory CoinGenerator.fromJson(Map<String, dynamic> json) {
