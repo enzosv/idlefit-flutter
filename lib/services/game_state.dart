@@ -214,11 +214,13 @@ class GameState with ChangeNotifier {
         healthMultiplier += item.effectValue * item.level;
       }
     }
-
-    energy.earn(calories * healthMultiplier * _calorieToEnergyMultiplier);
+    _backgroundEnergy =
+        calories * healthMultiplier * _calorieToEnergyMultiplier;
+    energy.earn(_backgroundEnergy);
     gems.earn(
       exerciseMinutes * healthMultiplier / 2,
     ); // 2 exercise minutes = 1 gem
+    _backgroundSpace = steps;
     space.earn(steps);
     save();
     notifyListeners();
@@ -320,8 +322,6 @@ class GameState with ChangeNotifier {
 
   void saveBackgroundState() {
     _backgroundCoins = coins.count;
-    _backgroundEnergy = energy.count;
-    _backgroundSpace = space.count;
     _backgroundEnergySpent = 0;
   }
 
