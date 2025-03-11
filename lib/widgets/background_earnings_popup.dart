@@ -1,101 +1,89 @@
 import 'package:flutter/material.dart';
 import '../util.dart';
-import '../services/game_state.dart';
-import 'package:provider/provider.dart';
 
 class BackgroundEarningsPopup extends StatelessWidget {
-  const BackgroundEarningsPopup({super.key});
+  final msToMins = 60000;
+  final Map<String, double> earnings;
+
+  const BackgroundEarningsPopup({super.key, required this.earnings});
 
   @override
   Widget build(BuildContext context) {
-    final msToMins = 60000;
-    return Consumer<GameState>(
-      builder: (context, gameState, child) {
-        final backgroundCurrencies = gameState.getBackgroundState();
-        final energyEarned =
-            (gameState.energy.count -
-                (backgroundCurrencies['energy_earned'] ?? 0)) /
-            msToMins;
-        final spaceEarned =
-            (gameState.space.count - (backgroundCurrencies['space'] ?? 0));
-        final coinsEarned =
-            gameState.coins.count - (backgroundCurrencies['coins'] ?? 0);
-        final energySpent =
-            (backgroundCurrencies['energy_spent'] ?? 0) / msToMins;
-        if (coinsEarned < 1 && spaceEarned < 1 && energyEarned < 1) {
-          return const SizedBox.shrink();
-        }
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Since You Were Gone',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                if (coinsEarned > 0) const SizedBox(height: 24),
-                if (coinsEarned > 0)
-                  _buildEarningRow(
-                    context,
-                    icon: Icons.monetization_on,
-                    label: 'Coins Earned',
-                    value: coinsEarned,
-                    color: Colors.amber,
-                  ),
+    final double energyEarned = (earnings['energy_earned'] ?? 0) / msToMins;
+    final double spaceEarned = earnings['space'] ?? 0;
+    final double coinsEarned = earnings['coins'] ?? 0;
+    final double energySpent = (earnings['energy_spent'] ?? 0) / msToMins;
+    if (coinsEarned < 1 && spaceEarned < 1 && energyEarned < 1) {
+      return const SizedBox.shrink();
+    }
 
-                if (spaceEarned > 0) const SizedBox(height: 16),
-                if (spaceEarned > 0)
-                  _buildEarningRow(
-                    context,
-                    icon: Icons.space_dashboard,
-                    label: 'Space Earned',
-                    value: spaceEarned,
-                    color: Colors.blueAccent,
-                  ),
-                if (energyEarned > 0) const SizedBox(height: 16),
-                if (energyEarned > 0)
-                  _buildEarningRow(
-                    context,
-                    icon: Icons.bolt,
-                    label: 'Energy Earned',
-                    value: energyEarned * msToMins,
-                    color: Colors.greenAccent,
-                  ),
-                if (energySpent > 0) const SizedBox(height: 16),
-                if (energySpent > 0)
-                  _buildEarningRow(
-                    context,
-                    icon: Icons.bolt,
-                    label: 'Energy Spent',
-                    value: energySpent * msToMins,
-                    color: Colors.redAccent,
-                  ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade400,
-                    foregroundColor: Colors.black,
-                    minimumSize: const Size(double.infinity, 48),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'Great!',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'While You Were Away',
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
-          ),
-        );
-      },
+            if (coinsEarned > 0) const SizedBox(height: 24),
+            if (coinsEarned > 0)
+              _buildEarningRow(
+                context,
+                icon: Icons.monetization_on,
+                label: 'Coins Earned',
+                value: coinsEarned,
+                color: Colors.amber,
+              ),
+
+            if (spaceEarned > 0) const SizedBox(height: 16),
+            if (spaceEarned > 0)
+              _buildEarningRow(
+                context,
+                icon: Icons.space_dashboard,
+                label: 'Space Earned',
+                value: spaceEarned,
+                color: Colors.blueAccent,
+              ),
+            if (energyEarned > 0) const SizedBox(height: 16),
+            if (energyEarned > 0)
+              _buildEarningRow(
+                context,
+                icon: Icons.bolt,
+                label: 'Energy Earned',
+                value: energyEarned * msToMins,
+                color: Colors.greenAccent,
+              ),
+            if (energySpent > 0) const SizedBox(height: 16),
+            if (energySpent > 0)
+              _buildEarningRow(
+                context,
+                icon: Icons.bolt,
+                label: 'Energy Spent',
+                value: energySpent * msToMins,
+                color: Colors.redAccent,
+              ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green.shade400,
+                foregroundColor: Colors.black,
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Great!',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
