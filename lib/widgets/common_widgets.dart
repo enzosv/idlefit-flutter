@@ -56,7 +56,7 @@ class CoinsDisplay extends StatelessWidget {
       children: [
         Icon(Icons.monetization_on, color: Colors.amber, size: 20),
         const SizedBox(width: 4),
-        const CurrentCoins(),
+        CurrentCoins(key: CurrentCoins.globalKey),
         const SizedBox(width: 4),
         const CoinsInfo(),
       ],

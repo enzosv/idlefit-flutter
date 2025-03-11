@@ -4,7 +4,13 @@ import '../services/game_state.dart';
 import '../util.dart';
 
 class CurrentCoins extends StatefulWidget {
+  static final globalKey = GlobalKey<_CurrentCoinsState>();
+
   const CurrentCoins({super.key});
+
+  static void triggerAnimation() {
+    globalKey.currentState?._triggerAnimation();
+  }
 
   @override
   State<CurrentCoins> createState() => _CurrentCoinsState();
@@ -14,7 +20,6 @@ class _CurrentCoinsState extends State<CurrentCoins>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
-  double _previousCoins = 0;
 
   @override
   void initState() {
@@ -46,11 +51,6 @@ class _CurrentCoinsState extends State<CurrentCoins>
   Widget build(BuildContext context) {
     return Consumer<GameState>(
       builder: (context, gameState, child) {
-        // if (gameState.coins.count != _previousCoins) {
-        //   _previousCoins = gameState.coins.count;
-        //   _triggerAnimation();
-        // }
-
         return AnimatedBuilder(
           animation: _scaleAnimation,
           builder: (context, child) {

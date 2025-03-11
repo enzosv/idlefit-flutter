@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:idlefit/util.dart';
+import 'package:idlefit/widgets/current_coins.dart';
 
 class GeneratorCard extends StatefulWidget {
   final GameState gameState;
@@ -92,6 +93,7 @@ class _GeneratorCardState extends State<GeneratorCard>
       final generator = widget.gameState.coinGenerators[widget.generatorIndex];
       widget.gameState.coins.earn(generator.tapOutput);
       _showFloatingText(toLettersNotation(generator.tapOutput));
+      CurrentCoins.triggerAnimation();
       // Trigger the animation
     });
   }
