@@ -288,8 +288,24 @@ class GameState with ChangeNotifier {
     return true;
   }
 
+  bool unlockGenerator(CoinGenerator generator) {
+    if (generator.count < 10) return false;
+    if (generator.isUnlocked) return false;
+
+    if (!space.spend(generator.upgradeUnlockCost)) {
+      return false;
+    }
+
+    generator.isUnlocked = true;
+    _generatorRepo.saveCoinGenerator(generator);
+    save();
+    notifyListeners();
+    return true;
+  }
+
   bool upgradeGenerator(CoinGenerator generator) {
     if (generator.count < 10) return false;
+    if (!generator.isUnlocked) return false;
 
     if (!coins.spend(generator.upgradeCost)) {
       return false;

@@ -9,6 +9,7 @@ class CoinGenerator {
   int tier = 0;
   int count = 0;
   int level = 0;
+  bool isUnlocked = false;
   @Transient()
   String name = "";
   @Transient()
@@ -17,8 +18,6 @@ class CoinGenerator {
   double baseOutput = 0.0;
   @Transient()
   String description = "";
-  @Transient()
-  int maxLevel = 10;
 
   CoinGenerator({
     required this.tier,
@@ -27,6 +26,10 @@ class CoinGenerator {
     this.baseOutput = 0,
     this.description = '',
   });
+
+  int get maxLevel {
+    return 10;
+  }
 
   // Base cost formula: C_n = C_0 * 1.15^n
   double get cost {
@@ -50,6 +53,10 @@ class CoinGenerator {
     return baseCost.toDouble() * pow(1.15, 10) * pow(1.15, level);
   }
 
+  double get upgradeUnlockCost {
+    return 1000.0; // Fixed space cost for upgrades
+  }
+
   factory CoinGenerator.fromJson(Map<String, dynamic> json) {
     return CoinGenerator(
       tier: json['tier'],
@@ -57,7 +64,7 @@ class CoinGenerator {
       baseCost: json['cost'].toDouble(),
       baseOutput: json['output'].toDouble(),
       description: json['description'],
-    );
+    )..isUnlocked = false;
   }
 }
 

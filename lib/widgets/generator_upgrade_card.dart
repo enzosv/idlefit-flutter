@@ -25,7 +25,10 @@ class _GeneratorUpgradeCardState extends State<GeneratorUpgradeCard> {
 
   @override
   Widget build(BuildContext context) {
-    final canAfford =
+    final needsSpace = !widget.generator.isUnlocked;
+    final canAffordSpace =
+        widget.gameState.space.count >= widget.generator.upgradeUnlockCost;
+    final canAffordCoins =
         widget.gameState.coins.count >= widget.generator.upgradeCost;
 
     return Card(
@@ -52,27 +55,49 @@ class _GeneratorUpgradeCardState extends State<GeneratorUpgradeCard> {
               'Next level: ${toLettersNotation(widget.generator.outputAtLevel(widget.generator.level + 1))} coins/sec',
             ),
             const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Cost: ${toLettersNotation(widget.generator.upgradeCost)} coins',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: canAfford ? Colors.green : Colors.red,
-                  ),
+            if (needsSpace) ...[
+              Text(
+                'Cost: ${toLettersNotation(widget.generator.upgradeUnlockCost)} space',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: canAffordSpace ? Colors.green : Colors.red,
                 ),
-                ElevatedButton(
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton(
                   onPressed:
-                      canAfford
+                      canAffordSpace
+                          ? () {
+                            widget.gameState.unlockGenerator(widget.generator);
+                          }
+                          : null,
+                  child: const Text('Unlock Upgrades'),
+                ),
+              ),
+            ] else ...[
+              Text(
+                'Cost: ${toLettersNotation(widget.generator.upgradeCost)} coins',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: canAffordCoins ? Colors.green : Colors.red,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton(
+                  onPressed:
+                      canAffordCoins
                           ? () {
                             widget.gameState.upgradeGenerator(widget.generator);
                           }
                           : null,
                   child: const Text('Upgrade'),
                 ),
-              ],
-            ),
+              ),
+            ],
           ],
         ),
       ),
