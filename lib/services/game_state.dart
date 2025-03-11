@@ -206,18 +206,19 @@ class GameState with ChangeNotifier {
     // Calculate health multiplier from upgrades
     double healthMultiplier = 1.0;
     for (final item in shopItems) {
-      if (item.effect == ShopItemEffect.healthMultiplier) {
+      if (item.shopItemEffect == ShopItemEffect.healthMultiplier) {
         healthMultiplier += item.effectValue * item.level;
       }
     }
-    _backgroundEnergy =
-        calories * healthMultiplier * _calorieToEnergyMultiplier;
-    energy.earn(_backgroundEnergy);
+
+    _backgroundEnergy = energy.earn(
+      calories * healthMultiplier * _calorieToEnergyMultiplier,
+    );
+    print("new energy $_backgroundEnergy");
     gems.earn(
       exerciseMinutes * healthMultiplier / 2,
     ); // 2 exercise minutes = 1 gem
-    _backgroundSpace = steps;
-    space.earn(steps);
+    _backgroundSpace = space.earn(steps);
     save();
     notifyListeners();
   }
