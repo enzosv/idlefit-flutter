@@ -19,6 +19,8 @@ class BackgroundEarningsPopup extends StatelessWidget {
             (gameState.space.count - (backgroundCurrencies['space'] ?? 0));
         final coinsEarned =
             gameState.coins.count - (backgroundCurrencies['coins'] ?? 0);
+        final energySpent =
+            (backgroundCurrencies['energy_spent'] ?? 0) / 600000;
         if (coinsEarned < 1 && spaceEarned < 1 && energyEarned < 1) {
           return const SizedBox.shrink();
         }
@@ -44,15 +46,7 @@ class BackgroundEarningsPopup extends StatelessWidget {
                     value: coinsEarned,
                     color: Colors.amber,
                   ),
-                if (energyEarned > 0) const SizedBox(height: 16),
-                if (energyEarned > 0)
-                  _buildEarningRow(
-                    context,
-                    icon: Icons.bolt,
-                    label: 'Energy Earned',
-                    value: energyEarned * 60000,
-                    color: Colors.greenAccent,
-                  ),
+
                 if (spaceEarned > 0) const SizedBox(height: 16),
                 if (spaceEarned > 0)
                   _buildEarningRow(
@@ -61,6 +55,24 @@ class BackgroundEarningsPopup extends StatelessWidget {
                     label: 'Space Earned',
                     value: spaceEarned,
                     color: Colors.blueAccent,
+                  ),
+                if (energyEarned > 0) const SizedBox(height: 16),
+                if (energyEarned > 0)
+                  _buildEarningRow(
+                    context,
+                    icon: Icons.bolt,
+                    label: 'Energy Earned',
+                    value: energyEarned * 600000,
+                    color: Colors.greenAccent,
+                  ),
+                if (energySpent > 0) const SizedBox(height: 16),
+                if (energySpent > 0)
+                  _buildEarningRow(
+                    context,
+                    icon: Icons.bolt,
+                    label: 'Energy Spent',
+                    value: energySpent * 600000,
+                    color: Colors.redAccent,
                   ),
                 const SizedBox(height: 24),
                 ElevatedButton(

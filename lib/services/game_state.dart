@@ -257,13 +257,10 @@ class GameState with ChangeNotifier {
     _backgroundCoins = coins.count;
     _backgroundEnergy = energy.count;
     _backgroundSpace = space.count;
+    _backgroundEnergySpent = 0;
   }
 
   Map<String, double> getBackgroundState() {
-    int energySpent = DateTime.now().millisecondsSinceEpoch - lastGenerated;
-    if (energySpent < _inactiveThreshold) {
-      energySpent = 0;
-    }
     return {
       'coins': _backgroundCoins,
       'energy_earned': _backgroundEnergy,
