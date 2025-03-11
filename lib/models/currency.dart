@@ -36,16 +36,17 @@ class Currency {
     maxMultiplier = currency.maxMultiplier;
   }
 
-  void earn(double amount, [bool allowExcess = false]) {
+  double earn(double amount, [bool allowExcess = false]) {
     if (!allowExcess) {
       amount = min(amount, max - count);
     }
     if (amount <= 0) {
       // TODO: convert unearned coins to energy
-      return;
+      return 0;
     }
     count += amount;
     totalEarned += amount;
+    return amount;
   }
 
   bool spend(double amount) {
