@@ -223,10 +223,7 @@ class GameState with ChangeNotifier {
 
       // 200*pow(10, generator.tier-1) or next tier cost * 1.8
       final next = coinGenerators[generator.tier].cost;
-      coins.baseMax = max(
-        next * 1.8,
-        (200 * pow(10, generator.tier - 1).toDouble()),
-      );
+      coins.baseMax = max(next, (200 * pow(10, generator.tier - 1).toDouble()));
 
       if (generator.tier % 10 == 0) {
         // raise gem limit every 10
