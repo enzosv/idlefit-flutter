@@ -164,7 +164,7 @@ class GameState with ChangeNotifier {
     // Calculate coin multiplier from upgrades
     double coinMultiplier = 1.0;
     for (final item in shopItems) {
-      if (item.effect == ShopItemEffect.coinMultiplier) {
+      if (item.shopItemEffect == ShopItemEffect.coinMultiplier) {
         coinMultiplier += item.effectValue * item.level;
       }
     }
