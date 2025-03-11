@@ -154,11 +154,11 @@ class GameState with ChangeNotifier {
     int now = DateTime.now().millisecondsSinceEpoch;
     if (doubleCoinExpiry > lastGenerated && now >= doubleCoinExpiry) {
       now = doubleCoinExpiry;
-      final doubler = _shopItemRepo.box.get(4);
-      if (doubler != null) {
+      final doublerIndex = shopItems.indexWhere((item) => item.id == 4);
+      final doubler = shopItems[doublerIndex];
         doubler.level = 0;
         _shopItemRepo.box.put(doubler);
-      }
+      shopItems[doublerIndex] = doubler;
     }
     final realDif = lastGenerated - now;
     final availableDif = validTimeSinceLastGenerate(now, lastGenerated);
