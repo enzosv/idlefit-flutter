@@ -20,31 +20,50 @@ class _GeneratorCardState extends State<GeneratorCard>
     with SingleTickerProviderStateMixin {
   double progress = 0.0;
   bool showProgress = false;
-  bool showIcon = false;
-  late AnimationController _iconController;
-  late Animation<double> _fadeAnimation;
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _opacityAnimation;
   late Animation<Offset> _positionAnimation;
   final duration = 500;
   Offset? _tapLocation;
+  OverlayEntry? _overlayEntry;
 
   @override
   void initState() {
     super.initState();
-    _iconController = AnimationController(
+    _animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 800),
     );
 
-    _fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _iconController, curve: Curves.easeInOut),
+    _scaleAnimation = Tween<double>(begin: 1.2, end: 0.8).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+      ),
+    );
+
+    _opacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
+      ),
     );
 
     _positionAnimation = Tween<Offset>(
       begin: Offset.zero,
-      end: Offset.zero, // Will be set dynamically based on tap location
+      end: const Offset(0, -1.5),
     ).animate(
-      CurvedAnimation(parent: _iconController, curve: Curves.easeInOutCubic),
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
     );
+
+    _animationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _overlayEntry?.remove();
+        _overlayEntry = null;
+        _animationController.reset();
+      }
+    });
   }
 
   void startProgress(TapDownDetails details) {
@@ -69,68 +88,73 @@ class _GeneratorCardState extends State<GeneratorCard>
       if (!mounted) return;
       setState(() {
         showProgress = false;
-        showIcon = true;
       }); // Hide bar after animation completes
-      _iconController.forward(from: 0.0); // Start icon animation
-      _showFloatingIcon(context);
-
-      Future.delayed(Duration(milliseconds: duration), () {
-        setState(() => showIcon = false); // Hide icon after animation
-      });
+      _showFloatingText();
 
       final generator = widget.gameState.coinGenerators[widget.generatorIndex];
       widget.gameState.coins.earn(generator.tapOutput);
     });
   }
 
-  void _showFloatingIcon(BuildContext context) {
-    if (!mounted || _tapLocation == null) return;
-    
-    final size = 24.0;
-    final overlay = Overlay.of(context);
+  void _showFloatingText() {
+    if (!mounted || _tapLocation == null || !context.mounted) return;
+
     final RenderBox? cardRenderBox = context.findRenderObject() as RenderBox?;
-    final RenderBox? currencyBarRenderBox = CurrencyBar.currencyBarKey.currentContext?.findRenderObject() as RenderBox?;
-    
-    if (cardRenderBox == null || currencyBarRenderBox == null) return;
+    if (cardRenderBox == null) return;
 
     // Get global positions
     final cardPosition = cardRenderBox.localToGlobal(Offset.zero);
-    final currencyBarPosition = currencyBarRenderBox.localToGlobal(Offset.zero);
-    
-    // Calculate start and end positions
+
+    // Calculate start position
     final startX = cardPosition.dx + _tapLocation!.dx;
     final startY = cardPosition.dy + _tapLocation!.dy;
-    final endX = currencyBarPosition.dx + (currencyBarRenderBox.size.width / 2);
-    final endY = currencyBarPosition.dy + (currencyBarRenderBox.size.height / 2);
-    
-    // Calculate the animation path
-    final dx = (endX - startX) / 100; // Divide by 100 to make the movement smoother
-    final dy = (endY - startY) / 100;
 
-    // Update the position animation
-    _positionAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: Offset(dx, dy),
-    ).animate(
-      CurvedAnimation(parent: _iconController, curve: Curves.easeInOutCubic),
-    );
+    final generator = widget.gameState.coinGenerators[widget.generatorIndex];
 
-    final overlayEntry = OverlayEntry(
+    // Remove existing overlay if any
+    _overlayEntry?.remove();
+
+    _overlayEntry = OverlayEntry(
       builder: (context) {
         return AnimatedBuilder(
-          animation: _iconController,
+          animation: _animationController,
           builder: (context, child) {
             return Positioned(
-              left: startX,
+              left: startX - 40, // Center the text around tap point
               top: startY,
-              child: Transform.translate(
-                offset: Offset(
-                  _positionAnimation.value.dx * 100,
-                  _positionAnimation.value.dy * 100,
-                ),
-                child: Opacity(
-                  opacity: _fadeAnimation.value,
-                  child: Icon(Icons.star, color: Colors.yellow, size: size),
+              child: SlideTransition(
+                position: _positionAnimation,
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: FadeTransition(
+                    opacity: _opacityAnimation,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.amber, width: 1),
+                      ),
+                      child: Text(
+                        '+${toLettersNotation(generator.tapOutput)}',
+                        style: const TextStyle(
+                          color: Colors.amber,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black54,
+                              offset: Offset(1, 1),
+                              blurRadius: 2,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             );
@@ -138,16 +162,19 @@ class _GeneratorCardState extends State<GeneratorCard>
         );
       },
     );
-    overlay.insert(overlayEntry);
 
-    Future.delayed(Duration(milliseconds: 800), () {
-      overlayEntry.remove();
-    });
+    // Insert the overlay entry
+    if (context.mounted) {
+      Overlay.of(context).insert(_overlayEntry!);
+      _animationController.forward(from: 0.0);
+    }
   }
 
   @override
   void dispose() {
-    _iconController.dispose();
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -162,7 +189,8 @@ class _GeneratorCardState extends State<GeneratorCard>
           elevation: 4,
           margin: const EdgeInsets.only(bottom: 16),
           child: InkWell(
-            onTapDown: showProgress || generator.count < 1 ? null : startProgress,
+            onTapDown:
+                showProgress || generator.count < 1 ? null : startProgress,
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -207,7 +235,10 @@ class _GeneratorCardState extends State<GeneratorCard>
                           backgroundColor: Colors.green.shade400,
                           foregroundColor: Colors.black,
                           elevation: 2,
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
