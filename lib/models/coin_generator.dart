@@ -17,6 +17,8 @@ class CoinGenerator {
   double baseOutput = 0.0;
   @Transient()
   String description = "";
+  @Transient()
+  int maxLevel = 10;
 
   CoinGenerator({
     required this.tier,
@@ -33,32 +35,19 @@ class CoinGenerator {
 
   // Base CPS formula: CPS = CPS_0 * N
   double get output {
-    return baseOutput * count * pow(2, level);
+    return baseOutput * count * (1 + level * 0.1);
+  }
+
+  double outputAtLevel(int lvl) {
+    return baseOutput * count * (1 + lvl * 0.1);
   }
 
   double get tapOutput {
     return baseOutput * pow(2, level);
   }
 
-  double upgradeCost(BigInt baseCost, int level) {
-    const List<int> multipliers = [
-      100,
-      500,
-      5000,
-      50000,
-      500000,
-      5000000,
-      50000000,
-      500000000,
-      5000000000,
-      50000000000,
-    ];
-
-    if (level < 1 || level > multipliers.length) {
-      throw ArgumentError("Tier must be between 1 and ${multipliers.length}");
-    }
-
-    return baseCost.toDouble() * multipliers[level - 1];
+  double get upgradeCost {
+    return baseCost.toDouble() * pow(1.15, 10) * pow(1.15, level);
   }
 
   factory CoinGenerator.fromJson(Map<String, dynamic> json) {

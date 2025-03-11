@@ -291,12 +291,7 @@ class GameState with ChangeNotifier {
   bool upgradeGenerator(CoinGenerator generator) {
     if (generator.count < 10) return false;
 
-    final upgradeCost = generator.upgradeCost(
-      BigInt.from(generator.baseCost),
-      generator.level + 1,
-    );
-
-    if (!coins.spend(upgradeCost)) {
+    if (!coins.spend(generator.upgradeCost)) {
       return false;
     }
 
