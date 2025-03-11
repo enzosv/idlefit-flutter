@@ -1,141 +1,141 @@
 [
   {
     "tier": 1,
-    "name": "Training Shoes",
-    "description": "They dont just make you faster, they make you regret not moving.",
+    "name": "Walking",
+    "description": "The gateway drug to fitness. Side effects include unexpected tan lines and judging elevator users.",
     "cost": 10,
     "output": 0.07
   },
   {
     "tier": 2,
-    "name": "Training Buddy",
-    "description": "They believe in you more than you believe in yourself. It’s terrifying.",
+    "name": "Bodyweight Squats",
+    "description": "Standing up and sitting down repeatedly until people ask if you're okay.",
     "cost": 80,
     "output": 0.8
   },
   {
     "tier": 3,
-    "name": "Supplements",
-    "description": "Mystery powders and pills. You don’t know what they do. You just take them now.",
+    "name": "Push-ups",
+    "description": "Repeatedly hugging the ground until your arms forgive you.",
     "cost": 900,
     "output": 6.5
   },
   {
     "tier": 4,
-    "name": "Athleisure",
-    "description": "Stylish. Functional. Expensive enough to guilt you into exercising.",
+    "name": "Dumbbell Training",
+    "description": "Picking up heavy things and putting them down. Revolutionary stuff.",
     "cost": 10000,
     "output": 40
   },
   {
     "tier": 5,
-    "name": "Gym Membership",
-    "description": "You walk in with good intentions. You crawl out in pain.",
+    "name": "Kettlebell Swings",
+    "description": "Like playing catch with yourself, but the ball is trying to dislocate your shoulders.",
     "cost": 110000,
     "output": 220
   },
   {
     "tier": 6,
-    "name": "Fitness Tracker",
-    "description": "Congratulations! You closed your rings! Now do it again.",
+    "name": "Deadlifts",
+    "description": "The art of picking up heavy things while your face looks like you're defusing a bomb.",
     "cost": 1200000,
     "output": 1200
   },
   {
     "tier": 7,
-    "name": "Sports",
-    "description": "You’ve started using words like ‘cardio’ and ‘aerobic threshold’ unironically.",
+    "name": "Burpees",
+    "description": "A push-up, jump squat, and existential crisis all rolled into one movement.",
     "cost": 17000000,
     "output": 6800
   },
   {
     "tier": 8,
-    "name": "Heartbreak",
-    "description": "Calories burn hotter when fueled by pain.",
+    "name": "One-Arm Push-ups",
+    "description": "Regular push-ups for people who think they're in an action movie.",
     "cost": 280000000,
     "output": 37500
   },
   {
     "tier": 9,
-    "name": "Personal Trainer",
-    "description": "They demand push-ups at random intervals. You obey without question.",
+    "name": "Muscle-ups",
+    "description": "Pull-ups that got too full of themselves.",
     "cost": 4200000000,
     "output": 220000
   },
   {
     "tier": 10,
-    "name": "Home Gym Setup",
-    "description": "Your living room is now a shrine to hypertrophy.",
+    "name": "Car Curls",
+    "description": "Using compact cars for XL biceps. Your gym's parking lot is suspiciously empty.",
     "cost": 61000000000,
     "output": 1300000
   },
   {
     "tier": 11,
-    "name": "Marathons",
-    "description": "The runner’s high is your baseline now",
+    "name": "Train Pull",
+    "description": "The morning commute is delayed because you're using the train for your back workout.",
     "cost": 800000000000,
     "output": 8000000
   },
   {
     "tier": 12,
-    "name": "Decathlons",
-    "description": "Ten events, one champion. You are now a human Swiss Army knife of athleticism.",
+    "name": "Mountain Range Circuit",
+    "description": "Using the Himalayas as your personal obstacle course. Yetis are your spotters.",
     "cost": 11000000000000,
     "output": 50000000
   },
   {
     "tier": 13,
-    "name": "Olympic Training",
-    "description": "Your life is just eating, training, and recovering. And you love it.",
+    "name": "Power Plant Cardio",
+    "description": "Running so fast the turbines can't keep up. You're now the city's main power source.",
     "cost": 130000000000000,
     "output": 320000000
   },
   {
     "tier": 14,
-    "name": "World Record Achievements",
-    "description": "Congratulations. Your name is now in a book next to ‘longest fingernails’ guy.",
+    "name": "Pyramid Push-ups",
+    "description": "Using ancient wonders as workout props. Egyptian gods are taking notes.",
     "cost": 1600000000000000,
     "output": 2200000000
   },
   {
     "tier": 15,
-    "name": "Gene Editing",
-    "description": "Fats and carbs burn themselves out of fear. You are pure muscle now.",
+    "name": "Grand Canyon Crunches",
+    "description": "Each rep carves a new natural wonder. The National Park Service is running out of brochures.",
     "cost": 20000000000000000,
     "output": 16500000000
   },
   {
     "tier": 16,
-    "name": "Biomechanical Augmentations",
-    "description": "You’re mostly metal now, but your VO2 max is off the charts.",
+    "name": "Volcano Kettlebell Swings",
+    "description": "Swinging active volcanoes for reps. Bonus points if you don't cause an extinction event.",
     "cost": 230000000000000000,
     "output": 115000000000
   },
   {
     "tier": 17,
-    "name": "Superpowers",
-    "description": "Gravity? Outdated. Limits? A joke. Strength? Infinite.",
+    "name": "Tectonic Plate Press",
+    "description": "Bench pressing continents. Geologists are having a meltdown.",
     "cost": 5500000000000000000,
     "output": 900000000000
   },
   {
     "tier": 18,
-    "name": "Muscle Worshipers",
-    "description": "The masses now gather to admire your physique. Gains fueled by admiration.",
+    "name": "Black Hole Resistance Training",
+    "description": "When regular gravity just isn't challenging enough anymore.",
     "cost": 93000000000000000000,
     "output": 6500000000000
   },
   {
     "tier": 19,
-    "name": "Post-Human Evolution",
-    "description": "The concept of ‘exercise’ is meaningless to you now. Your body simply is.",
+    "name": "Quantum Superposition Cardio",
+    "description": "Simultaneously running in every possible direction. Schrödinger's workout.",
     "cost": 1500000000000000000000,
     "output": 50500000000000
   },
   {
     "tier": 20,
-    "name": "Physical Transcendence",
-    "description": "You have ascended. You no longer train; you exist as pure fitness itself.",
+    "name": "Big Bang Burpees",
+    "description": "Each rep creates and destroys a universe. The ultimate full-body workout.",
     "cost": 25000000000000000000000,
     "output": 420000000000000
   }
