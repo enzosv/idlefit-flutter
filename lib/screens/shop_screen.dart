@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/widgets/generator_upgrade_card.dart';
 import 'package:provider/provider.dart';
 import '../services/game_state.dart';
 import '../widgets/common_widgets.dart';
-import 'dart:math';
 
 class ShopScreen extends StatelessWidget {
   const ShopScreen({super.key});
@@ -95,7 +95,7 @@ class ShopScreen extends StatelessWidget {
                           ),
                         ),
                       );
-                    }).toList(),
+                    }),
 
                     // Generator upgrades section
                     if (upgradableGenerators.isNotEmpty) ...[
@@ -106,74 +106,11 @@ class ShopScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       ...upgradableGenerators.map((generator) {
-                        final upgradeCost = generator.upgradeCost(
-                          BigInt.from(generator.baseCost),
-                          generator.level + 1,
+                        return GeneratorUpgradeCard(
+                          gameState: gameState,
+                          generator: generator,
                         );
-                        final canAfford = gameState.coins.count >= upgradeCost;
-
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      generator.name,
-                                      style:
-                                          Theme.of(
-                                            context,
-                                          ).textTheme.headlineSmall,
-                                    ),
-                                    Text('Level: ${generator.level}'),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(generator.description),
-                                Text(
-                                  'Current output: ${generator.output.toStringAsFixed(1)} coins/sec',
-                                ),
-                                Text(
-                                  'Next level: ${(generator.baseOutput * generator.count * pow(2, generator.level + 1)).toStringAsFixed(1)} coins/sec',
-                                ),
-                                const SizedBox(height: 16),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Cost: ${upgradeCost.toStringAsFixed(0)} coins',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color:
-                                            canAfford
-                                                ? Colors.green
-                                                : Colors.red,
-                                      ),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed:
-                                          canAfford
-                                              ? () {
-                                                gameState.upgradeGenerator(
-                                                  generator,
-                                                );
-                                              }
-                                              : null,
-                                      child: const Text('Upgrade'),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                      }),
                     ],
                   ],
                 );
