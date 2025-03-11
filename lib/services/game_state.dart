@@ -166,8 +166,8 @@ class GameState with ChangeNotifier {
       now = doubleCoinExpiry;
       final doublerIndex = shopItems.indexWhere((item) => item.id == 4);
       final doubler = shopItems[doublerIndex];
-        doubler.level = 0;
-        _shopItemRepo.box.put(doubler);
+      doubler.level = 0;
+      _shopItemRepo.box.put(doubler);
       shopItems[doublerIndex] = doubler;
     }
     final realDif = lastGenerated - now;
@@ -282,6 +282,25 @@ class GameState with ChangeNotifier {
     }
     save();
     _shopItemRepo.saveShopItem(item);
+    notifyListeners();
+    return true;
+  }
+
+  bool upgradeGenerator(CoinGenerator generator) {
+    if (generator.count < 10) return false;
+
+    final upgradeCost = generator.upgradeCost(
+      BigInt.from(generator.baseCost),
+      generator.level + 1,
+    );
+
+    if (!coins.spend(upgradeCost)) {
+      return false;
+    }
+
+    generator.level++;
+    _generatorRepo.saveCoinGenerator(generator);
+    save();
     notifyListeners();
     return true;
   }
