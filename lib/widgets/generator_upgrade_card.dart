@@ -61,16 +61,17 @@ class _GeneratorUpgradeCardState extends State<GeneratorUpgradeCard> {
                 Text('/sec', style: Theme.of(context).textTheme.bodyMedium),
               ],
             ),
-            Row(
-              children: [
-                Text(
-                  'Next level: ${toLettersNotation(widget.generator.outputAtLevel(widget.generator.level + 1))} ',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                Icon(Icons.monetization_on, color: Colors.amber, size: 16),
-                Text('/sec', style: Theme.of(context).textTheme.bodyMedium),
-              ],
-            ),
+            if (widget.generator.level < widget.generator.maxLevel)
+              Row(
+                children: [
+                  Text(
+                    'Next level: ${toLettersNotation(widget.generator.outputAtLevel(widget.generator.level + 1))} ',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  Icon(Icons.monetization_on, color: Colors.amber, size: 16),
+                  Text('/sec', style: Theme.of(context).textTheme.bodyMedium),
+                ],
+              ),
             const SizedBox(height: 16),
             if (needsSpace) ...[
               Row(
@@ -103,35 +104,39 @@ class _GeneratorUpgradeCardState extends State<GeneratorUpgradeCard> {
                 ),
               ),
             ] else ...[
-              Row(
-                children: [
-                  Text(
-                    'Cost: ${toLettersNotation(widget.generator.upgradeCost)} ',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: canAffordCoins ? Colors.green : Colors.red,
+              if (widget.generator.level < widget.generator.maxLevel) ...[
+                Row(
+                  children: [
+                    Text(
+                      'Cost: ${toLettersNotation(widget.generator.upgradeCost)} ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: canAffordCoins ? Colors.green : Colors.red,
+                      ),
                     ),
-                  ),
-                  Icon(
-                    Icons.monetization_on,
-                    color: canAffordCoins ? Colors.green : Colors.red,
-                    size: 20,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerRight,
-                child: CardButton(
-                  onPressed:
-                      canAffordCoins
-                          ? () {
-                            widget.gameState.upgradeGenerator(widget.generator);
-                          }
-                          : null,
-                  text: 'Upgrade',
+                    Icon(
+                      Icons.monetization_on,
+                      color: canAffordCoins ? Colors.green : Colors.red,
+                      size: 20,
+                    ),
+                  ],
                 ),
-              ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: CardButton(
+                    onPressed:
+                        canAffordCoins
+                            ? () {
+                              widget.gameState.upgradeGenerator(
+                                widget.generator,
+                              );
+                            }
+                            : null,
+                    text: 'Upgrade',
+                  ),
+                ),
+              ],
             ],
           ],
         ),
