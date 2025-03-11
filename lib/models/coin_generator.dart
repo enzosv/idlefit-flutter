@@ -84,6 +84,7 @@ class CoinGeneratorRepo {
       }
       generator.count = stored.count;
       generator.level = stored.level;
+      generator.isUnlocked = stored.isUnlocked;
       return generator;
     }).toList();
   }
