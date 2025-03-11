@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:idlefit/util.dart';
-import 'package:idlefit/widgets/common_widgets.dart';
 
 class GeneratorCard extends StatefulWidget {
   final GameState gameState;
@@ -89,14 +88,15 @@ class _GeneratorCardState extends State<GeneratorCard>
       setState(() {
         showProgress = false;
       }); // Hide bar after animation completes
-      _showFloatingText();
 
       final generator = widget.gameState.coinGenerators[widget.generatorIndex];
       widget.gameState.coins.earn(generator.tapOutput);
+      _showFloatingText(toLettersNotation(generator.tapOutput));
+      // Trigger the animation
     });
   }
 
-  void _showFloatingText() {
+  void _showFloatingText(String text) {
     if (!mounted || _tapLocation == null || !context.mounted) return;
 
     final RenderBox? cardRenderBox = context.findRenderObject() as RenderBox?;
@@ -108,8 +108,6 @@ class _GeneratorCardState extends State<GeneratorCard>
     // Calculate start position
     final startX = cardPosition.dx + _tapLocation!.dx;
     final startY = cardPosition.dy + _tapLocation!.dy;
-
-    final generator = widget.gameState.coinGenerators[widget.generatorIndex];
 
     // Remove existing overlay if any
     _overlayEntry?.remove();
@@ -138,8 +136,7 @@ class _GeneratorCardState extends State<GeneratorCard>
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: Colors.amber, width: 1),
                       ),
-                      child: Text(
-                        '+${toLettersNotation(generator.tapOutput)}',
+                      child: DefaultTextStyle(
                         style: const TextStyle(
                           color: Colors.amber,
                           fontSize: 16,
@@ -152,6 +149,7 @@ class _GeneratorCardState extends State<GeneratorCard>
                             ),
                           ],
                         ),
+                        child: Text('+$text'),
                       ),
                     ),
                   ),
