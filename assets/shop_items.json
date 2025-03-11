@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "name": "Energy Capacity",
+    "name": "Caffeine Intolerance",
     "description": "Increases energy capacity by 10%",
     "baseCost": 1000,
     "effect": "energyCapacity",
@@ -10,7 +10,7 @@
   },
   {
     "id": 2,
-    "name": "Space Capacity",
+    "name": "Gym Expansion",
     "description": "Increases space capacity by 10%",
     "baseCost": 1000,
     "effect": "spaceCapacity",
@@ -19,8 +19,8 @@
   },
   {
     "id": 3,
-    "name": "Offline Coin Multiplier",
-    "description": "Increases offline coin production by 10%",
+    "name": "Rest Day",
+    "description": "Increases offline gain production by 10%",
     "baseCost": 5000,
     "effect": "offlineCoinMultiplier",
     "effectValue": 0.1,
@@ -28,8 +28,8 @@
   },
   {
     "id": 4,
-    "name": "Coin Multiplier",
-    "description": "Doubles passive and offline coin production for 2hrs",
+    "name": "Heartbreak",
+    "description": "Doubles passive and offline gain production for 2hrs",
     "baseCost": 0,
     "effect": "coinMultiplier",
     "effectValue": 1,
@@ -37,8 +37,8 @@
   },
   {
     "id": 5,
-    "name": "Coin Capacity",
-    "description": "Increases coin capacity by 10%",
+    "name": "Protein Shake",
+    "description": "Increases gain capacity by 10%",
     "baseCost": 1000,
     "effect": "coinCapacity",
     "effectValue": 0.1,
