@@ -6,7 +6,7 @@
     "baseCost": 1000,
     "effect": "energyCapacity",
     "effectValue": 0.1,
-    "maxLevel": 10
+    "maxLevel": 100
   },
   {
     "id": 2,
@@ -15,7 +15,7 @@
     "baseCost": 1000,
     "effect": "spaceCapacity",
     "effectValue": 0.1,
-    "maxLevel": 10
+    "maxLevel": 100
   },
   {
     "id": 3,
@@ -34,5 +34,14 @@
     "effect": "coinMultiplier",
     "effectValue": 1,
     "maxLevel": 1
+  },
+  {
+    "id": 5,
+    "name": "Coin Capacity",
+    "description": "Increases coin capacity by 10%",
+    "baseCost": 1000,
+    "effect": "coinCapacity",
+    "effectValue": 0.1,
+    "maxLevel": 100
   }
 ]

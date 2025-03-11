@@ -260,13 +260,12 @@ class GameState with ChangeNotifier {
     switch (item.shopItemEffect) {
       case ShopItemEffect.spaceCapacity:
         space.maxMultiplier += item.effectValue;
-        break;
       case ShopItemEffect.energyCapacity:
         energy.maxMultiplier += item.effectValue;
-        break;
       case ShopItemEffect.offlineCoinMultiplier:
         offlineCoinMultiplier += item.effectValue;
-        break;
+      case ShopItemEffect.coinCapacity:
+        coins.maxMultiplier += item.effectValue;
       default:
         break;
     }

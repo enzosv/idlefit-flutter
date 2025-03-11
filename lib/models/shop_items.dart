@@ -8,6 +8,7 @@ enum ShopItemEffect {
   energyCapacity,
   spaceCapacity,
   offlineCoinMultiplier,
+  coinCapacity,
 }
 
 @Entity()
@@ -70,6 +71,7 @@ class ShopItem {
     assert(ShopItemEffect.energyCapacity.index == 3);
     assert(ShopItemEffect.spaceCapacity.index == 4);
     assert(ShopItemEffect.offlineCoinMultiplier.index == 5);
+    assert(ShopItemEffect.coinCapacity.index == 6);
   }
 
   int get currentCost {
