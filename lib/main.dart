@@ -8,6 +8,7 @@ import 'screens/shop_screen.dart';
 import 'services/health_service.dart';
 import 'services/storage_service.dart';
 import 'services/object_box.dart';
+import 'widgets/background_earnings_popup.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -77,14 +78,26 @@ class _GameHomePageState extends State<GameHomePage>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     final gameState = Provider.of<GameState>(context, listen: false);
-    if (state == AppLifecycleState.resumed) {
-      final healthService = Provider.of<HealthService>(context, listen: false);
-      final objectBoxService = Provider.of<ObjectBox>(context, listen: false);
-      // await healthService.collectHealth(gameState);
-      await healthService.syncHealthData(objectBoxService, gameState);
-    } else {
+    if (state == AppLifecycleState.paused) {
       // going to background
       gameState.save();
+      gameState.saveBackgroundState();
+    } else if (state == AppLifecycleState.resumed) {
+      final healthService = Provider.of<HealthService>(context, listen: false);
+      final objectBoxService = Provider.of<ObjectBox>(context, listen: false);
+      await healthService.syncHealthData(objectBoxService, gameState);
+
+      // Show background earnings popup
+      // final earnings = gameState.getBackgroundDifferences();
+      // if (earnings.values.any((value) => value > 0)) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => BackgroundEarningsPopup(),
+        );
+      }
+      // }
     }
     setState(() {
       gameState.isPaused = state != AppLifecycleState.resumed;
@@ -100,10 +113,17 @@ class _GameHomePageState extends State<GameHomePage>
     final objectBoxService = Provider.of<ObjectBox>(context, listen: false);
     gameState.isPaused = true;
     healthService.initialize().then((_) async {
-      // await healthService.collectHealth(gameState);
       await healthService.syncHealthData(objectBoxService, gameState);
-      // should this be in setstate
       gameState.isPaused = false;
+
+      // Show initial earnings popup
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => BackgroundEarningsPopup(),
+        );
+      }
     });
     WidgetsBinding.instance.addObserver(this);
   }

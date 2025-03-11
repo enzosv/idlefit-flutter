@@ -17,6 +17,12 @@ class GameState with ChangeNotifier {
 
   bool isPaused = true;
 
+  // Background state tracking
+  double _backgroundCoins = 0;
+  double _backgroundEnergy = 0;
+  double _backgroundSpace = 0;
+  double _backgroundEnergySpent = 0;
+
   late final Currency coins;
   late final Currency gems;
   late final Currency energy;
@@ -61,9 +67,7 @@ class GameState with ChangeNotifier {
     coinGenerators = await _generatorRepo.parseCoinGenerators(
       'assets/coin_generators.json',
     );
-    shopItems = await _shopItemRepo.parseShopItems(
-      'assets/shop_items.json',
-    );
+    shopItems = await _shopItemRepo.parseShopItems('assets/shop_items.json');
 
     // Ensure default currencies exist and load them
     _currencyRepo.ensureDefaultCurrencies();
@@ -72,6 +76,9 @@ class GameState with ChangeNotifier {
     gems = currencies[CurrencyType.gem]!;
     energy = currencies[CurrencyType.energy]!;
     space = currencies[CurrencyType.space]!;
+    _backgroundCoins = coins.count;
+    _backgroundEnergy = energy.count;
+    _backgroundSpace = space.count;
 
     print("loaded ${coins.max}");
 
@@ -137,6 +144,7 @@ class GameState with ChangeNotifier {
     }
     dif = min(dif, energy.count.round());
     // smelly to perform modification in get
+    _backgroundEnergySpent = dif.toDouble();
     energy.spend(dif.toDouble());
     print("spent energy $dif");
     return dif;
@@ -213,15 +221,15 @@ class GameState with ChangeNotifier {
         (200 * pow(10, generator.tier - 1).toDouble()),
       );
 
-    if (generator.tier % 10 == 0) {
-      // raise gem limit every 10
+      if (generator.tier % 10 == 0) {
+        // raise gem limit every 10
         gems.baseMax += 10;
-    }
-    if (generator.tier % 3 == 0) {
+      }
+      if (generator.tier % 3 == 0) {
         // raise energy limit by 1hr every 3
         energy.baseMax += 3600000;
-    }
-    // TODO: raise space limit
+      }
+      // TODO: raise space limit
     }
     generator.count++;
 
@@ -243,6 +251,25 @@ class GameState with ChangeNotifier {
     _shopItemRepo.saveShopItem(item);
     notifyListeners();
     return true;
+  }
+
+  void saveBackgroundState() {
+    _backgroundCoins = coins.count;
+    _backgroundEnergy = energy.count;
+    _backgroundSpace = space.count;
+  }
+
+  Map<String, double> getBackgroundState() {
+    int energySpent = DateTime.now().millisecondsSinceEpoch - lastGenerated;
+    if (energySpent < _inactiveThreshold) {
+      energySpent = 0;
+    }
+    return {
+      'coins': _backgroundCoins,
+      'energy_earned': _backgroundEnergy,
+      'space': _backgroundSpace,
+      'energy_spent': _backgroundEnergySpent,
+    };
   }
 
   @override
