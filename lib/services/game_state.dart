@@ -80,10 +80,6 @@ class GameState with ChangeNotifier {
     energy = currencies[CurrencyType.energy]!;
     space = currencies[CurrencyType.space]!;
     _backgroundCoins = coins.count;
-    _backgroundEnergy = energy.count;
-    _backgroundSpace = space.count;
-
-    print("loaded ${coins.max}");
 
     // Try to load saved state
     final savedState = await _storageService.loadGameState();
@@ -242,13 +238,12 @@ class GameState with ChangeNotifier {
         gems.baseMax += 10;
       }
       if (generator.tier % 5 == 0) {
-        // raise energy limit by 1hr every 3
-        // TODO: limit to 24hrs
+        // raise energy limit by 1hr every 5
+        // limit to 24hrs
         if (energy.baseMax < 86400000) {
           energy.baseMax += 3600000;
         }
       }
-      // TODO: raise space limit
     }
     generator.count++;
 
