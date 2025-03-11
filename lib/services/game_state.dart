@@ -32,6 +32,8 @@ class GameState with ChangeNotifier {
   int lastGenerated = 0;
   int lastHealthSync = 0;
   int startHealthSync = 0;
+  int doubleCoinExpiry = 0;
+  double offlineCoinMultiplier = 0.5;
 
   // Generators and shop items
   List<CoinGenerator> coinGenerators = [];
@@ -97,6 +99,8 @@ class GameState with ChangeNotifier {
     lastGenerated = savedState['lastGenerated'] ?? 0;
     lastHealthSync = savedState['lastHealthSync'] ?? 0;
     startHealthSync = savedState['startHealthSync'] ?? 0;
+    offlineCoinMultiplier = savedState['offlineCoinMultiplier'] ?? 0.5;
+    doubleCoinExpiry = savedState['doubleCoinExpiry'] ?? 0;
     if (startHealthSync == 0) {
       final now = DateTime.now();
       startHealthSync =
@@ -109,6 +113,8 @@ class GameState with ChangeNotifier {
       'lastGenerated': lastGenerated,
       'lastHealthSync': lastHealthSync,
       'startHealthSync': startHealthSync,
+      'offlineCoinMultiplier': offlineCoinMultiplier,
+      'doubleCoinExpiry': doubleCoinExpiry,
     };
   }
 
@@ -155,7 +161,15 @@ class GameState with ChangeNotifier {
     if (isPaused) {
       return;
     }
-    final now = DateTime.now().millisecondsSinceEpoch;
+    int now = DateTime.now().millisecondsSinceEpoch;
+    if (doubleCoinExpiry > lastGenerated && now >= doubleCoinExpiry) {
+      now = doubleCoinExpiry;
+      final doublerIndex = shopItems.indexWhere((item) => item.id == 4);
+      final doubler = shopItems[doublerIndex];
+        doubler.level = 0;
+        _shopItemRepo.box.put(doubler);
+      shopItems[doublerIndex] = doubler;
+    }
     final realDif = lastGenerated - now;
     final availableDif = validTimeSinceLastGenerate(now, lastGenerated);
     final usesEnergy = realDif > _inactiveThreshold;
@@ -163,6 +177,9 @@ class GameState with ChangeNotifier {
 
     // Calculate coin multiplier from upgrades
     double coinMultiplier = 1.0;
+    if (doubleCoinExpiry >= now) {
+      coinMultiplier += 1;
+    }
     for (final item in shopItems) {
       if (item.shopItemEffect == ShopItemEffect.coinMultiplier) {
         coinMultiplier += item.effectValue * item.level;
@@ -171,7 +188,7 @@ class GameState with ChangeNotifier {
 
     if (usesEnergy) {
       // reduce speed of coin generation in background
-      coinMultiplier /= 2;
+      coinMultiplier *= offlineCoinMultiplier;
     }
     // Process each generator
     for (final generator in coinGenerators) {
@@ -202,7 +219,7 @@ class GameState with ChangeNotifier {
     gems.earn(
       exerciseMinutes * healthMultiplier / 2,
     ); // 2 exercise minutes = 1 gem
-    space.earn(steps * healthMultiplier);
+    space.earn(steps);
     save();
     notifyListeners();
   }
@@ -216,10 +233,7 @@ class GameState with ChangeNotifier {
 
       // 200*pow(10, generator.tier-1) or next tier cost * 1.8
       final next = coinGenerators[generator.tier].cost;
-      coins.baseMax = max(
-        next * 1.8,
-        (200 * pow(10, generator.tier - 1).toDouble()),
-      );
+      coins.baseMax = max(next, (200 * pow(10, generator.tier - 1).toDouble()));
 
       if (generator.tier % 10 == 0) {
         // raise gem limit every 10
@@ -243,11 +257,29 @@ class GameState with ChangeNotifier {
   bool upgradeShopItem(ShopItem item) {
     if (item.level >= item.maxLevel) return false;
 
-    if (!gems.spend(item.currentCost.toDouble())) {
+    if (!space.spend(item.currentCost.toDouble())) {
       return false;
+    }
+    if (item.id == 4) {
+      // TODO: watch ad
+      // if ad does not finish, return
+      doubleCoinExpiry =
+          DateTime.now().add(Duration(minutes: 1)).millisecondsSinceEpoch;
     }
 
     item.level++;
+    switch (item.shopItemEffect) {
+      case ShopItemEffect.spaceCapacity:
+        space.maxMultiplier += item.effectValue;
+      case ShopItemEffect.energyCapacity:
+        energy.maxMultiplier += item.effectValue;
+      case ShopItemEffect.offlineCoinMultiplier:
+        offlineCoinMultiplier += item.effectValue;
+      case ShopItemEffect.coinCapacity:
+        coins.maxMultiplier += item.effectValue;
+      default:
+        break;
+    }
     save();
     _shopItemRepo.saveShopItem(item);
     notifyListeners();

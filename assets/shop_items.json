@@ -1,11 +1,47 @@
 [
-    {
-        "id": 1,
-        "name": "Energy Boost",
-        "description": "Increases energy capacity by 10%",
-        "baseCost": 1000,
-        "effect": "energyCapacity",
-        "effectValue": 0.1,
-        "maxLevel": 10
-    }
+  {
+    "id": 1,
+    "name": "Energy Capacity",
+    "description": "Increases energy capacity by 10%",
+    "baseCost": 1000,
+    "effect": "energyCapacity",
+    "effectValue": 0.1,
+    "maxLevel": 100
+  },
+  {
+    "id": 2,
+    "name": "Space Capacity",
+    "description": "Increases space capacity by 10%",
+    "baseCost": 1000,
+    "effect": "spaceCapacity",
+    "effectValue": 0.1,
+    "maxLevel": 100
+  },
+  {
+    "id": 3,
+    "name": "Offline Coin Multiplier",
+    "description": "Increases offline coin production by 10%",
+    "baseCost": 5000,
+    "effect": "offlineCoinMultiplier",
+    "effectValue": 0.1,
+    "maxLevel": 8
+  },
+  {
+    "id": 4,
+    "name": "Coin Multiplier",
+    "description": "Doubles passive and offline coin production for 2hrs",
+    "baseCost": 0,
+    "effect": "coinMultiplier",
+    "effectValue": 1,
+    "maxLevel": 1
+  },
+  {
+    "id": 5,
+    "name": "Coin Capacity",
+    "description": "Increases coin capacity by 10%",
+    "baseCost": 1000,
+    "effect": "coinCapacity",
+    "effectValue": 0.1,
+    "maxLevel": 100
+  }
 ]

@@ -28,23 +28,15 @@ class CurrencyRepo {
   /// Creates default currencies if they don't exist
   void ensureDefaultCurrencies() {
     final existingCurrencies = loadCurrencies();
-    
+
     final defaultCurrencies = [
-      Currency(
-        id: CurrencyType.coin.index,
-        count: 10,
-        baseMax: 100,
-      ),
-      Currency(
-        id: CurrencyType.gem.index,
-      ),
+      Currency(id: CurrencyType.coin.index, count: 10, baseMax: 100),
+      Currency(id: CurrencyType.gem.index),
       Currency(
         id: CurrencyType.energy.index,
         baseMax: 43200000,
-      ),
-      Currency(
-        id: CurrencyType.space.index,
-      ),
+      ), // millseconds to 12hrs
+      Currency(id: CurrencyType.space.index, baseMax: 5000),
     ];
 
     for (final defaultCurrency in defaultCurrencies) {
@@ -53,4 +45,4 @@ class CurrencyRepo {
       }
     }
   }
-} 
+}
