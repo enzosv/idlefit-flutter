@@ -91,7 +91,9 @@ class BackgroundEarningsPopup extends StatelessWidget {
           ],
         ),
         Text(
-          toLettersNotation(value),
+          label == "Energy Spent" || label == "Energy Earned"
+              ? durationNotation(value)
+              : toLettersNotation(value),
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ],
