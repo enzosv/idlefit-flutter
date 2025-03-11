@@ -92,8 +92,8 @@ class _GeneratorCardState extends State<GeneratorCard>
       }); // Hide bar after animation completes
 
       final generator = widget.gameState.coinGenerators[widget.generatorIndex];
-      widget.gameState.coins.earn(generator.tapOutput);
-      _showFloatingText(toLettersNotation(generator.tapOutput));
+      widget.gameState.coins.earn(generator.singleOutput);
+      _showFloatingText(toLettersNotation(generator.singleOutput));
       CurrentCoins.triggerAnimation();
       // Trigger the animation
     });
@@ -210,7 +210,7 @@ class _GeneratorCardState extends State<GeneratorCard>
                   const SizedBox(height: 8),
                   Text(generator.description),
                   Text(
-                    'Produces: ${toLettersNotation(generator.baseOutput)} coins/sec',
+                    'Produces: ${toLettersNotation(generator.singleOutput)} coins/sec',
                   ),
                   const SizedBox(height: 16),
                   Row(
