@@ -319,11 +319,13 @@ class GameState with ChangeNotifier {
   void saveBackgroundState() {
     _backgroundCoins = coins.count;
     _backgroundEnergySpent = 0;
+    _backgroundEnergy = 0;
+    _backgroundSpace = 0;
   }
 
-  Map<String, double> getBackgroundState() {
+  Map<String, double> getBackgroundDifferences() {
     return {
-      'coins': _backgroundCoins,
+      'coins': coins.count - _backgroundCoins,
       'energy_earned': _backgroundEnergy,
       'space': _backgroundSpace,
       'energy_spent': _backgroundEnergySpent,
