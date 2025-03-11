@@ -3,11 +3,9 @@ import 'package:health/health.dart';
 import 'package:flutter/material.dart';
 import 'package:idlefit/models/health_data_entry.dart';
 import 'package:idlefit/models/health_data_repo.dart';
-import 'package:idlefit/objectbox.g.dart';
 import 'package:idlefit/services/object_box.dart';
 import 'game_state.dart';
 import 'dart:math';
-import 'package:objectbox/objectbox.dart';
 
 class HealthService {
   final Health health = Health();

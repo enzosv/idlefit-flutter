@@ -19,12 +19,12 @@ class _HealthStatsTile extends StatelessWidget {
   final double total;
 
   const _HealthStatsTile({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
     required this.today,
     required this.total,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

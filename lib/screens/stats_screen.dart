@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/services/object_box.dart';
 import 'package:idlefit/widgets/health_stats_card.dart';
 import 'package:provider/provider.dart';
 import '../services/game_state.dart';
