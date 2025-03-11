@@ -45,7 +45,6 @@ class ShopScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(item.description),
-                            Text(item.effectDescription),
                             if (item.level > 0)
                               Text(
                                 'Current effect: ${item.currentEffectValue}',
@@ -63,7 +62,7 @@ class ShopScreen extends StatelessWidget {
                                     color:
                                         isMaxLevel
                                             ? Colors.grey
-                                            : gameState.gems.count >=
+                                            : gameState.space.count >=
                                                 item.currentCost
                                             ? Colors.green
                                             : Colors.red,

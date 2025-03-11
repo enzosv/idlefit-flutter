@@ -25,6 +25,7 @@ class GameState with ChangeNotifier {
   int lastGenerated = 0;
   int lastHealthSync = 0;
   int startHealthSync = 0;
+  double offlineCoinMultiplier = 0.5;
 
   // Generators and shop items
   List<CoinGenerator> coinGenerators = [];
@@ -61,9 +62,7 @@ class GameState with ChangeNotifier {
     coinGenerators = await _generatorRepo.parseCoinGenerators(
       'assets/coin_generators.json',
     );
-    shopItems = await _shopItemRepo.parseShopItems(
-      'assets/shop_items.json',
-    );
+    shopItems = await _shopItemRepo.parseShopItems('assets/shop_items.json');
 
     // Ensure default currencies exist and load them
     _currencyRepo.ensureDefaultCurrencies();
@@ -89,6 +88,7 @@ class GameState with ChangeNotifier {
     lastGenerated = savedState['lastGenerated'] ?? 0;
     lastHealthSync = savedState['lastHealthSync'] ?? 0;
     startHealthSync = savedState['startHealthSync'] ?? 0;
+    offlineCoinMultiplier = savedState['offlineCoinMultiplier'] ?? 0.5;
     if (startHealthSync == 0) {
       final now = DateTime.now();
       startHealthSync =
@@ -101,6 +101,7 @@ class GameState with ChangeNotifier {
       'lastGenerated': lastGenerated,
       'lastHealthSync': lastHealthSync,
       'startHealthSync': startHealthSync,
+      'offlineCoinMultiplier': offlineCoinMultiplier,
     };
   }
 
@@ -163,7 +164,7 @@ class GameState with ChangeNotifier {
 
     if (usesEnergy) {
       // reduce speed of coin generation in background
-      coinMultiplier /= 2;
+      coinMultiplier *= offlineCoinMultiplier;
     }
     // Process each generator
     for (final generator in coinGenerators) {
@@ -194,7 +195,7 @@ class GameState with ChangeNotifier {
     gems.earn(
       exerciseMinutes * healthMultiplier / 2,
     ); // 2 exercise minutes = 1 gem
-    space.earn(steps * healthMultiplier);
+    space.earn(steps);
     save();
     notifyListeners();
   }
@@ -213,15 +214,15 @@ class GameState with ChangeNotifier {
         (200 * pow(10, generator.tier - 1).toDouble()),
       );
 
-    if (generator.tier % 10 == 0) {
-      // raise gem limit every 10
+      if (generator.tier % 10 == 0) {
+        // raise gem limit every 10
         gems.baseMax += 10;
-    }
-    if (generator.tier % 3 == 0) {
+      }
+      if (generator.tier % 3 == 0) {
         // raise energy limit by 1hr every 3
         energy.baseMax += 3600000;
-    }
-    // TODO: raise space limit
+      }
+      // TODO: raise space limit
     }
     generator.count++;
 
@@ -234,11 +235,24 @@ class GameState with ChangeNotifier {
   bool upgradeShopItem(ShopItem item) {
     if (item.level >= item.maxLevel) return false;
 
-    if (!gems.spend(item.currentCost.toDouble())) {
+    if (!space.spend(item.currentCost.toDouble())) {
       return false;
     }
 
     item.level++;
+    switch (item.shopItemEffect) {
+      case ShopItemEffect.spaceCapacity:
+        space.maxMultiplier += item.effectValue;
+        break;
+      case ShopItemEffect.energyCapacity:
+        energy.maxMultiplier += item.effectValue;
+        break;
+      case ShopItemEffect.offlineCoinMultiplier:
+        offlineCoinMultiplier += item.effectValue;
+        break;
+      default:
+        break;
+    }
     save();
     _shopItemRepo.saveShopItem(item);
     notifyListeners();

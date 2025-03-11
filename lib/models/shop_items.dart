@@ -1,7 +1,14 @@
 import 'package:idlefit/models/currency.dart';
 import 'package:objectbox/objectbox.dart';
 
-enum ShopItemEffect { unknown, coinMultiplier, healthMultiplier, energyCapacity }
+enum ShopItemEffect {
+  unknown,
+  coinMultiplier,
+  healthMultiplier,
+  energyCapacity,
+  spaceCapacity,
+  offlineCoinMultiplier,
+}
 
 @Entity()
 class ShopItem {
@@ -20,7 +27,6 @@ class ShopItem {
   String description;
   @Transient()
   int maxLevel;
-  
 
   ShopItem({
     required this.id,
@@ -52,18 +58,18 @@ class ShopItem {
 
   CurrencyType get costUnit {
     switch (shopItemEffect) {
-      case ShopItemEffect.energyCapacity:
-      return CurrencyType.space;
       default:
-      return CurrencyType.coin;
+        return CurrencyType.space;
     }
   }
 
-    void _ensureStableEnumValues() {
+  void _ensureStableEnumValues() {
     assert(ShopItemEffect.unknown.index == 0);
     assert(ShopItemEffect.coinMultiplier.index == 1);
     assert(ShopItemEffect.healthMultiplier.index == 2);
     assert(ShopItemEffect.energyCapacity.index == 3);
+    assert(ShopItemEffect.spaceCapacity.index == 4);
+    assert(ShopItemEffect.offlineCoinMultiplier.index == 5);
   }
 
   int get currentCost {
@@ -71,29 +77,11 @@ class ShopItem {
     return (baseCost * (1.5 * level + 1)).floor();
   }
 
-  String get effectDescription {
-    switch (shopItemEffect) {
-      case ShopItemEffect.coinMultiplier:
-        return '+${(effectValue * 100).toStringAsFixed(0)}% coin production';
-      case ShopItemEffect.healthMultiplier:
-        return '+${(effectValue * 100).toStringAsFixed(0)}% health rewards';
-      case ShopItemEffect.energyCapacity:
-        return '+${effectValue.toStringAsFixed(0)} energy capacity';
-      default:
-        return "unknown";
-    }
-  }
-
   String get currentEffectValue {
     final value = effectValue * level;
     switch (shopItemEffect) {
-      case ShopItemEffect.coinMultiplier:
-      case ShopItemEffect.healthMultiplier:
-        return '${(value * 100).toStringAsFixed(0)}%';
-      case ShopItemEffect.energyCapacity:
-        return value.toStringAsFixed(0);
       default:
-        return "unknown";
+        return '+${(value * 100).toStringAsFixed(0)}%';
     }
   }
 }
