@@ -4,6 +4,7 @@ import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/shop_items_repo.dart';
 import 'package:idlefit/models/currency_repo.dart';
+import 'package:idlefit/util.dart';
 import 'package:objectbox/objectbox.dart';
 import 'storage_service.dart';
 import '../models/shop_items.dart';
@@ -135,8 +136,7 @@ class GameState with ChangeNotifier {
       return _tickTime;
     }
 
-    int dif = now - _tickTime;
-    dif = now - previous;
+    int dif = now - previous;
     // if last generated > 30s, consume energy
     if (dif < _inactiveThreshold) {
       // do not consume energy
@@ -146,7 +146,7 @@ class GameState with ChangeNotifier {
     // smelly to perform modification in get
     _backgroundEnergySpent = dif.toDouble();
     energy.spend(dif.toDouble());
-    print("spent energy $dif");
+    print("spent energy ${durationNotation(dif.toDouble())}");
     return dif;
   }
 
@@ -227,6 +227,7 @@ class GameState with ChangeNotifier {
       }
       if (generator.tier % 3 == 0) {
         // raise energy limit by 1hr every 3
+        // TODO: limit to 24hrs
         energy.baseMax += 3600000;
       }
       // TODO: raise space limit

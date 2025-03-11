@@ -8,19 +8,20 @@ class BackgroundEarningsPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final msToMins = 60000;
     return Consumer<GameState>(
       builder: (context, gameState, child) {
         final backgroundCurrencies = gameState.getBackgroundState();
         final energyEarned =
             (gameState.energy.count -
                 (backgroundCurrencies['energy_earned'] ?? 0)) /
-            600000;
+            msToMins;
         final spaceEarned =
             (gameState.space.count - (backgroundCurrencies['space'] ?? 0));
         final coinsEarned =
             gameState.coins.count - (backgroundCurrencies['coins'] ?? 0);
         final energySpent =
-            (backgroundCurrencies['energy_spent'] ?? 0) / 600000;
+            (backgroundCurrencies['energy_spent'] ?? 0) / msToMins;
         if (coinsEarned < 1 && spaceEarned < 1 && energyEarned < 1) {
           return const SizedBox.shrink();
         }
@@ -62,7 +63,7 @@ class BackgroundEarningsPopup extends StatelessWidget {
                     context,
                     icon: Icons.bolt,
                     label: 'Energy Earned',
-                    value: energyEarned * 600000,
+                    value: energyEarned * msToMins,
                     color: Colors.greenAccent,
                   ),
                 if (energySpent > 0) const SizedBox(height: 16),
@@ -71,7 +72,7 @@ class BackgroundEarningsPopup extends StatelessWidget {
                     context,
                     icon: Icons.bolt,
                     label: 'Energy Spent',
-                    value: energySpent * 600000,
+                    value: energySpent * msToMins,
                     color: Colors.redAccent,
                   ),
                 const SizedBox(height: 24),
