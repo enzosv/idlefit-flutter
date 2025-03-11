@@ -167,7 +167,7 @@ class GameState with ChangeNotifier {
 
     // Calculate coin multiplier from upgrades
     double coinMultiplier = 1.0;
-    if (doubleCoinExpiry > lastGenerated && doubleCoinExpiry >= now) {
+    if (doubleCoinExpiry >= now) {
       coinMultiplier += 1;
     }
     for (final item in shopItems) {
@@ -252,10 +252,7 @@ class GameState with ChangeNotifier {
     if (!space.spend(item.currentCost.toDouble())) {
       return false;
     }
-    if (item.id == 4 &&
-        item.effectValue == 2 &&
-        item.maxLevel == 1 &&
-        item.shopItemEffect == ShopItemEffect.coinMultiplier) {
+    if (item.id == 4) {
       // TODO: watch ad
       // if ad does not finish, return
       doubleCoinExpiry =

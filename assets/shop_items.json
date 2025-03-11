@@ -32,7 +32,7 @@
     "description": "Doubles passive and offline coin production for 2hrs",
     "baseCost": 0,
     "effect": "coinMultiplier",
-    "effectValue": 2,
+    "effectValue": 1,
     "maxLevel": 1
   }
 ]
