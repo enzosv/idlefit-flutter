@@ -25,6 +25,7 @@ class GameState with ChangeNotifier {
   int lastGenerated = 0;
   int lastHealthSync = 0;
   int startHealthSync = 0;
+  int doubleCoinExpiry = 0;
   double offlineCoinMultiplier = 0.5;
 
   // Generators and shop items
@@ -89,6 +90,7 @@ class GameState with ChangeNotifier {
     lastHealthSync = savedState['lastHealthSync'] ?? 0;
     startHealthSync = savedState['startHealthSync'] ?? 0;
     offlineCoinMultiplier = savedState['offlineCoinMultiplier'] ?? 0.5;
+    doubleCoinExpiry = savedState['doubleCoinExpiry'] ?? 0;
     if (startHealthSync == 0) {
       final now = DateTime.now();
       startHealthSync =
@@ -102,6 +104,7 @@ class GameState with ChangeNotifier {
       'lastHealthSync': lastHealthSync,
       'startHealthSync': startHealthSync,
       'offlineCoinMultiplier': offlineCoinMultiplier,
+      'doubleCoinExpiry': doubleCoinExpiry,
     };
   }
 
@@ -148,7 +151,15 @@ class GameState with ChangeNotifier {
     if (isPaused) {
       return;
     }
-    final now = DateTime.now().millisecondsSinceEpoch;
+    int now = DateTime.now().millisecondsSinceEpoch;
+    if (doubleCoinExpiry > lastGenerated && now >= doubleCoinExpiry) {
+      now = doubleCoinExpiry;
+      final doubler = _shopItemRepo.box.get(4);
+      if (doubler != null) {
+        doubler.level = 0;
+        _shopItemRepo.box.put(doubler);
+      }
+    }
     final realDif = lastGenerated - now;
     final availableDif = validTimeSinceLastGenerate(now, lastGenerated);
     final usesEnergy = realDif > _inactiveThreshold;
@@ -156,8 +167,11 @@ class GameState with ChangeNotifier {
 
     // Calculate coin multiplier from upgrades
     double coinMultiplier = 1.0;
+    if (doubleCoinExpiry > lastGenerated && doubleCoinExpiry >= now) {
+      coinMultiplier += 1;
+    }
     for (final item in shopItems) {
-      if (item.effect == ShopItemEffect.coinMultiplier) {
+      if (item.shopItemEffect == ShopItemEffect.coinMultiplier) {
         coinMultiplier += item.effectValue * item.level;
       }
     }
@@ -237,6 +251,15 @@ class GameState with ChangeNotifier {
 
     if (!space.spend(item.currentCost.toDouble())) {
       return false;
+    }
+    if (item.id == 4 &&
+        item.effectValue == 2 &&
+        item.maxLevel == 1 &&
+        item.shopItemEffect == ShopItemEffect.coinMultiplier) {
+      // TODO: watch ad
+      // if ad does not finish, return
+      doubleCoinExpiry =
+          DateTime.now().add(Duration(minutes: 1)).millisecondsSinceEpoch;
     }
 
     item.level++;
