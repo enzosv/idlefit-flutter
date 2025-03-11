@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:idlefit/util.dart';
+import 'package:idlefit/widgets/card_button.dart';
 
 class GeneratorUpgradeCard extends StatefulWidget {
   final GameState gameState;
@@ -45,7 +46,9 @@ class _GeneratorUpgradeCardState extends State<GeneratorUpgradeCard> {
                   widget.generator.name,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
-                Text('Level: ${widget.generator.level}'),
+                Text(
+                  'Level: ${widget.generator.level}/${widget.generator.maxLevel}',
+                ),
               ],
             ),
             Row(
@@ -89,14 +92,14 @@ class _GeneratorUpgradeCardState extends State<GeneratorUpgradeCard> {
               const SizedBox(height: 8),
               Align(
                 alignment: Alignment.centerRight,
-                child: ElevatedButton(
+                child: CardButton(
                   onPressed:
                       canAffordSpace
                           ? () {
                             widget.gameState.unlockGenerator(widget.generator);
                           }
                           : null,
-                  child: const Text('Unlock Upgrades'),
+                  text: 'Unlock',
                 ),
               ),
             ] else ...[
@@ -119,14 +122,14 @@ class _GeneratorUpgradeCardState extends State<GeneratorUpgradeCard> {
               const SizedBox(height: 8),
               Align(
                 alignment: Alignment.centerRight,
-                child: ElevatedButton(
+                child: CardButton(
                   onPressed:
                       canAffordCoins
                           ? () {
                             widget.gameState.upgradeGenerator(widget.generator);
                           }
                           : null,
-                  child: const Text('Upgrade'),
+                  text: 'Upgrade',
                 ),
               ),
             ],
