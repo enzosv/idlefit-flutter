@@ -239,10 +239,12 @@ class GameState with ChangeNotifier {
         // raise gem limit every 10
         gems.baseMax += 10;
       }
-      if (generator.tier % 3 == 0) {
+      if (generator.tier % 5 == 0) {
         // raise energy limit by 1hr every 3
         // TODO: limit to 24hrs
-        energy.baseMax += 3600000;
+        if (energy.baseMax < 86400000) {
+          energy.baseMax += 3600000;
+        }
       }
       // TODO: raise space limit
     }
