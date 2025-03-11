@@ -48,20 +48,43 @@ class _GeneratorUpgradeCardState extends State<GeneratorUpgradeCard> {
                 Text('Level: ${widget.generator.level}'),
               ],
             ),
-            Text(
-              'Current output: ${toLettersNotation(widget.generator.output)} coins/sec',
+            Row(
+              children: [
+                Text(
+                  'Current output: ${toLettersNotation(widget.generator.output)} ',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                Icon(Icons.monetization_on, color: Colors.amber, size: 16),
+                Text('/sec', style: Theme.of(context).textTheme.bodyMedium),
+              ],
             ),
-            Text(
-              'Next level: ${toLettersNotation(widget.generator.outputAtLevel(widget.generator.level + 1))} coins/sec',
+            Row(
+              children: [
+                Text(
+                  'Next level: ${toLettersNotation(widget.generator.outputAtLevel(widget.generator.level + 1))} ',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                Icon(Icons.monetization_on, color: Colors.amber, size: 16),
+                Text('/sec', style: Theme.of(context).textTheme.bodyMedium),
+              ],
             ),
             const SizedBox(height: 16),
             if (needsSpace) ...[
-              Text(
-                'Cost: ${toLettersNotation(widget.generator.upgradeUnlockCost)} space',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: canAffordSpace ? Colors.green : Colors.red,
-                ),
+              Row(
+                children: [
+                  Text(
+                    'Cost: ${toLettersNotation(widget.generator.upgradeUnlockCost)} ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: canAffordSpace ? Colors.green : Colors.red,
+                    ),
+                  ),
+                  Icon(
+                    Icons.space_dashboard,
+                    color: canAffordSpace ? Colors.green : Colors.red,
+                    size: 20,
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
               Align(
@@ -77,12 +100,21 @@ class _GeneratorUpgradeCardState extends State<GeneratorUpgradeCard> {
                 ),
               ),
             ] else ...[
-              Text(
-                'Cost: ${toLettersNotation(widget.generator.upgradeCost)} coins',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: canAffordCoins ? Colors.green : Colors.red,
-                ),
+              Row(
+                children: [
+                  Text(
+                    'Cost: ${toLettersNotation(widget.generator.upgradeCost)} ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: canAffordCoins ? Colors.green : Colors.red,
+                    ),
+                  ),
+                  Icon(
+                    Icons.monetization_on,
+                    color: canAffordCoins ? Colors.green : Colors.red,
+                    size: 20,
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
               Align(
