@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:idlefit/util.dart';
 import 'package:idlefit/widgets/current_coins.dart';
+import 'package:idlefit/widgets/card_button.dart';
 
 class GeneratorCard extends StatefulWidget {
   final GameState gameState;
@@ -225,31 +226,13 @@ class _GeneratorCardState extends State<GeneratorCard>
                                   : Colors.red,
                         ),
                       ),
-                      ElevatedButton(
+                      CardButton(
+                        text: 'Buy',
                         onPressed:
                             widget.gameState.coins.count >= generator.cost
                                 ? () =>
                                     widget.gameState.buyCoinGenerator(generator)
                                 : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green.shade400,
-                          foregroundColor: Colors.black,
-                          elevation: 2,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text(
-                          'Buy',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
                       ),
                     ],
                   ),
