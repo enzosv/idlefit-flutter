@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/widgets/achievement_list.dart';
 import 'package:idlefit/widgets/health_stats_card.dart';
 import 'package:idlefit/widgets/game_stats_card.dart';
 
@@ -23,6 +24,9 @@ class StatsScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 // Health data card
                 HealthStatsCard(),
+                const SizedBox(height: 16),
+                // Achievement list
+                const AchievementList(),
               ],
             ),
           ),

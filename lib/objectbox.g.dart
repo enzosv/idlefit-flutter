@@ -14,6 +14,7 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_sync_flutter_libs/objectbox_sync_flutter_libs.dart';
 
+import 'models/achievement.dart';
 import 'models/coin_generator.dart';
 import 'models/currency.dart';
 import 'models/health_data_entry.dart';
@@ -148,6 +149,25 @@ final _entities = <obx_int.ModelEntity>[
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(7, 2119159745219438621),
+      name: 'Achievement',
+      lastPropertyId: const obx_int.IdUid(10, 2084831577797524984),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 37781412133150881),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(10, 2084831577797524984),
+            name: 'dateClaimed',
+            type: 6,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
 ];
 
@@ -186,7 +206,7 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(6, 3093373672220765882),
+      lastEntityId: const obx_int.IdUid(7, 2119159745219438621),
       lastIndexId: const obx_int.IdUid(2, 6046711262050609894),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
@@ -211,7 +231,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
         2037289546189049172,
         2255176740307486357,
         745509794462133064,
-        6946102241664551198
+        6946102241664551198,
+        5678817004169731437,
+        167161125635220021,
+        4278904461843222799,
+        4060410116606726424,
+        5122690587257086689,
+        7633385983348480139,
+        5727768307727832225,
+        2592235923790219212
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -356,6 +384,32 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final object = ShopItem(id: idParam, level: levelParam);
 
           return object;
+        }),
+    Achievement: obx_int.EntityDefinition<Achievement>(
+        model: _entities[4],
+        toOneRelations: (Achievement object) => [],
+        toManyRelations: (Achievement object) => {},
+        getId: (Achievement object) => object.id,
+        setId: (Achievement object, int id) {
+          object.id = id;
+        },
+        objectToFB: (Achievement object, fb.Builder fbb) {
+          fbb.startTable(11);
+          fbb.addInt64(0, object.id);
+          fbb.addInt64(9, object.dateClaimed);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+
+          final object = Achievement()
+            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
+            ..dateClaimed = const fb.Int64Reader()
+                .vTableGetNullable(buffer, rootOffset, 22);
+
+          return object;
         })
   };
 
@@ -444,4 +498,15 @@ class ShopItem_ {
   /// See [ShopItem.level].
   static final level =
       obx.QueryIntegerProperty<ShopItem>(_entities[3].properties[1]);
+}
+
+/// [Achievement] entity fields to define ObjectBox queries.
+class Achievement_ {
+  /// See [Achievement.id].
+  static final id =
+      obx.QueryIntegerProperty<Achievement>(_entities[4].properties[0]);
+
+  /// See [Achievement.dateClaimed].
+  static final dateClaimed =
+      obx.QueryIntegerProperty<Achievement>(_entities[4].properties[1]);
 }

@@ -23,7 +23,6 @@ class _HealthStatsTile extends StatelessWidget {
   final Color? iconColor;
 
   const _HealthStatsTile({
-    super.key,
     required this.icon,
     required this.title,
     required this.today,
