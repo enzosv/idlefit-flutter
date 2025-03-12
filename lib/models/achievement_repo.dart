@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:idlefit/objectbox.g.dart';
+import 'package:idlefit/util.dart';
 import 'achievement.dart';
 
 class AchievementRepo {
@@ -8,45 +9,30 @@ class AchievementRepo {
 
   AchievementRepo({required this.box});
 
-  List<Achievement> getAll() {
-    return box.getAll();
-  }
-
-  void saveAchievement(Achievement achievement) {
-    box.put(achievement);
-  }
-
-  Achievement? getById(int id) {
-    return box.get(id);
-  }
-
-  List<Achievement> getByAction(String action) {
-    // Temporary solution until ObjectBox models are generated
-    return box.getAll().where((a) => a.action == action).toList();
-  }
-
   Future<List<Achievement>> loadNewAchievements() async {
     final String response = await rootBundle.loadString(
       'assets/achievements.json',
     );
     final List<dynamic> data = jsonDecode(response);
 
-    // Map to store the lowest unclaimed achievement for each action/reqUnit pair
-    Map<String, Achievement> lowestUnclaimedMap = {};
+    List<Achievement> achievements = [];
 
-    for (var item in data) {
+    for (final item in data) {
       final List<int> requirements = List<int>.from(item['requirements']);
+      assert(isSorted(requirements));
       final List<int> rewards = List<int>.from(item['rewards']);
       assert(
         requirements.length == rewards.length,
         "${item["action"]} invalid",
       );
-
-      String action = item['action'];
-      String reqUnit = item['req_unit'];
-      // TODO: assuming requirements are in increasing order
-      // if achivement of this action and requnit already in list, continue?
-      String key = '$action:$reqUnit';
+      final String action = item['action'];
+      final String reqUnit = item['req_unit'];
+      assert(
+        achievements
+            .where((a) => (a.action == action && a.reqUnit == reqUnit))
+            .isEmpty,
+        "there should only be one achivement per action and requirement pair",
+      );
 
       for (int i = 0; i < requirements.length; i++) {
         Achievement achievement = Achievement();
@@ -63,16 +49,13 @@ class AchievementRepo {
 
         achievement.rewardUnit = item['reward_unit'];
         achievement.reward = rewards[i];
-
-        // Only keep the achievement with lowest requirement for this action/reqUnit pair
-        if (!lowestUnclaimedMap.containsKey(key) ||
-            lowestUnclaimedMap[key]!.requirement > achievement.requirement) {
-          lowestUnclaimedMap[key] = achievement;
-        }
+        achievements.add(achievement);
+        // only get the achievement with the lowest requirement
+        break;
       }
     }
 
-    return lowestUnclaimedMap.values.toList();
+    return achievements;
   }
 
   bool claimAchievement(Achievement achievement) {
@@ -80,17 +63,6 @@ class AchievementRepo {
     achievement.dateClaimed = DateTime.now().millisecondsSinceEpoch;
     box.put(achievement);
     return true;
-  }
-
-  double checkProgress(String action, double currentValue) {
-    final achievements = getByAction(action);
-    for (var achievement in achievements) {
-      if (achievement.dateClaimed == null &&
-          currentValue >= achievement.requirement) {
-        return achievement.reward.toDouble();
-      }
-    }
-    return 0;
   }
 
   List<Achievement> getClaimed(Achievement achievement) {
