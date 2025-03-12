@@ -3,22 +3,24 @@
     "id": 1,
     "action": "Walk",
     "req_unit": "steps",
-    "reward_unit":"space",
-    "rewards":[1000,2000,3000,4000,5000,6000],
-    "requirements":[10000,50000,100000,200000,500000,1000000]
-  }, {
+    "reward_unit": "space",
+    "rewards": [1000, 2000, 3000, 4000, 5000, 6000],
+    "requirements": [10000, 50000, 100000, 200000, 500000, 1000000]
+  },
+  {
     "id": 2,
     "action": "Collect",
     "req_unit": "coins",
-    "reward_unit":"coins",
-    "rewards":[10000,50000,100000,500000],
-    "requirements":[100000,500000,1000000,5000000]
-  }, {
+    "reward_unit": "coins",
+    "rewards": [10000, 50000, 100000, 500000],
+    "requirements": [100000, 500000, 1000000, 5000000]
+  },
+  {
     "id": 2,
     "action": "Spend",
     "req_unit": "energy",
-    "reward_unit":"energy",
-    "rewards":[10000,50000,100000,500000],
-    "requirements":[100000,500000,1000000,5000000]
+    "reward_unit": "energy",
+    "rewards": [1200000, 3600000, 7200000, 10800000],
+    "requirements": [28800000, 86400000, 604800000, 2592000000]
   }
 ]
