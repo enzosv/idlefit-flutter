@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/constants.dart';
 import 'package:idlefit/widgets/achievement_list.dart';
 import 'package:idlefit/widgets/health_stats_card.dart';
 import 'package:idlefit/widgets/game_stats_card.dart';
@@ -13,7 +14,10 @@ class StatsScreen extends StatelessWidget {
       top: false,
       child: Column(
         children: [
-          Container(height: MediaQuery.paddingOf(context).top),
+          Container(
+            height: MediaQuery.paddingOf(context).top,
+            color: Constants.barColor,
+          ),
           const BannerAdWidget(),
           // Stats cards
           Expanded(

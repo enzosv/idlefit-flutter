@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../services/ad_service.dart';
+import '../constants.dart';
 
 class BannerAdWidget extends StatefulWidget {
   const BannerAdWidget({super.key});
@@ -38,13 +39,21 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   @override
   Widget build(BuildContext context) {
     if (!_isAdLoaded || _bannerAd == null) {
-      return const SizedBox(height: 50); // Placeholder height for the ad
+      return SizedBox(
+        height: 50, // TODO: height of currency bar
+        width: MediaQuery.of(context).size.width,
+      ); // Placeholder height for the ad
     }
 
-    return SizedBox(
-      width: _bannerAd!.size.width.toDouble(),
-      height: _bannerAd!.size.height.toDouble(),
-      child: AdWidget(ad: _bannerAd!),
+    return Container(
+      padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+      decoration: BoxDecoration(color: Constants.barColor),
+      width: MediaQuery.of(context).size.width,
+      child: SizedBox(
+        width: _bannerAd!.size.width.toDouble(),
+        height: _bannerAd!.size.height.toDouble(),
+        child: AdWidget(ad: _bannerAd!),
+      ),
     );
   }
 }
