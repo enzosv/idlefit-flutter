@@ -109,8 +109,9 @@ class _GameHomePageState extends State<GameHomePage>
     final healthService = Provider.of<HealthService>(context, listen: false);
     final objectBoxService = Provider.of<ObjectBox>(context, listen: false);
     await healthService.syncHealthData(objectBoxService, gameState);
+    NotificationService.cancelAllNotifications();
     gameState.isPaused = false;
-    await Future.delayed(const Duration(seconds: 2)).then((_) {
+    await Future.delayed(const Duration(seconds: 1)).then((_) {
       if (!mounted) {
         return;
       }
