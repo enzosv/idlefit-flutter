@@ -11,6 +11,7 @@ import 'services/storage_service.dart';
 import 'services/object_box.dart';
 import 'widgets/background_earnings_popup.dart';
 import 'services/ad_service.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +21,9 @@ void main() async {
   final storageService = StorageService(prefs);
   final healthService = HealthService();
   final objectBox = await ObjectBox.create();
+
+  // Initialize notifications
+  await NotificationService.initialize();
 
   // Load game state
   final gameState = GameState();
