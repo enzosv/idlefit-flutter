@@ -151,7 +151,6 @@ class GameState with ChangeNotifier {
       coinsGenerated *= offlineCoinMultiplier;
     }
     coinsGenerated *= (availableDif / _tickTime);
-    print("coins: ${toLettersNotation(coinsGenerated)}");
 
     if (coinsGenerated > 0) {
       coins.earn(coinsGenerated);
@@ -295,6 +294,7 @@ class GameState with ChangeNotifier {
     );
     double coinMultiplier = 1.0;
     if (doubleCoinExpiry >= DateTime.now().millisecondsSinceEpoch) {
+      // TODO: what if doubler is active for part of the time?
       coinMultiplier += 1;
     }
     for (final item in shopItems) {
