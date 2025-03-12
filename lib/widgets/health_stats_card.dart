@@ -34,10 +34,7 @@ class _HealthStatsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(
-        icon,
-        color: iconColor,
-      ),
+      leading: Icon(icon, color: iconColor),
       title: Text(title),
       subtitle: Text('Today: ${toLettersNotation(today)}'),
       trailing: Text('Total: ${toLettersNotation(total)}'),
@@ -88,25 +85,45 @@ class _HealthStatsCardState extends State<HealthStatsCard> {
                       'Health Activity',
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
-                    FutureBuilder<DateTime?>(
-                      future: () {
+                    FutureBuilder<(DateTime?, DateTime?)>(
+                      future: () async {
                         final box =
                             Provider.of<ObjectBox>(
                               context,
                               listen: false,
                             ).store.box<HealthDataEntry>();
-                        return HealthDataRepo(box: box).latestEntryDate();
+                        final repo = HealthDataRepo(box: box);
+                        final latest = await repo.latestEntryDate();
+                        final earliest = await repo.earliestEntryDate();
+                        return (latest, earliest);
                       }(),
                       builder: (context, snapshot) {
-                        if (!snapshot.hasData || snapshot.data == null) {
+                        if (!snapshot.hasData) {
                           return Text(
                             'Last sync: Never',
                             style: Theme.of(context).textTheme.bodySmall,
                           );
                         }
-                        return Text(
-                          'Last sync: ${formatRelativeTime(snapshot.data!)}',
-                          style: Theme.of(context).textTheme.bodySmall,
+                        final (latest, earliest) = snapshot.data!;
+                        if (latest == null) {
+                          return Text(
+                            'Last sync: Never',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          );
+                        }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Last sync: ${formatRelativeTime(latest)}',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            if (earliest != null)
+                              Text(
+                                'Since: ${formatRelativeTime(earliest)}',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                          ],
                         );
                       },
                     ),
