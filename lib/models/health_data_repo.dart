@@ -95,4 +95,17 @@ class HealthDataRepo {
     }
     return DateTime.fromMillisecondsSinceEpoch(entry.timestamp);
   }
+
+  Future<DateTime?> earliestEntryDate() async {
+    final entry =
+        await box
+            .query()
+            .order(HealthDataEntry_.timestamp)
+            .build()
+            .findFirstAsync();
+    if (entry == null || entry.timestamp == 0) {
+      return null;
+    }
+    return DateTime.fromMillisecondsSinceEpoch(entry.timestamp);
+  }
 }
