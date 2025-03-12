@@ -18,11 +18,11 @@ class StatsScreen extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                // Health data card
-                HealthStatsCard(),
-                const SizedBox(height: 16),
                 // Game stats card
                 const GameStatsCard(),
+                const SizedBox(height: 16),
+                // Health data card
+                HealthStatsCard(),
               ],
             ),
           ),
