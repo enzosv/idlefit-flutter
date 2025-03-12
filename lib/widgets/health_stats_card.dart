@@ -115,12 +115,12 @@ class _HealthStatsCardState extends State<HealthStatsCard> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Last sync: ${formatRelativeTime(latest)}',
+                              'Lastest data: ${formatRelativeTime(latest)}',
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             if (earliest != null)
                               Text(
-                                'Since: ${formatRelativeTime(earliest)}',
+                                'Started: ${formatRelativeTime(earliest)}',
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                           ],

@@ -17,12 +17,11 @@ class GameStatsCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Game Statistics',
+              'Game Stats',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const Divider(),
             const _DynamicStats(),
-            const Divider(),
             const _StaticStats(),
           ],
         ),
@@ -121,6 +120,9 @@ class _StatListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String titleText = title;
+    if (perSecond != null) {
+      titleText = '$title • ${toLettersNotation(perSecond!)}/s';
+    }
     return ListTile(
       leading: Icon(icon, color: iconColor),
       title: Text(titleText),
