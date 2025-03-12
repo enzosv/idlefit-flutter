@@ -191,36 +191,36 @@ class _GeneratorCardState extends State<GeneratorCard>
           rightText: 'Owned: ${generator.count}',
           description: generator.description,
           additionalInfo: [
-                  Text(
-                    'Produces: ${toLettersNotation(generator.singleOutput)} coins/sec',
-                  ),
+            Text(
+              'Produces: ${toLettersNotation(generator.singleOutput)} coins/sec',
+            ),
           ],
-          costText: 'Cost: ${toLettersNotation(generator.cost)} coins',
+          costText: 'Cost: ${toLettersNotation(generator.cost)}',
           costColor:
               widget.gameState.coins.count >= generator.cost
                   ? Colors.green
                   : Colors.red,
           costIcon: Icon(
             Icons.monetization_on,
-                          color:
-                              widget.gameState.coins.count >= generator.cost
-                                  ? Colors.green
-                                  : Colors.red,
+            color:
+                widget.gameState.coins.count >= generator.cost
+                    ? Colors.green
+                    : Colors.red,
             size: 20,
-                      ),
+          ),
           buttonText: 'Buy',
           onButtonPressed:
-                            widget.gameState.coins.count >= generator.cost
+              widget.gameState.coins.count >= generator.cost
                   ? () => widget.gameState.buyCoinGenerator(generator)
-                                : null,
+                  : null,
           onTapDown: showProgress || generator.count < 1 ? null : startProgress,
           progressIndicator:
               showProgress
                   ? AnimatedContainer(
-                      duration: Duration(milliseconds: duration),
-                      height: 5,
+                    duration: Duration(milliseconds: duration),
+                    height: 5,
                     width: progress * (screenWidth - 32),
-                      color: Colors.blue,
+                    color: Colors.blue,
                   )
                   : null,
         ),

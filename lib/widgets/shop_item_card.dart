@@ -22,10 +22,15 @@ class ShopItemCard extends StatelessWidget {
           item.level > 0
               ? [Text('Current effect: ${item.currentEffectValue}')]
               : [],
-      costText:
-          isMaxLevel
-              ? 'MAXED OUT'
-              : 'Cost: ${item.currentCost} ${item.costUnit.name}',
+      costText: isMaxLevel ? 'MAXED OUT' : 'Cost: ${item.currentCost}',
+      costIcon: Icon(
+        Icons.space_dashboard,
+        color:
+            gameState.space.count >= item.currentCost
+                ? Colors.green
+                : Colors.red,
+        size: 20,
+      ),
       costColor:
           isMaxLevel
               ? Colors.grey
