@@ -87,12 +87,6 @@ class _HealthStatsCardState extends State<HealthStatsCard> {
               today: today.calories,
               total: total.calories,
             ),
-            _HealthStatsTile(
-              icon: Icons.fitness_center,
-              title: "Exercise Minutes",
-              today: today.exerciseMinutes,
-              total: total.exerciseMinutes,
-            ),
           ],
         ),
       ),
