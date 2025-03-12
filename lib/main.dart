@@ -10,6 +10,7 @@ import 'services/health_service.dart';
 import 'services/storage_service.dart';
 import 'services/object_box.dart';
 import 'widgets/background_earnings_popup.dart';
+import 'services/ad_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -127,6 +128,8 @@ class _GameHomePageState extends State<GameHomePage>
     final gameState = Provider.of<GameState>(context, listen: false);
     final objectBoxService = Provider.of<ObjectBox>(context, listen: false);
     gameState.isPaused = true;
+    // Initialize ads
+    AdService.initialize();
     healthService.initialize().then((_) async {
       await healthService.syncHealthData(objectBoxService, gameState);
       gameState.isPaused = false;

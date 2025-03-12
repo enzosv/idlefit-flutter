@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:idlefit/widgets/achievement_list.dart';
 import 'package:idlefit/widgets/health_stats_card.dart';
 import 'package:idlefit/widgets/game_stats_card.dart';
+import 'package:idlefit/widgets/banner_ad_widget.dart';
 
 class StatsScreen extends StatelessWidget {
   const StatsScreen({super.key});
@@ -13,7 +14,7 @@ class StatsScreen extends StatelessWidget {
       child: Column(
         children: [
           Container(height: MediaQuery.paddingOf(context).top),
-
+          const BannerAdWidget(),
           // Stats cards
           Expanded(
             child: ListView(

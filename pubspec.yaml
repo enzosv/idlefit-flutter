@@ -37,6 +37,8 @@ dependencies:
   health: ^12.0.1
   objectbox: ^4.1.0
   objectbox_sync_flutter_libs: any
+  google_mobile_ads: ^4.0.0
+
   # intl: ^0.20.2
 
 dev_dependencies:
