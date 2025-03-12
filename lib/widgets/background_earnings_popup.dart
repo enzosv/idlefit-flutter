@@ -33,8 +33,8 @@ class BackgroundEarningsPopup extends StatelessWidget {
               _buildEarningRow(
                 context,
                 icon: Icons.monetization_on,
-                label: 'Coins Earned',
-                value: coinsEarned,
+                label: 'Earned',
+                value: toLettersNotation(coinsEarned),
                 color: Colors.amber,
               ),
 
@@ -43,8 +43,8 @@ class BackgroundEarningsPopup extends StatelessWidget {
               _buildEarningRow(
                 context,
                 icon: Icons.space_dashboard,
-                label: 'Space Earned',
-                value: spaceEarned,
+                label: 'Earned',
+                value: toLettersNotation(spaceEarned),
                 color: Colors.blueAccent,
               ),
             if (energyEarned > 0) const SizedBox(height: 16),
@@ -52,8 +52,8 @@ class BackgroundEarningsPopup extends StatelessWidget {
               _buildEarningRow(
                 context,
                 icon: Icons.bolt,
-                label: 'Energy Earned',
-                value: energyEarned * msToMins,
+                label: 'Earned',
+                value: durationNotation(energyEarned * msToMins),
                 color: Colors.greenAccent,
               ),
             if (energySpent > 0) const SizedBox(height: 16),
@@ -61,8 +61,8 @@ class BackgroundEarningsPopup extends StatelessWidget {
               _buildEarningRow(
                 context,
                 icon: Icons.bolt,
-                label: 'Energy Spent',
-                value: energySpent * msToMins,
+                label: 'Spent',
+                value: durationNotation(energySpent * msToMins),
                 color: Colors.redAccent,
               ),
             const SizedBox(height: 24),
@@ -91,7 +91,7 @@ class BackgroundEarningsPopup extends StatelessWidget {
     BuildContext context, {
     required IconData icon,
     required String label,
-    required double value,
+    required String value,
     required Color color,
   }) {
     return Row(
@@ -104,12 +104,7 @@ class BackgroundEarningsPopup extends StatelessWidget {
             Text(label),
           ],
         ),
-        Text(
-          label == "Energy Spent" || label == "Energy Earned"
-              ? durationNotation(value)
-              : toLettersNotation(value),
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
       ],
     );
   }
