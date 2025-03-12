@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/util.dart';
 import '../models/achievement.dart';
 
 class AchievementCard extends StatelessWidget {
@@ -62,7 +61,7 @@ class AchievementCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progressPercent,
               minHeight: 8,
-              backgroundColor: theme.colorScheme.surfaceVariant,
+              backgroundColor: theme.colorScheme.surfaceContainerHighest,
             ),
           ),
           const SizedBox(height: 8),
