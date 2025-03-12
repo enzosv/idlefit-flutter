@@ -1,5 +1,6 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:idlefit/constants.dart';
 import 'package:idlefit/widgets/generator_card.dart';
 import 'package:provider/provider.dart';
 import '../services/game_state.dart';
@@ -23,8 +24,14 @@ class MainScreen extends StatelessWidget {
         GameWidget(game: FlameBackground()),
         // Game UI overlay
         SafeArea(
+          top: false,
           child: Column(
             children: [
+              Container(
+                height: MediaQuery.paddingOf(context).top,
+                color: Constants.barColor,
+              ),
+
               // Currency display
               const CurrencyBar(),
 
@@ -33,10 +40,14 @@ class MainScreen extends StatelessWidget {
                 child: Consumer<GameState>(
                   builder: (context, gameState, child) {
                     // Filter affordable generators and sort by price
-                    final affordableGenerators = gameState.coinGenerators
-                        .where((generator) => generator.cost <= gameState.coins.max)
-                        .toList()
-                      ..sort((a, b) => b.cost.compareTo(a.cost));
+                    final affordableGenerators =
+                        gameState.coinGenerators
+                            .where(
+                              (generator) =>
+                                  generator.cost <= gameState.coins.max,
+                            )
+                            .toList()
+                          ..sort((a, b) => b.cost.compareTo(a.cost));
 
                     return ListView.builder(
                       padding: const EdgeInsets.all(16),
@@ -44,7 +55,9 @@ class MainScreen extends StatelessWidget {
                       itemBuilder: (context, index) {
                         return GeneratorCard(
                           gameState: gameState,
-                          generatorIndex: gameState.coinGenerators.indexOf(affordableGenerators[index]),
+                          generatorIndex: gameState.coinGenerators.indexOf(
+                            affordableGenerators[index],
+                          ),
                         );
                       },
                     );

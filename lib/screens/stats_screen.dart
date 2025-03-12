@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/constants.dart';
 import 'package:idlefit/widgets/health_stats_card.dart';
 import 'package:provider/provider.dart';
 import '../services/game_state.dart';
@@ -12,8 +13,13 @@ class StatsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final gameState = Provider.of<GameState>(context);
     return SafeArea(
+      top: false,
       child: Column(
         children: [
+          Container(
+            height: MediaQuery.paddingOf(context).top,
+            color: Constants.barColor,
+          ),
           // Currency display
           const CurrencyBar(),
 

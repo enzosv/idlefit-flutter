@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/constants.dart';
 import 'package:idlefit/widgets/current_coins.dart';
 import 'package:provider/provider.dart';
 import '../services/game_state.dart';
@@ -126,17 +127,8 @@ class CurrencyBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: currencyBarKey,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.blueGrey.shade800,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+      decoration: BoxDecoration(color: Constants.barColor),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
