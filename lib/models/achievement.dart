@@ -1,3 +1,4 @@
+import 'package:idlefit/util.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()
@@ -24,29 +25,17 @@ class Achievement {
   //   this.reward = 0,
   // });
 
-  String get formattedRequirement {
-    if (requirement >= 1000000) {
-      return '${(requirement / 1000000).toStringAsFixed(1)}M';
-    } else if (requirement >= 1000) {
-      return '${(requirement / 1000).toStringAsFixed(1)}K';
-    }
-    return requirement.toStringAsFixed(0);
-  }
-
-  String get formattedReward {
-    if (reward >= 1000000) {
-      return '${(reward / 1000000).toStringAsFixed(1)}M';
-    } else if (reward >= 1000) {
-      return '${(reward / 1000).toStringAsFixed(1)}K';
-    }
-    return reward.toStringAsFixed(0);
-  }
-
   String get description {
-    return '$action ${formattedRequirement} $reqUnit';
+    if (reqUnit == "energy") {
+      return '$action ${durationNotation(requirement.toDouble())} $reqUnit';
+    }
+    return '$action ${toLettersNotation(requirement.toDouble())} $reqUnit';
   }
 
   String get rewardText {
-    return '${formattedReward} $rewardUnit';
+    if (rewardUnit == "energy") {
+      return durationNotation(reward.toDouble());
+    }
+    return toLettersNotation(reward.toDouble());
   }
 }
