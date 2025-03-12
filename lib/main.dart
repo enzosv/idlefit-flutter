@@ -111,7 +111,8 @@ class _GameHomePageState extends State<GameHomePage>
         return;
       }
       final earnings = gameState.getBackgroundDifferences();
-      if (earnings.values.any((value) => value > 0)) {
+      if ((earnings['energy_spent'] ?? 0) > 60000) {
+        // do not show popup if energy spent is less than 1 minute
         showDialog(
           context: context,
           builder: (context) => BackgroundEarningsPopup(earnings: earnings),
