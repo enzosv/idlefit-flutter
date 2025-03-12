@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/constants.dart';
 import 'package:provider/provider.dart';
 import '../services/game_state.dart';
 import '../models/shop_items.dart';
@@ -23,7 +24,7 @@ class ShopItemCard extends StatelessWidget {
               ? [Text('Current effect: ${item.currentEffectValue}')]
               : [],
       cost: isMaxLevel ? null : item.currentCost.toDouble(),
-      costIcon: isMaxLevel ? null : Icons.space_dashboard,
+      costIcon: isMaxLevel ? null : Constants.spaceIcon,
       affordable: gameState.space.count >= item.currentCost,
       buttonText: isMaxLevel ? 'MAXED' : 'Upgrade',
       onButtonPressed:

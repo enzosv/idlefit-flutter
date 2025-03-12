@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/constants.dart';
 import '../util.dart';
 
 class BackgroundEarningsPopup extends StatelessWidget {
@@ -32,7 +33,7 @@ class BackgroundEarningsPopup extends StatelessWidget {
             if (coinsEarned > 0)
               _buildEarningRow(
                 context,
-                icon: Icons.monetization_on,
+                icon: Constants.coinIcon,
                 label: 'Earned',
                 value: toLettersNotation(coinsEarned),
                 color: Colors.amber,
@@ -42,7 +43,7 @@ class BackgroundEarningsPopup extends StatelessWidget {
             if (spaceEarned > 0)
               _buildEarningRow(
                 context,
-                icon: Icons.space_dashboard,
+                icon: Constants.spaceIcon,
                 label: 'Earned',
                 value: toLettersNotation(spaceEarned),
                 color: Colors.blueAccent,
@@ -51,7 +52,7 @@ class BackgroundEarningsPopup extends StatelessWidget {
             if (energyEarned > 0)
               _buildEarningRow(
                 context,
-                icon: Icons.bolt,
+                icon: Constants.energyIcon,
                 label: 'Earned',
                 value: durationNotation(energyEarned * msToMins),
                 color: Colors.greenAccent,
@@ -60,7 +61,7 @@ class BackgroundEarningsPopup extends StatelessWidget {
             if (energySpent > 0)
               _buildEarningRow(
                 context,
-                icon: Icons.bolt,
+                icon: Constants.energyIcon,
                 label: 'Spent',
                 value: durationNotation(energySpent * msToMins),
                 color: Colors.redAccent,

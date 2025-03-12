@@ -147,7 +147,10 @@ class _GameHomePageState extends State<GameHomePage>
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Stats'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Generators'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.table_chart),
+            label: 'Workout Routine',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
             label: 'Shop',

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/constants.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:idlefit/util.dart';
@@ -23,7 +24,7 @@ class GeneratorUpgradeCard extends StatelessWidget {
             'Output: ${toLettersNotation(generator.output)} ',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          Icon(Icons.monetization_on, color: Colors.amber, size: 16),
+          Icon(Constants.coinIcon, color: Colors.amber, size: 16),
           Text('/sec', style: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
@@ -37,7 +38,7 @@ class GeneratorUpgradeCard extends StatelessWidget {
               'Next level: ${toLettersNotation(generator.outputAtLevel(generator.level + 1))} ',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-            Icon(Icons.monetization_on, color: Colors.amber, size: 16),
+            Icon(Constants.coinIcon, color: Colors.amber, size: 16),
             Text('/sec', style: Theme.of(context).textTheme.bodyMedium),
           ],
         ),
@@ -51,7 +52,7 @@ class GeneratorUpgradeCard extends StatelessWidget {
         additionalInfo: additionalInfo,
         cost: generator.upgradeUnlockCost,
         affordable: gameState.space.count >= generator.upgradeUnlockCost,
-        costIcon: Icons.space_dashboard,
+        costIcon: Constants.spaceIcon,
         buttonText: 'Unlock',
         onButtonPressed:
             gameState.space.count >= generator.upgradeUnlockCost
@@ -68,7 +69,7 @@ class GeneratorUpgradeCard extends StatelessWidget {
       additionalInfo: additionalInfo,
       cost: isMaxLevel ? null : generator.upgradeCost,
       affordable: gameState.coins.count >= generator.upgradeCost,
-      costIcon: isMaxLevel ? null : Icons.monetization_on,
+      costIcon: isMaxLevel ? null : Constants.coinIcon,
       buttonText: isMaxLevel ? 'MAXED' : 'Upgrade',
       onButtonPressed:
           (isMaxLevel || gameState.coins.count < generator.upgradeCost)

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/constants.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:idlefit/util.dart';
 import 'package:idlefit/widgets/current_coins.dart';
@@ -190,7 +191,7 @@ class _GeneratorCardState extends State<GeneratorCard>
             'Produces: ${toLettersNotation(generator.singleOutput)} ',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          Icon(Icons.monetization_on, color: Colors.amber, size: 16),
+          Icon(Constants.coinIcon, color: Colors.amber, size: 16),
           Text('/sec', style: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
@@ -203,7 +204,7 @@ class _GeneratorCardState extends State<GeneratorCard>
               'Output: ${toLettersNotation(generator.output)} ',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-            Icon(Icons.monetization_on, color: Colors.amber, size: 16),
+            Icon(Constants.coinIcon, color: Colors.amber, size: 16),
             Text('/sec', style: Theme.of(context).textTheme.bodyMedium),
           ],
         ),
@@ -219,7 +220,7 @@ class _GeneratorCardState extends State<GeneratorCard>
           additionalInfo: additionalInfo,
           cost: generator.cost,
           affordable: widget.gameState.coins.count >= generator.cost,
-          costIcon: Icons.monetization_on,
+          costIcon: Constants.coinIcon,
           buttonText: 'Add Rep',
           onButtonPressed:
               widget.gameState.coins.count >= generator.cost

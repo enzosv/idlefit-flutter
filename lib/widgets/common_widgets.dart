@@ -55,7 +55,7 @@ class CoinsDisplay extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.monetization_on, color: Colors.amber, size: 20),
+        Icon(Constants.coinIcon, color: Colors.amber, size: 20),
         const SizedBox(width: 4),
         CurrentCoins(key: CurrentCoins.globalKey),
         const SizedBox(width: 4),
@@ -84,14 +84,14 @@ class OtherCurrencies extends StatelessWidget {
             ),
             _buildCurrencyItem(
               context,
-              icon: Icons.bolt,
+              icon: Constants.energyIcon,
               value:
                   '${durationNotation(gameState.energy.count)}/${durationNotation(gameState.energy.max)}',
               color: Colors.greenAccent,
             ),
             _buildCurrencyItem(
               context,
-              icon: Icons.space_dashboard,
+              icon: Constants.spaceIcon,
               value:
                   '${toLettersNotation(gameState.space.count)}/${toLettersNotation(gameState.space.max)}',
               color: Colors.blueAccent,
