@@ -25,7 +25,7 @@ class GeneratorUpgradeCard extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           Icon(Constants.coinIcon, color: Colors.amber, size: 16),
-          Text('/sec', style: Theme.of(context).textTheme.bodyMedium),
+          Text('/s', style: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
     ];
@@ -39,7 +39,7 @@ class GeneratorUpgradeCard extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             Icon(Constants.coinIcon, color: Colors.amber, size: 16),
-            Text('/sec', style: Theme.of(context).textTheme.bodyMedium),
+            Text('/s', style: Theme.of(context).textTheme.bodyMedium),
           ],
         ),
       );

@@ -192,7 +192,7 @@ class _GeneratorCardState extends State<GeneratorCard>
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           Icon(Constants.coinIcon, color: Colors.amber, size: 16),
-          Text('/sec', style: Theme.of(context).textTheme.bodyMedium),
+          Text('/s', style: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
     ];
@@ -205,7 +205,7 @@ class _GeneratorCardState extends State<GeneratorCard>
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             Icon(Constants.coinIcon, color: Colors.amber, size: 16),
-            Text('/sec', style: Theme.of(context).textTheme.bodyMedium),
+            Text('/s', style: Theme.of(context).textTheme.bodyMedium),
           ],
         ),
       );
