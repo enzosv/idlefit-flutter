@@ -22,7 +22,7 @@ class CoinsInfo extends StatelessWidget {
         // Apply coin multiplier from upgrades
         double coinMultiplier = 1.0;
         for (final item in gameState.shopItems) {
-          if (item.effect == ShopItemEffect.coinMultiplier) {
+          if (item.shopItemEffect == ShopItemEffect.coinMultiplier) {
             coinMultiplier += item.effectValue * item.level;
           }
         }
@@ -139,7 +139,7 @@ class CurrencyBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: currencyBarKey,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
       decoration: BoxDecoration(color: Constants.barColor),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
