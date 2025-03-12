@@ -29,7 +29,7 @@ class CardButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor ?? Colors.green.shade400,
+        backgroundColor: backgroundColor ?? Colors.orange.shade700,
         foregroundColor: textColor ?? Colors.black,
         elevation: 2,
         // padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

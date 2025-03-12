@@ -36,6 +36,7 @@ class CommonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = affordable ? Colors.amber : Colors.red;
     return Card(
       margin: margin,
       child: InkWell(
@@ -68,16 +69,12 @@ class CommonCard extends StatelessWidget {
                           "Cost: ${toLettersNotation(cost!)}",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: affordable ? Colors.green : Colors.red,
+                            color: color,
                           ),
                         ),
                         if (costIcon != null) ...[
                           const SizedBox(width: 4),
-                          Icon(
-                            costIcon!,
-                            color: affordable ? Colors.green : Colors.red,
-                            size: 20,
-                          ),
+                          Icon(costIcon!, color: color, size: 20),
                         ],
                       ],
                     ),
