@@ -44,7 +44,7 @@ class _GeneratorUpgradeCardState extends State<GeneratorUpgradeCard> {
               children: [
                 Text(
                   widget.generator.name,
-                  style: Theme.of(context).textTheme.headlineSmall,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 Text(
                   'Level: ${widget.generator.level}/${widget.generator.maxLevel}',
