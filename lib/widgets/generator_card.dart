@@ -186,67 +186,43 @@ class _GeneratorCardState extends State<GeneratorCard>
     return Stack(
       clipBehavior: Clip.none, // Allow animations to move outside bounds
       children: [
-        Card(
-          elevation: 4,
-          margin: const EdgeInsets.only(bottom: 16),
-          child: InkWell(
-            onTapDown:
-                showProgress || generator.count < 1 ? null : startProgress,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        generator.name,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      Text('Owned: ${generator.count}'),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(generator.description),
+        CommonCard(
+          title: generator.name,
+          rightText: 'Owned: ${generator.count}',
+          description: generator.description,
+          additionalInfo: [
                   Text(
                     'Produces: ${toLettersNotation(generator.singleOutput)} coins/sec',
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Cost: ${toLettersNotation(generator.cost)} coins',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+          ],
+          costText: 'Cost: ${toLettersNotation(generator.cost)} coins',
+          costColor:
+              widget.gameState.coins.count >= generator.cost
+                  ? Colors.green
+                  : Colors.red,
+          costIcon: Icon(
+            Icons.monetization_on,
                           color:
                               widget.gameState.coins.count >= generator.cost
                                   ? Colors.green
                                   : Colors.red,
-                        ),
+            size: 20,
                       ),
-                      CardButton(
-                        text: 'Buy',
-                        onPressed:
+          buttonText: 'Buy',
+          onButtonPressed:
                             widget.gameState.coins.count >= generator.cost
-                                ? () =>
-                                    widget.gameState.buyCoinGenerator(generator)
+                  ? () => widget.gameState.buyCoinGenerator(generator)
                                 : null,
-                      ),
-                    ],
-                  ),
-                  if (showProgress)
-                    AnimatedContainer(
+          onTapDown: showProgress || generator.count < 1 ? null : startProgress,
+          progressIndicator:
+              showProgress
+                  ? AnimatedContainer(
                       duration: Duration(milliseconds: duration),
                       height: 5,
-                      width: progress * (screenWidth - 32), // Expanding bar
+                    width: progress * (screenWidth - 32),
                       color: Colors.blue,
-                    ),
-                ],
-              ),
-            ),
-          ),
+                  )
+                  : null,
         ),
       ],
     );
