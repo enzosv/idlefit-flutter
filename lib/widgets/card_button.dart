@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/constants.dart';
 
 class CardButton extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -29,7 +30,7 @@ class CardButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor ?? Colors.orange.shade700,
+        backgroundColor: backgroundColor ?? Constants.primaryColor,
         foregroundColor: textColor ?? Colors.black,
         elevation: 2,
         // padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

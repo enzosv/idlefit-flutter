@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'services/game_state.dart';
@@ -139,7 +140,7 @@ class _GameHomePageState extends State<GameHomePage>
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        selectedItemColor: Theme.of(context).primaryColor,
+        selectedItemColor: Constants.primaryColor,
         onTap: (index) {
           setState(() {
             _selectedIndex = index;
@@ -148,8 +149,8 @@ class _GameHomePageState extends State<GameHomePage>
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Stats'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.table_chart),
-            label: 'Workout Routine',
+            icon: Icon(Icons.fitness_center),
+            label: 'Workout',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
