@@ -6,6 +6,7 @@ import 'package:idlefit/util.dart';
 import 'package:provider/provider.dart';
 import 'package:idlefit/services/health_service.dart';
 import 'package:idlefit/services/game_state.dart';
+import 'package:idlefit/widgets/card_button.dart';
 
 class HealthStatsCard extends StatefulWidget {
   const HealthStatsCard({super.key});
@@ -106,17 +107,9 @@ class _HealthStatsCardState extends State<HealthStatsCard> {
                     ),
                   ],
                 ),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.sync),
-                  label: const Text('Sync Now'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade400,
-                    foregroundColor: Colors.black,
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
+                CardButton(
+                  icon: Icons.sync,
+                  text: 'Sync',
                   onPressed: () async {
                     final healthService = Provider.of<HealthService>(
                       context,
