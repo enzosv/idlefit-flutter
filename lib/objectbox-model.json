@@ -44,7 +44,7 @@
     },
     {
       "id": "3:7897766162698443189",
-      "lastPropertyId": "4:3181080062182307300",
+      "lastPropertyId": "5:2457321709930163773",
       "name": "CoinGenerator",
       "properties": [
         {
@@ -62,6 +62,11 @@
           "name": "tier",
           "type": 6,
           "flags": 129
+        },
+        {
+          "id": "5:2457321709930163773",
+          "name": "isUnlocked",
+          "type": 1
         }
       ],
       "relations": []

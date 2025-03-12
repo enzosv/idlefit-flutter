@@ -54,7 +54,7 @@ class CoinGenerator {
   }
 
   double get upgradeUnlockCost {
-    return 1000.0; // Fixed space cost for unlocking upgrades
+    return 1000; // Fixed space cost for unlocking upgrades
   }
 
   factory CoinGenerator.fromJson(Map<String, dynamic> json) {
@@ -64,7 +64,7 @@ class CoinGenerator {
       baseCost: json['cost'].toDouble(),
       baseOutput: json['output'].toDouble(),
       description: json['description'],
-    )..isUnlocked = false;
+    );
   }
 }
 

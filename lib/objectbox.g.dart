@@ -64,7 +64,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(3, 7897766162698443189),
       name: 'CoinGenerator',
-      lastPropertyId: const obx_int.IdUid(4, 3181080062182307300),
+      lastPropertyId: const obx_int.IdUid(5, 2457321709930163773),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -81,7 +81,12 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(4, 3181080062182307300),
             name: 'tier',
             type: 6,
-            flags: 129)
+            flags: 129),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 2457321709930163773),
+            name: 'isUnlocked',
+            type: 1,
+            flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[]),
@@ -262,10 +267,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
           object.tier = id;
         },
         objectToFB: (CoinGenerator object, fb.Builder fbb) {
-          fbb.startTable(5);
+          fbb.startTable(6);
           fbb.addInt64(1, object.count);
           fbb.addInt64(2, object.level);
           fbb.addInt64(3, object.tier);
+          fbb.addBool(4, object.isUnlocked);
           fbb.finish(fbb.endTable());
           return object.tier;
         },
@@ -276,8 +282,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0);
           final object = CoinGenerator(tier: tierParam)
             ..count = const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0)
-            ..level =
-                const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
+            ..level = const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0)
+            ..isUnlocked =
+                const fb.BoolReader().vTableGet(buffer, rootOffset, 12, false);
 
           return object;
         }),
@@ -395,6 +402,10 @@ class CoinGenerator_ {
   /// See [CoinGenerator.tier].
   static final tier =
       obx.QueryIntegerProperty<CoinGenerator>(_entities[1].properties[2]);
+
+  /// See [CoinGenerator.isUnlocked].
+  static final isUnlocked =
+      obx.QueryBooleanProperty<CoinGenerator>(_entities[1].properties[3]);
 }
 
 /// [HealthDataEntry] entity fields to define ObjectBox queries.
