@@ -10,22 +10,6 @@ class GameStatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gameState = Provider.of<GameState>(context);
-
-    // Calculate coins per second
-    double coinsPerSecond = 0;
-    for (final generator in gameState.coinGenerators) {
-      coinsPerSecond += generator.output;
-    }
-    // Apply coin multiplier from upgrades
-    double coinMultiplier = 1.0;
-    for (final item in gameState.shopItems) {
-      if (item.effect == ShopItemEffect.coinMultiplier) {
-        coinMultiplier += item.effectValue * item.level;
-      }
-    }
-    coinsPerSecond *= coinMultiplier;
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -37,37 +21,78 @@ class GameStatsCard extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const Divider(),
-            _StatListTile(
-              icon: Constants.coinIcon,
-              iconColor: Colors.amber,
-              title: 'Gains',
-              current: gameState.coins.count,
-              max: gameState.coins.max,
-              perSecond: coinsPerSecond,
-              earned: gameState.coins.totalEarned,
-              spent: gameState.coins.totalSpent,
-            ),
-            _StatListTile(
-              icon: Constants.energyIcon,
-              iconColor: Colors.greenAccent,
-              title: 'Energy',
-              current: gameState.energy.count,
-              max: gameState.energy.max,
-              earned: gameState.energy.totalEarned,
-              spent: gameState.energy.totalSpent,
-            ),
-            _StatListTile(
-              icon: Constants.spaceIcon,
-              iconColor: Colors.blueAccent,
-              title: 'Space',
-              current: gameState.space.count,
-              max: gameState.space.max,
-              earned: gameState.space.totalEarned,
-              spent: gameState.space.totalSpent,
-            ),
+            const _DynamicStats(),
+            const Divider(),
+            const _StaticStats(),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _DynamicStats extends StatelessWidget {
+  const _DynamicStats();
+
+  @override
+  Widget build(BuildContext context) {
+    final gameState = Provider.of<GameState>(context);
+
+    // Calculate coins per second
+    double coinsPerSecond = 0;
+    for (final generator in gameState.coinGenerators) {
+      coinsPerSecond += generator.output;
+    }
+    // Apply coin multiplier from upgrades
+    double coinMultiplier = 1.0;
+    for (final item in gameState.shopItems) {
+      if (item.shopItemEffect == ShopItemEffect.coinMultiplier) {
+        coinMultiplier += item.effectValue * item.level;
+      }
+    }
+    coinsPerSecond *= coinMultiplier;
+
+    return _StatListTile(
+      icon: Constants.coinIcon,
+      iconColor: Colors.amber,
+      title: 'Gains',
+      current: gameState.coins.count,
+      max: gameState.coins.max,
+      perSecond: coinsPerSecond,
+      earned: gameState.coins.totalEarned,
+      spent: gameState.coins.totalSpent,
+    );
+  }
+}
+
+class _StaticStats extends StatelessWidget {
+  const _StaticStats();
+
+  @override
+  Widget build(BuildContext context) {
+    final gameState = Provider.of<GameState>(context);
+
+    return Column(
+      children: [
+        _StatListTile(
+          icon: Constants.energyIcon,
+          iconColor: Colors.greenAccent,
+          title: 'Energy',
+          current: gameState.energy.count,
+          max: gameState.energy.max,
+          earned: gameState.energy.totalEarned,
+          spent: gameState.energy.totalSpent,
+        ),
+        _StatListTile(
+          icon: Constants.spaceIcon,
+          iconColor: Colors.blueAccent,
+          title: 'Space',
+          current: gameState.space.count,
+          max: gameState.space.max,
+          earned: gameState.space.totalEarned,
+          spent: gameState.space.totalSpent,
+        ),
+      ],
     );
   }
 }
@@ -96,9 +121,6 @@ class _StatListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String titleText = title;
-    if (perSecond != null) {
-      titleText = '${title} • ${toLettersNotation(perSecond!)}/s';
-    }
     return ListTile(
       leading: Icon(icon, color: iconColor),
       title: Text(titleText),
