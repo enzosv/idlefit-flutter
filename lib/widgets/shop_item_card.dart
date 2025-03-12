@@ -26,7 +26,12 @@ class ShopItemCard extends StatelessWidget {
       cost: isMaxLevel ? null : item.currentCost.toDouble(),
       costIcon: isMaxLevel ? null : Constants.spaceIcon,
       affordable: gameState.space.count >= item.currentCost,
-      buttonText: isMaxLevel ? 'MAXED' : 'Upgrade',
+      buttonText:
+          isMaxLevel
+              ? 'MAXED'
+              : item.id == 4
+              ? 'Watch Ad'
+              : 'Upgrade',
       onButtonPressed:
           (isMaxLevel || gameState.space.count < item.currentCost)
               ? null

@@ -9,6 +9,7 @@ import 'package:objectbox/objectbox.dart';
 import 'storage_service.dart';
 import '../models/shop_items.dart';
 import 'dart:math';
+import 'package:idlefit/services/ad_service.dart';
 
 class GameState with ChangeNotifier {
   static const _tickTime = 1000; // miliseconds
@@ -244,10 +245,32 @@ class GameState with ChangeNotifier {
       return false;
     }
     if (item.id == 4) {
-      // TODO: watch ad
-      // if ad does not finish, return
-      doubleCoinExpiry =
-          DateTime.now().add(Duration(minutes: 1)).millisecondsSinceEpoch;
+      // Refund the space cost since we'll charge it after the ad is watched
+      space.earn(item.currentCost.toDouble());
+
+      AdService.showRewardedAd(
+        onRewarded: () {
+          // Only upgrade and spend space if the ad was watched
+          if (space.spend(item.currentCost.toDouble())) {
+            item.level++;
+            doubleCoinExpiry =
+                DateTime.now()
+                    .add(const Duration(minutes: 1))
+                    .millisecondsSinceEpoch;
+            _shopItemRepo.saveShopItem(item);
+            notifyListeners();
+          }
+        },
+        onAdDismissed: () {
+          // Ad was dismissed without reward
+          notifyListeners();
+        },
+        onAdFailedToShow: (error) {
+          debugPrint('Failed to show ad: $error');
+          notifyListeners();
+        },
+      );
+      return true;
     }
 
     item.level++;
