@@ -50,36 +50,37 @@
   },
   {
     "tier": 8,
-    "name": "One-Arm Push-ups",
-    "description": "Regular push-ups for people who think they're in an action movie.",
+    "name": "Weighted Muscle-ups",
+    "description": "Pull-ups that got too full of themselves.",
     "cost": 280000000,
     "output": 37500
   },
   {
     "tier": 9,
-    "name": "Muscle-ups",
-    "description": "Pull-ups that got too full of themselves.",
+    "name": "Seafloor Sprints",
+    "description": "Air didn't provide enough resistance, so you're using the ocean.",
     "cost": 4200000000,
     "output": 220000
   },
   {
     "tier": 10,
-    "name": "Car Curls",
-    "description": "Using compact cars for XL biceps. Your gym's parking lot is suspiciously empty.",
+    "name": "Mountain Range Circuit",
+    "description": "Nothing like a quick jog up Everest to start the day.",
+    
     "cost": 61000000000,
     "output": 1300000
   },
   {
     "tier": 11,
-    "name": "Train Pull",
-    "description": "The morning commute is delayed because you're using the train for your back workout.",
+    "name": "Car Curls",
+    "description": "Using compact cars for XL biceps. Your gym's parking lot is suspiciously empty.",
     "cost": 800000000000,
     "output": 8000000
   },
   {
     "tier": 12,
-    "name": "Mountain Range Circuit",
-    "description": "Using the Himalayas as your personal obstacle course. Yetis are your spotters.",
+    "name": "Train Pull",
+    "description": "The morning commute is delayed because you're using the train for your back workout.",
     "cost": 11000000000000,
     "output": 50000000
   },
