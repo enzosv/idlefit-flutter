@@ -75,13 +75,13 @@ class OtherCurrencies extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildCurrencyItem(
-              context,
-              icon: Icons.diamond,
-              value:
-                  '${toLettersNotation(gameState.gems.count)}/${toLettersNotation(gameState.gems.max)}',
-              color: Colors.purpleAccent,
-            ),
+            // _buildCurrencyItem(
+            //   context,
+            //   icon: Icons.diamond,
+            //   value:
+            //       '${toLettersNotation(gameState.gems.count)}/${toLettersNotation(gameState.gems.max)}',
+            //   color: Colors.purpleAccent,
+            // ),
             _buildCurrencyItem(
               context,
               icon: Constants.energyIcon,
