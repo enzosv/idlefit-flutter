@@ -9,12 +9,14 @@ import 'package:objectbox/objectbox.dart';
 import 'storage_service.dart';
 import '../models/shop_items.dart';
 import 'dart:math';
+import 'notification_service.dart';
 
 class GameState with ChangeNotifier {
   static const _tickTime = 1000; // miliseconds
   static const _inactiveThreshold = 30000; // 30 seconds in milliseocnds
   static const _calorieToEnergyMultiplier =
       72000.0; // 1 calorie = 72 seconds of idle fuel
+  static const _notificationId = 1;
 
   bool isPaused = true;
 
@@ -276,6 +278,32 @@ class GameState with ChangeNotifier {
     _backgroundEnergySpent = 0;
     _backgroundEnergy = 0;
     _backgroundSpace = 0;
+
+    // Schedule notification for when coins will reach capacity
+    _scheduleCoinCapacityNotification();
+  }
+
+  void _scheduleCoinCapacityNotification() {
+    if (coins.count >= coins.max) return;
+
+    final coinsToFill = coins.max - coins.count;
+    final effectiveOutput = passiveOutput * offlineCoinMultiplier;
+    if (effectiveOutput <= 0) return;
+
+    final secondsToFill = coinsToFill / effectiveOutput;
+    if (secondsToFill <= 0) return;
+
+    final notificationTime = DateTime.now().add(
+      Duration(seconds: secondsToFill.ceil()),
+    );
+
+    NotificationService.scheduleCoinCapacityNotification(
+      id: _notificationId,
+      scheduledDate: notificationTime,
+      title: 'Coin Capacity Full',
+      body:
+          'Your coins have reached maximum capacity! Time to upgrade or spend.',
+    );
   }
 
   Map<String, double> getBackgroundDifferences() {
