@@ -30,7 +30,8 @@ class ShopScreen extends StatelessWidget {
                 final upgradableGenerators =
                     gameState.coinGenerators
                         .where((gen) => gen.count >= 10)
-                        .toList();
+                        .toList()
+                      ..sort((a, b) => b.tier.compareTo(a.tier));
 
                 return ListView(
                   padding: const EdgeInsets.all(16),

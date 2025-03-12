@@ -47,7 +47,7 @@ class MainScreen extends StatelessWidget {
                                   generator.cost <= gameState.coins.max,
                             )
                             .toList()
-                          ..sort((a, b) => b.cost.compareTo(a.cost));
+                          ..sort((a, b) => b.tier.compareTo(a.tier));
 
                     return ListView.builder(
                       padding: const EdgeInsets.all(16),
