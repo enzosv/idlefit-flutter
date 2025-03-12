@@ -4,6 +4,8 @@ import 'package:idlefit/models/health_data_repo.dart';
 import 'package:idlefit/services/object_box.dart';
 import 'package:idlefit/util.dart';
 import 'package:provider/provider.dart';
+import 'package:idlefit/services/health_service.dart';
+import 'package:idlefit/services/game_state.dart';
 
 class HealthStatsCard extends StatefulWidget {
   const HealthStatsCard({super.key});
@@ -70,9 +72,64 @@ class _HealthStatsCardState extends State<HealthStatsCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Health Activity',
-              style: Theme.of(context).textTheme.headlineSmall,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Health Activity',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    FutureBuilder<DateTime?>(
+                      future: () {
+                        final box = Provider.of<ObjectBox>(context, listen: false)
+                            .store
+                            .box<HealthDataEntry>();
+                        return HealthDataRepo(box: box).latestEntryDate();
+                      }(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData || snapshot.data == null) {
+                          return Text(
+                            'Last sync: Never',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          );
+                        }
+                        final lastSync = snapshot.data!;
+                        final now = DateTime.now();
+                        final difference = now.difference(lastSync);
+                        String syncText = 'Last sync: ';
+                        if (difference.inMinutes < 1) {
+                          syncText += 'Just now';
+                        } else if (difference.inHours < 1) {
+                          syncText += '${difference.inMinutes}m ago';
+                        } else if (difference.inDays < 1) {
+                          syncText += '${difference.inHours}h ago';
+                        } else {
+                          syncText += '${difference.inDays}d ago';
+                        }
+                        return Text(
+                          syncText,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.sync),
+                  label: const Text('Sync Now'),
+                  onPressed: () async {
+                    final healthService = Provider.of<HealthService>(context, listen: false);
+                    final gameState = Provider.of<GameState>(context, listen: false);
+                    final objectBox = Provider.of<ObjectBox>(context, listen: false);
+                    await healthService.syncHealthData(objectBox, gameState);
+                    setState(() {}); // Trigger rebuild to refresh last sync time
+                    await _fetchData(); // Refresh displayed data
+                  },
+                ),
+              ],
             ),
             const Divider(),
             _HealthStatsTile(
