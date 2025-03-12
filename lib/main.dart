@@ -45,11 +45,18 @@ class MyApp extends StatelessWidget {
       title: 'Health Idle Game',
       theme: ThemeData(
         brightness: Brightness.dark,
-        primarySwatch: Colors.blue,
+        primaryColor: Colors.blue,
+        primarySwatch: Colors.orange,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        splashColor: Colors.transparent,
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
+        primaryColor: Colors.blue,
+        primarySwatch: Colors.orange,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
         /* dark theme settings */
       ),
       themeMode: ThemeMode.dark,
@@ -121,7 +128,7 @@ class _GameHomePageState extends State<GameHomePage>
     gameState.isPaused = true;
     healthService.initialize().then((_) async {
       await healthService.syncHealthData(objectBoxService, gameState);
-        gameState.isPaused = false;
+      gameState.isPaused = false;
     });
     WidgetsBinding.instance.addObserver(this);
   }
@@ -132,6 +139,7 @@ class _GameHomePageState extends State<GameHomePage>
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
+        selectedItemColor: Theme.of(context).primaryColor,
         onTap: (index) {
           setState(() {
             _selectedIndex = index;
