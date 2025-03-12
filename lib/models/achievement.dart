@@ -6,14 +6,12 @@ class Achievement {
   int id = 0;
   int? dateClaimed;
 
-  @Transient()
   String action = '';
-  @Transient()
   String reqUnit = '';
+  int requirement = 0;
+
   @Transient()
   String rewardUnit = '';
-  @Transient()
-  int requirement = 0;
   @Transient()
   int reward = 0;
 

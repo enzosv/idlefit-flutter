@@ -18,6 +18,7 @@ class AchievementList extends StatefulWidget {
 class _AchievementListState extends State<AchievementList> {
   List<Achievement> achievements = [];
   Map<String, double> progress = {};
+  late AchievementRepo _achievementRepo;
 
   @override
   void initState() {
@@ -28,37 +29,8 @@ class _AchievementListState extends State<AchievementList> {
   Future<void> _fetchData() async {
     final objectBox = Provider.of<ObjectBox>(context, listen: false);
     final achievementBox = objectBox.store.box<Achievement>();
-    final achievementRepo = AchievementRepo(box: achievementBox);
-    final allAchievements = await achievementRepo.loadAchievements();
-
-    // Sort achievements by action, reqUnit, and requirement
-    allAchievements.sort((a, b) {
-      int actionCompare = a.action.compareTo(b.action);
-      if (actionCompare != 0) return actionCompare;
-
-      int reqUnitCompare = a.reqUnit.compareTo(b.reqUnit);
-      if (reqUnitCompare != 0) return reqUnitCompare;
-
-      return a.requirement.compareTo(b.requirement);
-    });
-
-    // Filter achievements to only show those where lower requirements are claimed
-    final filteredAchievements =
-        allAchievements.where((achievement) {
-          // Find all achievements with same action and reqUnit but lower requirement
-          final lowerRequirements = allAchievements.where(
-            (a) =>
-                a.action == achievement.action &&
-                a.reqUnit == achievement.reqUnit &&
-                a.requirement < achievement.requirement,
-          );
-
-          // If there are no lower requirements, show the achievement
-          if (lowerRequirements.isEmpty) return true;
-
-          // Only show if all lower requirements are claimed
-          return lowerRequirements.every((a) => a.dateClaimed != null);
-        }).toList();
+    _achievementRepo = AchievementRepo(box: achievementBox);
+    final newAchievements = await _achievementRepo.loadNewAchievements();
 
     // Get progress for each achievement type
     final healthBox = objectBox.store.box<HealthDataEntry>();
@@ -67,7 +39,7 @@ class _AchievementListState extends State<AchievementList> {
     final gameState = Provider.of<GameState>(context, listen: false);
 
     final newProgress = <String, double>{};
-    for (final achievement in filteredAchievements) {
+    for (final achievement in newAchievements) {
       if (achievement.dateClaimed != null) continue;
 
       switch (achievement.action.toLowerCase()) {
@@ -84,35 +56,42 @@ class _AchievementListState extends State<AchievementList> {
     }
 
     setState(() {
-      achievements = filteredAchievements;
+      achievements = newAchievements;
       progress = newProgress;
     });
   }
 
   void _onClaim(Achievement achievement) async {
-    final objectBox = Provider.of<ObjectBox>(context, listen: false);
-    final achievementBox = objectBox.store.box<Achievement>();
-    final achievementRepo = AchievementRepo(box: achievementBox);
-
-    if (achievementRepo.claimAchievement(achievement)) {
-      final gameState = Provider.of<GameState>(context, listen: false);
-
-      // Award the achievement reward
-      switch (achievement.rewardUnit.toLowerCase()) {
-        case 'space':
-          gameState.space.earn(achievement.reward.toDouble());
-          break;
-        case 'coins':
-          gameState.coins.earn(achievement.reward.toDouble());
-          break;
-        case 'energy':
-          gameState.energy.earn(achievement.reward.toDouble());
-          break;
-      }
-
-      // Refresh the achievement list to update visibility
-      _fetchData();
+    // final isLast = _isLastAchievement(achievement, allAchievements);
+    print("attempting to claim");
+    if (!_achievementRepo.claimAchievement(achievement)) {
+      return;
     }
+    if (!mounted) {
+      return;
+    }
+    print("claimed, ${achievement.reward}");
+
+    final gameState = Provider.of<GameState>(context, listen: false);
+    final reward = achievement.reward.toDouble();
+    // Award the achievement reward
+    switch (achievement.rewardUnit.toLowerCase()) {
+      case 'space':
+        gameState.space.earn(reward);
+        break;
+      case 'coins':
+        gameState.coins.earn(reward);
+        break;
+      case 'energy':
+        gameState.energy.earn(reward);
+        break;
+    }
+    // if (isLast) {
+    //   return;
+    // }
+
+    // Refresh the achievement list to update visibility
+    _fetchData();
   }
 
   @override
@@ -122,10 +101,14 @@ class _AchievementListState extends State<AchievementList> {
         children: [
           ...achievements.map((achievement) {
             final currentProgress = progress[achievement.action] ?? 0;
+            final bool isCompleted = achievement.dateClaimed != null;
+            final bool canClaim =
+                currentProgress >= achievement.requirement && !isCompleted;
+
             return AchievementCard(
               achievement: achievement,
               progress: currentProgress,
-              onClaim: () => _onClaim(achievement),
+              onClaim: canClaim ? () => _onClaim(achievement) : null,
             );
           }),
         ],

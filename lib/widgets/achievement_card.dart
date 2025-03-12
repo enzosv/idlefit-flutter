@@ -4,13 +4,13 @@ import '../models/achievement.dart';
 class AchievementCard extends StatelessWidget {
   final Achievement achievement;
   final double progress;
-  final Function() onClaim;
+  final VoidCallback? onClaim;
 
   const AchievementCard({
     super.key,
     required this.achievement,
     required this.progress,
-    required this.onClaim,
+    this.onClaim,
   });
 
   @override

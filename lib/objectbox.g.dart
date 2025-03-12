@@ -153,7 +153,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(7, 2119159745219438621),
       name: 'Achievement',
-      lastPropertyId: const obx_int.IdUid(10, 2084831577797524984),
+      lastPropertyId: const obx_int.IdUid(13, 5316489849535110872),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -164,6 +164,21 @@ final _entities = <obx_int.ModelEntity>[
         obx_int.ModelProperty(
             id: const obx_int.IdUid(10, 2084831577797524984),
             name: 'dateClaimed',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(11, 6913876187873743667),
+            name: 'action',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(12, 759831562113825008),
+            name: 'reqUnit',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(13, 5316489849535110872),
+            name: 'requirement',
             type: 6,
             flags: 0)
       ],
@@ -394,9 +409,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
           object.id = id;
         },
         objectToFB: (Achievement object, fb.Builder fbb) {
-          fbb.startTable(11);
+          final actionOffset = fbb.writeString(object.action);
+          final reqUnitOffset = fbb.writeString(object.reqUnit);
+          fbb.startTable(14);
           fbb.addInt64(0, object.id);
           fbb.addInt64(9, object.dateClaimed);
+          fbb.addOffset(10, actionOffset);
+          fbb.addOffset(11, reqUnitOffset);
+          fbb.addInt64(12, object.requirement);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -406,8 +426,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
 
           final object = Achievement()
             ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
-            ..dateClaimed = const fb.Int64Reader()
-                .vTableGetNullable(buffer, rootOffset, 22);
+            ..dateClaimed =
+                const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 22)
+            ..action = const fb.StringReader(asciiOptimization: true)
+                .vTableGet(buffer, rootOffset, 24, '')
+            ..reqUnit = const fb.StringReader(asciiOptimization: true)
+                .vTableGet(buffer, rootOffset, 26, '')
+            ..requirement =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 28, 0);
 
           return object;
         })
@@ -509,4 +535,16 @@ class Achievement_ {
   /// See [Achievement.dateClaimed].
   static final dateClaimed =
       obx.QueryIntegerProperty<Achievement>(_entities[4].properties[1]);
+
+  /// See [Achievement.action].
+  static final action =
+      obx.QueryStringProperty<Achievement>(_entities[4].properties[2]);
+
+  /// See [Achievement.reqUnit].
+  static final reqUnit =
+      obx.QueryStringProperty<Achievement>(_entities[4].properties[3]);
+
+  /// See [Achievement.requirement].
+  static final requirement =
+      obx.QueryIntegerProperty<Achievement>(_entities[4].properties[4]);
 }
