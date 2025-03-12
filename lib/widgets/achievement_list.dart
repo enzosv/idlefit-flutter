@@ -3,6 +3,9 @@ import 'package:idlefit/services/object_box.dart';
 import 'package:provider/provider.dart';
 import '../models/achievement.dart';
 import '../models/achievement_repo.dart';
+import '../models/health_data_repo.dart';
+import '../models/health_data_entry.dart';
+import '../services/game_state.dart';
 import 'achievement_card.dart';
 
 class AchievementList extends StatefulWidget {
@@ -14,6 +17,7 @@ class AchievementList extends StatefulWidget {
 
 class _AchievementListState extends State<AchievementList> {
   List<Achievement> achievements = [];
+  Map<String, double> progress = {};
 
   @override
   void initState() {
@@ -22,8 +26,8 @@ class _AchievementListState extends State<AchievementList> {
   }
 
   Future<void> _fetchData() async {
-    final achievementBox =
-        Provider.of<ObjectBox>(context, listen: false).store.box<Achievement>();
+    final objectBox = Provider.of<ObjectBox>(context, listen: false);
+    final achievementBox = objectBox.store.box<Achievement>();
     final achievementRepo = AchievementRepo(box: achievementBox);
     final allAchievements = await achievementRepo.loadAchievements();
 
@@ -56,9 +60,59 @@ class _AchievementListState extends State<AchievementList> {
           return lowerRequirements.every((a) => a.dateClaimed != null);
         }).toList();
 
+    // Get progress for each achievement type
+    final healthBox = objectBox.store.box<HealthDataEntry>();
+    final healthRepo = HealthDataRepo(box: healthBox);
+    final healthStats = await healthRepo.total();
+    final gameState = Provider.of<GameState>(context, listen: false);
+
+    final newProgress = <String, double>{};
+    for (final achievement in filteredAchievements) {
+      if (achievement.dateClaimed != null) continue;
+
+      switch (achievement.action.toLowerCase()) {
+        case 'walk':
+          newProgress[achievement.action] = healthStats.steps;
+          break;
+        case 'collect':
+          newProgress[achievement.action] = gameState.coins.totalEarned;
+          break;
+        case 'spend':
+          newProgress[achievement.action] = gameState.energy.totalSpent;
+          break;
+      }
+    }
+
     setState(() {
       achievements = filteredAchievements;
+      progress = newProgress;
     });
+  }
+
+  void _onClaim(Achievement achievement) async {
+    final objectBox = Provider.of<ObjectBox>(context, listen: false);
+    final achievementBox = objectBox.store.box<Achievement>();
+    final achievementRepo = AchievementRepo(box: achievementBox);
+
+    if (achievementRepo.claimAchievement(achievement)) {
+      final gameState = Provider.of<GameState>(context, listen: false);
+
+      // Award the achievement reward
+      switch (achievement.rewardUnit.toLowerCase()) {
+        case 'space':
+          gameState.space.earn(achievement.reward.toDouble());
+          break;
+        case 'coins':
+          gameState.coins.earn(achievement.reward.toDouble());
+          break;
+        case 'energy':
+          gameState.energy.earn(achievement.reward.toDouble());
+          break;
+      }
+
+      // Refresh the achievement list to update visibility
+      _fetchData();
+    }
   }
 
   @override
@@ -67,12 +121,11 @@ class _AchievementListState extends State<AchievementList> {
       child: Column(
         children: [
           ...achievements.map((achievement) {
-            // final currentProgress = progress[achievement.action] ?? 0;
+            final currentProgress = progress[achievement.action] ?? 0;
             return AchievementCard(
               achievement: achievement,
-              progress: 1,
-              onClaim: () {},
-              // onClaim: () => onClaim(achievement, currentProgress),
+              progress: currentProgress,
+              onClaim: () => _onClaim(achievement),
             );
           }),
         ],
