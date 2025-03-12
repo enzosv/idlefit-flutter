@@ -20,6 +20,7 @@ class _HealthStatsTile extends StatelessWidget {
   final String title;
   final double today;
   final double total;
+  final Color? iconColor;
 
   const _HealthStatsTile({
     super.key,
@@ -27,12 +28,16 @@ class _HealthStatsTile extends StatelessWidget {
     required this.title,
     required this.today,
     required this.total,
+    this.iconColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon),
+      leading: Icon(
+        icon,
+        color: iconColor,
+      ),
       title: Text(title),
       subtitle: Text('Today: ${toLettersNotation(today)}'),
       trailing: Text('Total: ${toLettersNotation(total)}'),
@@ -138,12 +143,14 @@ class _HealthStatsCardState extends State<HealthStatsCard> {
               title: "Steps",
               today: today.steps,
               total: total.steps,
+              iconColor: Colors.blue,
             ),
             _HealthStatsTile(
               icon: Icons.local_fire_department,
               title: "Calories Burned",
               today: today.calories,
               total: total.calories,
+              iconColor: Colors.red,
             ),
           ],
         ),
