@@ -141,44 +141,20 @@ class GameState with ChangeNotifier {
       return;
     }
     int now = DateTime.now().millisecondsSinceEpoch;
-    if (doubleCoinExpiry > lastGenerated && now >= doubleCoinExpiry) {
-      now = doubleCoinExpiry;
-      final doublerIndex = shopItems.indexWhere((item) => item.id == 4);
-      final doubler = shopItems[doublerIndex];
-      doubler.level = 0;
-      _shopItemRepo.box.put(doubler);
-      shopItems[doublerIndex] = doubler;
-    }
     final realDif = lastGenerated - now;
     final availableDif = validTimeSinceLastGenerate(now, lastGenerated);
     final usesEnergy = realDif > _inactiveThreshold;
-    double coinsGenerated = 0;
 
-    // Calculate coin multiplier from upgrades
-    double coinMultiplier = 1.0;
-    if (doubleCoinExpiry >= now) {
-      coinMultiplier += 1;
-    }
-    for (final item in shopItems) {
-      if (item.shopItemEffect == ShopItemEffect.coinMultiplier) {
-        coinMultiplier += item.effectValue * item.level;
-      }
-    }
-
+    double coinsGenerated = passiveOutput;
     if (usesEnergy) {
       // reduce speed of coin generation in background
-      coinMultiplier *= offlineCoinMultiplier;
+      coinsGenerated *= offlineCoinMultiplier;
     }
-    // Process each generator
-    for (final generator in coinGenerators) {
-      coinsGenerated += (availableDif / _tickTime * generator.output);
-    }
-
-    // print(coinsGenerated);
+    coinsGenerated *= (availableDif / _tickTime);
+    print("coins: ${toLettersNotation(coinsGenerated)}");
 
     if (coinsGenerated > 0) {
-      // addCoins(coinsGenerated);
-      coins.earn(coinsGenerated * coinMultiplier, usesEnergy);
+      coins.earn(coinsGenerated);
       notifyListeners();
     }
 
@@ -310,6 +286,23 @@ class GameState with ChangeNotifier {
       'space': _backgroundSpace,
       'energy_spent': _backgroundEnergySpent,
     };
+  }
+
+  double get passiveOutput {
+    double output = coinGenerators.fold(
+      0,
+      (sum, generator) => sum + generator.output,
+    );
+    double coinMultiplier = 1.0;
+    if (doubleCoinExpiry >= DateTime.now().millisecondsSinceEpoch) {
+      coinMultiplier += 1;
+    }
+    for (final item in shopItems) {
+      if (item.shopItemEffect == ShopItemEffect.coinMultiplier) {
+        coinMultiplier += item.effectValue * item.level;
+      }
+    }
+    return output * coinMultiplier;
   }
 
   @override

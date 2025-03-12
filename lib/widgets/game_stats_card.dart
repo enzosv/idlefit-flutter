@@ -37,27 +37,13 @@ class _DynamicStats extends StatelessWidget {
   Widget build(BuildContext context) {
     final gameState = Provider.of<GameState>(context);
 
-    // Calculate coins per second
-    double coinsPerSecond = 0;
-    for (final generator in gameState.coinGenerators) {
-      coinsPerSecond += generator.output;
-    }
-    // Apply coin multiplier from upgrades
-    double coinMultiplier = 1.0;
-    for (final item in gameState.shopItems) {
-      if (item.shopItemEffect == ShopItemEffect.coinMultiplier) {
-        coinMultiplier += item.effectValue * item.level;
-      }
-    }
-    coinsPerSecond *= coinMultiplier;
-
     return _StatListTile(
       icon: Constants.coinIcon,
       iconColor: Colors.amber,
       title: 'Gains',
       current: gameState.coins.count,
       max: gameState.coins.max,
-      perSecond: coinsPerSecond,
+      perSecond: gameState.passiveOutput,
       earned: gameState.coins.totalEarned,
       spent: gameState.coins.totalSpent,
     );

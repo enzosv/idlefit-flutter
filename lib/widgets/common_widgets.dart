@@ -13,21 +13,6 @@ class CoinsInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<GameState>(
       builder: (context, gameState, child) {
-        // Calculate total coins per second
-        double totalCoinsPerSecond = 0;
-        for (final generator in gameState.coinGenerators) {
-          totalCoinsPerSecond += generator.output;
-        }
-
-        // Apply coin multiplier from upgrades
-        double coinMultiplier = 1.0;
-        for (final item in gameState.shopItems) {
-          if (item.shopItemEffect == ShopItemEffect.coinMultiplier) {
-            coinMultiplier += item.effectValue * item.level;
-          }
-        }
-        totalCoinsPerSecond *= coinMultiplier;
-
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
@@ -42,7 +27,7 @@ class CoinsInfo extends StatelessWidget {
             const SizedBox(width: 8),
             Flexible(
               child: Text(
-                '${toLettersNotation(totalCoinsPerSecond)}/s',
+                '${toLettersNotation(gameState.passiveOutput)}/s',
                 style: const TextStyle(color: Colors.white70, fontSize: 14),
                 overflow: TextOverflow.ellipsis,
               ),
