@@ -121,23 +121,7 @@ class _GameHomePageState extends State<GameHomePage>
     gameState.isPaused = true;
     healthService.initialize().then((_) async {
       await healthService.syncHealthData(objectBoxService, gameState);
-      setState(() {
         gameState.isPaused = false;
-      });
-      await Future.delayed(const Duration(seconds: 2)).then((_) {
-        if (!mounted) {
-          return;
-        }
-        // Show initial earnings popup
-
-        final earnings = gameState.getBackgroundDifferences();
-        if (earnings.values.any((value) => value > 0)) {
-          showDialog(
-            context: context,
-            builder: (context) => BackgroundEarningsPopup(earnings: earnings),
-          );
-        }
-      });
     });
     WidgetsBinding.instance.addObserver(this);
   }
