@@ -1,34 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/util.dart';
 import 'package:idlefit/widgets/card_button.dart';
 
 class CommonCard extends StatelessWidget {
   final String title;
-  final String? rightText;
-  final String description;
+  final String rightText;
+  final String? description;
   final List<Widget> additionalInfo;
-  final String? costText;
-  final Color? costColor;
-  final Widget? costIcon;
+  final double? cost;
+  final IconData? costIcon;
   final String buttonText;
   final VoidCallback? onButtonPressed;
   final Widget? progressIndicator;
   final EdgeInsets margin;
   final GestureTapDownCallback? onTapDown;
+  final bool affordable;
+  final bool disabled;
 
   const CommonCard({
     super.key,
     required this.title,
-    this.rightText,
-    required this.description,
+    required this.rightText,
+    this.description,
     this.additionalInfo = const [],
-    this.costText,
-    this.costColor,
+    this.cost,
     this.costIcon,
     required this.buttonText,
     this.onButtonPressed,
     this.progressIndicator,
     this.margin = const EdgeInsets.only(bottom: 16),
     this.onTapDown,
+    this.affordable = false,
+    this.disabled = true,
   });
 
   @override
@@ -46,29 +49,35 @@ class CommonCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(title, style: Theme.of(context).textTheme.titleMedium),
-                  if (rightText != null) Text(rightText!),
+                  Text(rightText),
                 ],
               ),
-              const SizedBox(height: 8),
-              Text(description),
+              if (description != null) ...[
+                const SizedBox(height: 8),
+                Text(description!),
+              ],
               ...additionalInfo,
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  if (costText != null)
+                  if (cost != null)
                     Row(
                       children: [
                         Text(
-                          costText!,
+                          "Cost: ${toLettersNotation(cost!)}",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: costColor,
+                            color: affordable ? Colors.green : Colors.red,
                           ),
                         ),
                         if (costIcon != null) ...[
                           const SizedBox(width: 4),
-                          costIcon!,
+                          Icon(
+                            costIcon!,
+                            color: affordable ? Colors.green : Colors.red,
+                            size: 20,
+                          ),
                         ],
                       ],
                     ),

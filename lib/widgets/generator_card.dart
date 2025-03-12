@@ -183,6 +183,19 @@ class _GeneratorCardState extends State<GeneratorCard>
   Widget build(BuildContext context) {
     final generator = widget.gameState.coinGenerators[widget.generatorIndex];
     final screenWidth = MediaQuery.of(context).size.width;
+    final productionText =
+        generator.count < 1
+            ? 'Produces: ${toLettersNotation(generator.singleOutput)} '
+            : 'Output: ${toLettersNotation(generator.output)} ';
+    final additionalInfo = [
+      Row(
+        children: [
+          Text(productionText, style: Theme.of(context).textTheme.bodyMedium),
+          Icon(Icons.monetization_on, color: Colors.amber, size: 16),
+          Text('/sec', style: Theme.of(context).textTheme.bodyMedium),
+        ],
+      ),
+    ];
     return Stack(
       clipBehavior: Clip.none, // Allow animations to move outside bounds
       children: [
@@ -190,24 +203,10 @@ class _GeneratorCardState extends State<GeneratorCard>
           title: generator.name,
           rightText: 'Owned: ${generator.count}',
           description: generator.description,
-          additionalInfo: [
-            Text(
-              'Produces: ${toLettersNotation(generator.singleOutput)} coins/sec',
-            ),
-          ],
-          costText: 'Cost: ${toLettersNotation(generator.cost)}',
-          costColor:
-              widget.gameState.coins.count >= generator.cost
-                  ? Colors.green
-                  : Colors.red,
-          costIcon: Icon(
-            Icons.monetization_on,
-            color:
-                widget.gameState.coins.count >= generator.cost
-                    ? Colors.green
-                    : Colors.red,
-            size: 20,
-          ),
+          additionalInfo: additionalInfo,
+          cost: generator.cost,
+          affordable: widget.gameState.coins.count >= generator.cost,
+          costIcon: Icons.monetization_on,
           buttonText: 'Buy',
           onButtonPressed:
               widget.gameState.coins.count >= generator.cost

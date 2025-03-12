@@ -16,15 +16,11 @@ class GeneratorUpgradeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final needsSpace = !generator.isUnlocked;
-    final canAffordSpace = gameState.space.count >= generator.upgradeUnlockCost;
-    final canAffordCoins = gameState.coins.count >= generator.upgradeCost;
-
     final additionalInfo = <Widget>[
       Row(
         children: [
           Text(
-            'Current output: ${toLettersNotation(generator.output)} ',
+            'Output: ${toLettersNotation(generator.output)} ',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           Icon(Icons.monetization_on, color: Colors.amber, size: 16),
@@ -48,51 +44,36 @@ class GeneratorUpgradeCard extends StatelessWidget {
       );
     }
 
-    if (needsSpace) {
+    if (!generator.isUnlocked) {
       return CommonCard(
         title: generator.name,
         rightText: 'Level: ${generator.level}/${generator.maxLevel}',
-        description: generator.description,
         additionalInfo: additionalInfo,
-        costText: 'Cost: ${toLettersNotation(generator.upgradeUnlockCost)}',
-        costColor: canAffordSpace ? Colors.green : Colors.red,
-        costIcon: Icon(
-          Icons.space_dashboard,
-          color: canAffordSpace ? Colors.green : Colors.red,
-          size: 20,
-        ),
+        cost: generator.upgradeUnlockCost,
+        affordable: gameState.space.count >= generator.upgradeUnlockCost,
+        costIcon: Icons.space_dashboard,
         buttonText: 'Unlock',
         onButtonPressed:
-            canAffordSpace ? () => gameState.unlockGenerator(generator) : null,
+            gameState.space.count >= generator.upgradeUnlockCost
+                ? () => gameState.unlockGenerator(generator)
+                : null,
       );
     }
 
-    if (generator.level < generator.maxLevel) {
-      return CommonCard(
-        title: generator.name,
-        rightText: 'Level: ${generator.level}/${generator.maxLevel}',
-        description: generator.description,
-        additionalInfo: additionalInfo,
-        costText: 'Cost: ${toLettersNotation(generator.upgradeCost)}',
-        costColor: canAffordCoins ? Colors.green : Colors.red,
-        costIcon: Icon(
-          Icons.monetization_on,
-          color: canAffordCoins ? Colors.green : Colors.red,
-          size: 20,
-        ),
-        buttonText: 'Upgrade',
-        onButtonPressed:
-            canAffordCoins ? () => gameState.upgradeGenerator(generator) : null,
-      );
-    }
+    final isMaxLevel = generator.level >= generator.maxLevel;
 
     return CommonCard(
       title: generator.name,
       rightText: 'Level: ${generator.level}/${generator.maxLevel}',
-      description: generator.description,
       additionalInfo: additionalInfo,
-      buttonText: 'MAXED',
-      onButtonPressed: null,
+      cost: isMaxLevel ? null : generator.upgradeCost,
+      affordable: gameState.coins.count >= generator.upgradeCost,
+      costIcon: isMaxLevel ? null : Icons.monetization_on,
+      buttonText: isMaxLevel ? 'MAXED' : 'Upgrade',
+      onButtonPressed:
+          (isMaxLevel || gameState.coins.count < generator.upgradeCost)
+              ? null
+              : () => gameState.upgradeGenerator(generator),
     );
   }
 }
