@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/widgets/card_button.dart';
 import 'package:provider/provider.dart';
 import '../services/game_state.dart';
 import '../models/shop_items.dart';
@@ -49,12 +50,12 @@ class ShopItemCard extends StatelessWidget {
                             : Colors.red,
                   ),
                 ),
-                ElevatedButton(
+                CardButton(
+                  text: 'Upgrade',
                   onPressed:
                       (isMaxLevel || gameState.space.count < item.currentCost)
                           ? null
                           : () => gameState.upgradeShopItem(item),
-                  child: const Text('Upgrade'),
                 ),
               ],
             ),
