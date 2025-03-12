@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../services/game_state.dart';
 import '../models/shop_items.dart';
 import 'common_card.dart';
+import 'shop_double_coin_card.dart';
 
 class ShopItemCard extends StatelessWidget {
   final ShopItem item;
@@ -12,6 +13,10 @@ class ShopItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (item.id == 4) {
+      return DoubleCoinsCard(item: item);
+    }
+
     final gameState = Provider.of<GameState>(context);
     final isMaxLevel = item.level >= item.maxLevel;
 
@@ -26,12 +31,7 @@ class ShopItemCard extends StatelessWidget {
       cost: isMaxLevel ? null : item.currentCost.toDouble(),
       costIcon: isMaxLevel ? null : Constants.spaceIcon,
       affordable: gameState.space.count >= item.currentCost,
-      buttonText:
-          isMaxLevel
-              ? 'MAXED'
-              : item.id == 4
-              ? 'Watch Ad'
-              : 'Upgrade',
+      buttonText: isMaxLevel ? 'MAXED' : 'Upgrade',
       onButtonPressed:
           (isMaxLevel || gameState.space.count < item.currentCost)
               ? null
