@@ -183,31 +183,44 @@ class _GeneratorCardState extends State<GeneratorCard>
   Widget build(BuildContext context) {
     final generator = widget.gameState.coinGenerators[widget.generatorIndex];
     final screenWidth = MediaQuery.of(context).size.width;
-    final productionText =
-        generator.count < 1
-            ? 'Produces: ${toLettersNotation(generator.singleOutput)} '
-            : 'Output: ${toLettersNotation(generator.output)} ';
     final additionalInfo = [
       Row(
         children: [
-          Text(productionText, style: Theme.of(context).textTheme.bodyMedium),
+          Text(
+            'Produces: ${toLettersNotation(generator.singleOutput)} ',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
           Icon(Icons.monetization_on, color: Colors.amber, size: 16),
           Text('/sec', style: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
     ];
+    if (generator.count > 0) {
+      additionalInfo.add(
+        Row(
+          children: [
+            Text(
+              'Output: ${toLettersNotation(generator.output)} ',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            Icon(Icons.monetization_on, color: Colors.amber, size: 16),
+            Text('/sec', style: Theme.of(context).textTheme.bodyMedium),
+          ],
+        ),
+      );
+    }
     return Stack(
       clipBehavior: Clip.none, // Allow animations to move outside bounds
       children: [
         CommonCard(
           title: generator.name,
-          rightText: 'Owned: ${generator.count}',
+          rightText: 'Reps: ${generator.count}',
           description: generator.description,
           additionalInfo: additionalInfo,
           cost: generator.cost,
           affordable: widget.gameState.coins.count >= generator.cost,
           costIcon: Icons.monetization_on,
-          buttonText: 'Buy',
+          buttonText: 'Add Rep',
           onButtonPressed:
               widget.gameState.coins.count >= generator.cost
                   ? () => widget.gameState.buyCoinGenerator(generator)

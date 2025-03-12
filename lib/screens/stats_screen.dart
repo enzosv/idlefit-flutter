@@ -94,7 +94,7 @@ class StatsScreen extends StatelessWidget {
                                 subtitle: Text(
                                   '${toLettersNotation(generator.output)} coins/sec',
                                 ),
-                                trailing: Text('Owned: ${generator.count}'),
+                                trailing: Text('Reps: ${generator.count}'),
                               ),
                             ),
                       ],
