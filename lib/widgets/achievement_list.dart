@@ -97,21 +97,30 @@ class _AchievementListState extends State<AchievementList> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Column(
-        children: [
-          ...achievements.map((achievement) {
-            final currentProgress = progress[achievement.action] ?? 0;
-            final bool isCompleted = achievement.dateClaimed != null;
-            final bool canClaim =
-                currentProgress >= achievement.requirement && !isCompleted;
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Achievements',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const Divider(),
+            ...achievements.map((achievement) {
+              final currentProgress = progress[achievement.action] ?? 0;
+              final bool isCompleted = achievement.dateClaimed != null;
+              final bool canClaim =
+                  currentProgress >= achievement.requirement && !isCompleted;
 
-            return AchievementCard(
-              achievement: achievement,
-              progress: currentProgress,
-              onClaim: canClaim ? () => _onClaim(achievement) : null,
-            );
-          }),
-        ],
+              return AchievementCard(
+                achievement: achievement,
+                progress: currentProgress,
+                onClaim: canClaim ? () => _onClaim(achievement) : null,
+              );
+            }),
+          ],
+        ),
       ),
     );
   }
