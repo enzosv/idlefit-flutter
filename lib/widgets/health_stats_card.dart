@@ -84,9 +84,11 @@ class _HealthStatsCardState extends State<HealthStatsCard> {
                     ),
                     FutureBuilder<DateTime?>(
                       future: () {
-                        final box = Provider.of<ObjectBox>(context, listen: false)
-                            .store
-                            .box<HealthDataEntry>();
+                        final box =
+                            Provider.of<ObjectBox>(
+                              context,
+                              listen: false,
+                            ).store.box<HealthDataEntry>();
                         return HealthDataRepo(box: box).latestEntryDate();
                       }(),
                       builder: (context, snapshot) {
@@ -96,21 +98,8 @@ class _HealthStatsCardState extends State<HealthStatsCard> {
                             style: Theme.of(context).textTheme.bodySmall,
                           );
                         }
-                        final lastSync = snapshot.data!;
-                        final now = DateTime.now();
-                        final difference = now.difference(lastSync);
-                        String syncText = 'Last sync: ';
-                        if (difference.inMinutes < 1) {
-                          syncText += 'Just now';
-                        } else if (difference.inHours < 1) {
-                          syncText += '${difference.inMinutes}m ago';
-                        } else if (difference.inDays < 1) {
-                          syncText += '${difference.inHours}h ago';
-                        } else {
-                          syncText += '${difference.inDays}d ago';
-                        }
                         return Text(
-                          syncText,
+                          'Last sync: ${formatRelativeTime(snapshot.data!)}',
                           style: Theme.of(context).textTheme.bodySmall,
                         );
                       },
@@ -120,12 +109,31 @@ class _HealthStatsCardState extends State<HealthStatsCard> {
                 ElevatedButton.icon(
                   icon: const Icon(Icons.sync),
                   label: const Text('Sync Now'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade400,
+                    foregroundColor: Colors.black,
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                   onPressed: () async {
-                    final healthService = Provider.of<HealthService>(context, listen: false);
-                    final gameState = Provider.of<GameState>(context, listen: false);
-                    final objectBox = Provider.of<ObjectBox>(context, listen: false);
+                    final healthService = Provider.of<HealthService>(
+                      context,
+                      listen: false,
+                    );
+                    final gameState = Provider.of<GameState>(
+                      context,
+                      listen: false,
+                    );
+                    final objectBox = Provider.of<ObjectBox>(
+                      context,
+                      listen: false,
+                    );
                     await healthService.syncHealthData(objectBox, gameState);
-                    setState(() {}); // Trigger rebuild to refresh last sync time
+                    setState(
+                      () {},
+                    ); // Trigger rebuild to refresh last sync time
                     await _fetchData(); // Refresh displayed data
                   },
                 ),

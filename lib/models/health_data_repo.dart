@@ -93,7 +93,6 @@ class HealthDataRepo {
     if (entry == null || entry.timestamp == 0) {
       return null;
     }
-    print("latest is ${entry.timestamp}");
     return DateTime.fromMillisecondsSinceEpoch(entry.timestamp);
   }
 }
