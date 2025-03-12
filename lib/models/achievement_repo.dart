@@ -37,10 +37,15 @@ class AchievementRepo {
     for (var item in data) {
       final List<int> requirements = List<int>.from(item['requirements']);
       final List<int> rewards = List<int>.from(item['rewards']);
-      assert(requirements.length == rewards.length);
+      assert(
+        requirements.length == rewards.length,
+        "${item["action"]} invalid",
+      );
 
       String action = item['action'];
       String reqUnit = item['req_unit'];
+      // TODO: assuming requirements are in increasing order
+      // if achivement of this action and requnit already in list, continue?
       String key = '$action:$reqUnit';
 
       for (int i = 0; i < requirements.length; i++) {
