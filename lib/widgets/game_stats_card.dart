@@ -117,6 +117,12 @@ class _StatListTile extends StatelessWidget {
   final double earned;
   final double spent;
 
+  String _formatted(double value) {
+    return title == "Energy"
+        ? durationNotation(value)
+        : toLettersNotation(value);
+  }
+
   @override
   Widget build(BuildContext context) {
     String titleText = title;
@@ -127,16 +133,14 @@ class _StatListTile extends StatelessWidget {
       leading: Icon(icon, color: iconColor),
       title: Text(titleText),
       subtitle: Row(
-        children: [
-          Text('${toLettersNotation(current)}/${toLettersNotation(max)}'),
-        ],
+        children: [Text('${_formatted(current)}/${_formatted(max)}')],
       ),
       trailing: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text('Earned: ${toLettersNotation(earned)}'),
-          Text('Spent: ${toLettersNotation(spent)}'),
+          Text('Earned: ${_formatted(earned)}'),
+          Text('Spent: ${_formatted(spent)}'),
         ],
       ),
     );

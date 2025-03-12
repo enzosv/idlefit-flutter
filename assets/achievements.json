@@ -1,0 +1,24 @@
+[
+  {
+    "action": "Walk",
+    "req_unit": "steps",
+    "reward_unit": "space",
+    "rewards": [1000, 2000, 3000, 4000, 5000, 6000],
+    "requirements": [10000, 50000, 100000, 200000, 500000, 1000000]
+  },
+  {
+    "action": "Collect",
+    "req_unit": "coins",
+    "reward_unit": "coins",
+    "_note": "values should be multiplied by 100000000",
+    "rewards": [1000000000, 1000000000000, 1000000000000000],
+    "requirements": [10000000000, 10000000000000, 1000000000000000]
+  },
+  {
+    "action": "Spend",
+    "req_unit": "energy",
+    "reward_unit": "energy",
+    "rewards": [1200000, 3600000, 7200000, 10800000],
+    "requirements": [28800000, 86400000, 604800000, 2592000000]
+  }
+]

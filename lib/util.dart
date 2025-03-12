@@ -60,7 +60,17 @@ String formatRelativeTime(DateTime dateTime) {
     return '${difference.inMinutes}m ago';
   } else if (difference.inDays < 1) {
     return '${difference.inHours}h ago';
-  } else {
+  } else if (difference.inDays < 7) {
     return '${difference.inDays}d ago';
   }
+  return '${dateTime.year}-${dateTime.month}-${dateTime.day}';
+}
+
+bool isSorted<T extends Comparable>(List<T> list) {
+  for (int i = 0; i < list.length - 1; i++) {
+    if (list[i].compareTo(list[i + 1]) > 0) {
+      return false;
+    }
+  }
+  return true;
 }

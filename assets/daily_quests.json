@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "action": "Walk",
+    "unit": "steps",
+    "reward": 750,
+    "requirement":7500,
+    "reward_unit":"space"
+  },{
+    "id": 2,
+    "action": "Spend",
+    "unit": "coins",
+    "reward":0,
+    "requirements":0,
+    "reward_unit":"coins"
+  },{
+    "id": 3,
+    "action": "Burn",
+    "unit": "calories",
+    "reward":35,
+    "requirements":350,
+    "reward_unit":"energy"
+  },{
+    "id": 4,
+    "action": "Spend",
+    "unit": "space",
+    "reward":500,
+    "requirements":3000,
+    "reward_unit":"space"
+  },{
+    "id": 5,
+    "action": "Watch",
+    "unit": "ad",
+    "reward":0,
+    "requirements":1,
+    "reward_unit":"coins"
+  }
+]
