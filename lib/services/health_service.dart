@@ -147,13 +147,15 @@ class HealthService {
     final repo = HealthDataRepo(box: box);
     final latestTime = await repo.latestEntryDate();
 
+    final now = DateTime.now();
+
     // Fetch data from 10 minutes before the last saved time to now
     // to handle late recordings
     final startTime =
         latestTime?.subtract(Duration(minutes: 10)) ??
-        DateTime.fromMillisecondsSinceEpoch(gameState.startHealthSync);
+        DateTime(now.year, now.month, now.day);
 
-    final entries = await queryHealthEntries(startTime, DateTime.now());
+    final entries = await queryHealthEntries(startTime, now);
     final newEntries = await repo.newFromList(entries, startTime);
     if (newEntries.isEmpty) {
       return;

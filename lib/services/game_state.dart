@@ -30,8 +30,6 @@ class GameState with ChangeNotifier {
   late final Currency space;
 
   int lastGenerated = 0;
-  int lastHealthSync = 0;
-  int startHealthSync = 0;
   int doubleCoinExpiry = 0;
   double offlineCoinMultiplier = 0.5;
 
@@ -60,12 +58,6 @@ class GameState with ChangeNotifier {
     );
     _shopItemRepo = ShopItemsRepo(box: objectBoxService.box<ShopItem>());
 
-    if (startHealthSync == 0) {
-      final now = DateTime.now();
-      startHealthSync =
-          DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
-    }
-
     // Load data from repositories
     coinGenerators = await _generatorRepo.parseCoinGenerators(
       'assets/coin_generators.json',
@@ -93,22 +85,13 @@ class GameState with ChangeNotifier {
 
   void _loadFromSavedState(Map<String, dynamic> savedState) {
     lastGenerated = savedState['lastGenerated'] ?? 0;
-    lastHealthSync = savedState['lastHealthSync'] ?? 0;
-    startHealthSync = savedState['startHealthSync'] ?? 0;
     offlineCoinMultiplier = savedState['offlineCoinMultiplier'] ?? 0.5;
     doubleCoinExpiry = savedState['doubleCoinExpiry'] ?? 0;
-    if (startHealthSync == 0) {
-      final now = DateTime.now();
-      startHealthSync =
-          DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
-    }
   }
 
   Map<String, dynamic> toJson() {
     return {
       'lastGenerated': lastGenerated,
-      'lastHealthSync': lastHealthSync,
-      'startHealthSync': startHealthSync,
       'offlineCoinMultiplier': offlineCoinMultiplier,
       'doubleCoinExpiry': doubleCoinExpiry,
     };
