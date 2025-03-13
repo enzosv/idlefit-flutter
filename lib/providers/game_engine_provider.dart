@@ -14,6 +14,30 @@ import 'shop_item_provider.dart';
 
 part 'game_engine_provider.g.dart';
 
+/// Creates a stream that emits a tick event whenever the game loop updates
+final gameTickProvider = StreamProvider<void>((ref) {
+  final controller = StreamController<void>();
+
+  // Listen to the game engine state changes
+  final subscription = ref.listen(gameEngineProvider, (previous, next) {});
+
+  // Create a periodic timer that emits at the same rate as the game loop
+  final timer = Timer.periodic(const Duration(milliseconds: 1000), (_) {
+    if (!ref.read(gameEngineProvider)) {
+      // If game is not paused
+      controller.add(null); // Emit a tick event
+    }
+  });
+
+  ref.onDispose(() {
+    timer.cancel();
+    subscription.close();
+    controller.close();
+  });
+
+  return controller.stream;
+});
+
 @Riverpod(keepAlive: true)
 class GameEngine extends _$GameEngine {
   static const _tickTime = 1000; // milliseconds

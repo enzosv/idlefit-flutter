@@ -2,7 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/providers/currency_provider.dart';
+import 'package:idlefit/providers/game_engine_provider.dart';
 import '../util.dart';
+
+/// Provider that combines the game tick and coin count to ensure consistent updates
+final currentCoinValueProvider = Provider<double>((ref) {
+  // Watch the game tick stream to rebuild when the game loop runs
+  ref.watch(gameTickProvider);
+
+  // Get the current coin value
+  final currencies = ref.watch(currencyNotifierProvider);
+  return currencies[CurrencyType.coin]?.count ?? 0;
+});
 
 class CurrentCoins extends ConsumerStatefulWidget {
   static final globalKey = GlobalKey<_CurrentCoinsState>();
@@ -50,8 +61,8 @@ class _CurrentCoinsState extends ConsumerState<CurrentCoins>
 
   @override
   Widget build(BuildContext context) {
-    final currencies = ref.watch(currencyNotifierProvider);
-    final coinCount = currencies[CurrencyType.coin]?.count ?? 0;
+    // Get coin value from the combined provider that watches the game tick
+    final coinCount = ref.watch(currentCoinValueProvider);
 
     return AnimatedBuilder(
       animation: _scaleAnimation,
