@@ -11,6 +11,8 @@ class CommonCard extends StatelessWidget {
   final IconData? costIcon;
   final String buttonText;
   final VoidCallback? onButtonPressed;
+  final String? secondaryButtonText;
+  final VoidCallback? onSecondaryButtonPressed;
   final Widget? progressIndicator;
   final EdgeInsets margin;
   final GestureTapDownCallback? onTapDown;
@@ -27,6 +29,8 @@ class CommonCard extends StatelessWidget {
     this.costIcon,
     required this.buttonText,
     this.onButtonPressed,
+    this.secondaryButtonText,
+    this.onSecondaryButtonPressed,
     this.progressIndicator,
     this.margin = const EdgeInsets.only(bottom: 16),
     this.onTapDown,
@@ -79,6 +83,14 @@ class CommonCard extends StatelessWidget {
                       ],
                     ),
                   const Spacer(),
+                  if (secondaryButtonText != null) ...[
+                    CardButton(
+                      text: secondaryButtonText!,
+                      onPressed: onSecondaryButtonPressed,
+                      color: Colors.blue,
+                    ),
+                    const SizedBox(width: 8),
+                  ],
                   CardButton(text: buttonText, onPressed: onButtonPressed),
                 ],
               ),

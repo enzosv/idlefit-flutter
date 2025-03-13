@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
-import 'package:provider/provider.dart';
-import 'services/game_state.dart';
+import 'package:idlefit/providers/game_engine_provider.dart';
+import 'package:idlefit/providers/objectbox_provider.dart';
+import 'services/health_service.dart';
 import 'screens/main_screen.dart';
 import 'screens/stats_screen.dart';
 import 'screens/shop_screen.dart';
-import 'services/health_service.dart';
 import 'services/object_box.dart';
 import 'widgets/background_earnings_popup.dart';
 import 'services/ad_service.dart';
 import 'services/notification_service.dart';
+
+// Health service provider
+final healthServiceProvider = Provider<HealthService>((ref) {
+  return HealthService();
+});
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,16 +27,11 @@ void main() async {
   // Initialize notifications
   await NotificationService.initialize();
 
-  // Load game state
-  final gameState = GameState();
-  await gameState.initialize(objectBox.store);
-
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: gameState),
-        Provider.value(value: healthService),
-        Provider.value(value: objectBox),
+    ProviderScope(
+      overrides: [
+        // Override objectBoxProvider with actual instance
+        objectBoxProvider.overrideWithValue(objectBox),
       ],
       child: const MyApp(),
     ),
@@ -58,7 +59,6 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
-        /* dark theme settings */
       ),
       themeMode: ThemeMode.dark,
       home: const GameHomePage(),
@@ -66,14 +66,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class GameHomePage extends StatefulWidget {
+class GameHomePage extends ConsumerStatefulWidget {
   const GameHomePage({super.key});
 
   @override
-  _GameHomePageState createState() => _GameHomePageState();
+  ConsumerState<GameHomePage> createState() => _GameHomePageState();
 }
 
-class _GameHomePageState extends State<GameHomePage>
+class _GameHomePageState extends ConsumerState<GameHomePage>
     with WidgetsBindingObserver {
   int _selectedIndex = 1; // Start with main screen
 
@@ -92,25 +92,31 @@ class _GameHomePageState extends State<GameHomePage>
     ].contains(state)) {
       return;
     }
-    final gameState = Provider.of<GameState>(context, listen: false);
+
     if (state == AppLifecycleState.paused) {
       // going to background
-      gameState.isPaused = true;
-      gameState.save();
-      gameState.saveBackgroundState();
+      ref.read(gameEngineProvider.notifier).setPaused(true);
+      ref.read(gameEngineProvider.notifier).saveBackgroundState();
       return;
     }
+
     // going to foreground
-    final healthService = Provider.of<HealthService>(context, listen: false);
-    final objectBoxService = Provider.of<ObjectBox>(context, listen: false);
-    await healthService.syncHealthData(objectBoxService, gameState);
+    final healthService = ref.read(healthServiceProvider);
+    await healthService.syncHealthData(
+      ref.read(objectBoxProvider),
+      ref.read(gameEngineProvider.notifier),
+    );
+
     NotificationService.cancelAllNotifications();
-    gameState.isPaused = false;
+    ref.read(gameEngineProvider.notifier).setPaused(false);
+
     await Future.delayed(const Duration(seconds: 1)).then((_) {
       if (!mounted) {
         return;
       }
-      final earnings = gameState.getBackgroundDifferences();
+
+      final earnings =
+          ref.read(gameEngineProvider.notifier).getBackgroundDifferences();
       if ((earnings['energy_spent'] ?? 0) > 60000) {
         // do not show popup if energy spent is less than 1 minute
         showDialog(
@@ -124,17 +130,23 @@ class _GameHomePageState extends State<GameHomePage>
   @override
   void initState() {
     super.initState();
-    // Initialize health data
-    final healthService = Provider.of<HealthService>(context, listen: false);
-    final gameState = Provider.of<GameState>(context, listen: false);
-    final objectBoxService = Provider.of<ObjectBox>(context, listen: false);
-    gameState.isPaused = true;
+
+    // Initialize game engine (paused)
+    ref.read(gameEngineProvider.notifier).setPaused(true);
+
     // Initialize ads
     AdService.initialize();
+
+    // Initialize health data
+    final healthService = ref.read(healthServiceProvider);
     healthService.initialize().then((_) async {
-      await healthService.syncHealthData(objectBoxService, gameState);
-      gameState.isPaused = false;
+      await healthService.syncHealthData(
+        ref.read(objectBoxProvider),
+        ref.read(gameEngineProvider.notifier),
+      );
+      ref.read(gameEngineProvider.notifier).setPaused(false);
     });
+
     WidgetsBinding.instance.addObserver(this);
   }
 

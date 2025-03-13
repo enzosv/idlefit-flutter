@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../services/game_state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/models/currency.dart';
+import 'package:idlefit/providers/currency_provider.dart';
 import '../util.dart';
 
-class CurrentCoins extends StatefulWidget {
+class CurrentCoins extends ConsumerStatefulWidget {
   static final globalKey = GlobalKey<_CurrentCoinsState>();
 
   const CurrentCoins({super.key});
@@ -13,10 +14,10 @@ class CurrentCoins extends StatefulWidget {
   }
 
   @override
-  State<CurrentCoins> createState() => _CurrentCoinsState();
+  ConsumerState<CurrentCoins> createState() => _CurrentCoinsState();
 }
 
-class _CurrentCoinsState extends State<CurrentCoins>
+class _CurrentCoinsState extends ConsumerState<CurrentCoins>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -49,23 +50,22 @@ class _CurrentCoinsState extends State<CurrentCoins>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<GameState>(
-      builder: (context, gameState, child) {
-        return AnimatedBuilder(
-          animation: _scaleAnimation,
-          builder: (context, child) {
-            return Transform.scale(
-              scale: _scaleAnimation.value,
-              child: Text(
-                toLettersNotation(gameState.coins.count),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            );
-          },
+    final currencies = ref.watch(currencyNotifierProvider);
+    final coinCount = currencies[CurrencyType.coin]?.count ?? 0;
+
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: Text(
+            toLettersNotation(coinCount),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         );
       },
     );

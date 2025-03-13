@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/models/currency.dart';
+import 'package:idlefit/providers/coin_generator_provider.dart';
+import 'package:idlefit/providers/currency_provider.dart';
 import '../constants.dart';
-import '../services/game_state.dart';
 import '../util.dart';
-import '../models/shop_items.dart';
 
 class GameStatsCard extends StatelessWidget {
   const GameStatsCard({super.key});
@@ -30,32 +31,50 @@ class GameStatsCard extends StatelessWidget {
   }
 }
 
-class _DynamicStats extends StatelessWidget {
+class _DynamicStats extends ConsumerWidget {
   const _DynamicStats();
 
   @override
-  Widget build(BuildContext context) {
-    final gameState = Provider.of<GameState>(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currencies = ref.watch(currencyNotifierProvider);
+    final coin = currencies[CurrencyType.coin];
+
+    // Calculate passive output
+    final passiveOutput = ref
+        .watch(coinGeneratorNotifierProvider)
+        .when(
+          data: (generators) {
+            double output = 0;
+            for (final generator in generators) {
+              output += generator.output;
+            }
+            return output;
+          },
+          loading: () => 0.0,
+          error: (_, __) => 0.0,
+        );
 
     return _StatListTile(
       icon: Constants.coinIcon,
       iconColor: Colors.amber,
       title: 'Gains',
-      current: gameState.coins.count,
-      max: gameState.coins.max,
-      perSecond: gameState.passiveOutput,
-      earned: gameState.coins.totalEarned,
-      spent: gameState.coins.totalSpent,
+      current: coin?.count ?? 0,
+      max: coin?.max ?? 0,
+      perSecond: passiveOutput,
+      earned: coin?.totalEarned ?? 0,
+      spent: coin?.totalSpent ?? 0,
     );
   }
 }
 
-class _StaticStats extends StatelessWidget {
+class _StaticStats extends ConsumerWidget {
   const _StaticStats();
 
   @override
-  Widget build(BuildContext context) {
-    final gameState = Provider.of<GameState>(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currencies = ref.watch(currencyNotifierProvider);
+    final energy = currencies[CurrencyType.energy];
+    final space = currencies[CurrencyType.space];
 
     return Column(
       children: [
@@ -63,19 +82,19 @@ class _StaticStats extends StatelessWidget {
           icon: Constants.energyIcon,
           iconColor: Colors.greenAccent,
           title: 'Energy',
-          current: gameState.energy.count,
-          max: gameState.energy.max,
-          earned: gameState.energy.totalEarned,
-          spent: gameState.energy.totalSpent,
+          current: energy?.count ?? 0,
+          max: energy?.max ?? 0,
+          earned: energy?.totalEarned ?? 0,
+          spent: energy?.totalSpent ?? 0,
         ),
         _StatListTile(
           icon: Constants.spaceIcon,
           iconColor: Colors.blueAccent,
           title: 'Space',
-          current: gameState.space.count,
-          max: gameState.space.max,
-          earned: gameState.space.totalEarned,
-          spent: gameState.space.totalSpent,
+          current: space?.count ?? 0,
+          max: space?.max ?? 0,
+          earned: space?.totalEarned ?? 0,
+          spent: space?.totalSpent ?? 0,
         ),
       ],
     );

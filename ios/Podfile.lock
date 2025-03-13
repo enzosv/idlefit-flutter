@@ -2,6 +2,8 @@ PODS:
   - device_info_plus (0.0.1):
     - Flutter
   - Flutter (1.0.0)
+  - flutter_local_notifications (0.0.1):
+    - Flutter
   - Google-Mobile-Ads-SDK (10.11.0):
     - GoogleAppMeasurement (< 11.0, >= 7.0)
     - GoogleUserMessagingPlatform (>= 1.1)
@@ -70,9 +72,6 @@ PODS:
     - Flutter
     - FlutterMacOS
   - PromisesObjC (2.4.0)
-  - shared_preferences_foundation (0.0.1):
-    - Flutter
-    - FlutterMacOS
   - webview_flutter_wkwebview (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -80,11 +79,11 @@ PODS:
 DEPENDENCIES:
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
+  - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - google_mobile_ads (from `.symlinks/plugins/google_mobile_ads/ios`)
   - health (from `.symlinks/plugins/health/ios`)
   - objectbox_sync_flutter_libs (from `.symlinks/plugins/objectbox_sync_flutter_libs/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
-  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/darwin`)
 
 SPEC REPOS:
@@ -102,6 +101,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/device_info_plus/ios"
   Flutter:
     :path: Flutter
+  flutter_local_notifications:
+    :path: ".symlinks/plugins/flutter_local_notifications/ios"
   google_mobile_ads:
     :path: ".symlinks/plugins/google_mobile_ads/ios"
   health:
@@ -110,14 +111,13 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/objectbox_sync_flutter_libs/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
-  shared_preferences_foundation:
-    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   webview_flutter_wkwebview:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/darwin"
 
 SPEC CHECKSUMS:
   device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  flutter_local_notifications: ad39620c743ea4c15127860f4b5641649a988100
   Google-Mobile-Ads-SDK: 58b4fda3f9758fc1ed210aa5cf7777b5eb55d47e
   google_mobile_ads: c49bca7ce6656c411965e56b4e24893466fef840
   GoogleAppMeasurement: f9de05ee17401e3355f68e8fc8b5064d429f5918
@@ -129,7 +129,6 @@ SPEC CHECKSUMS:
   objectbox_sync_flutter_libs: fa82af74a6ae10113b74a7a541d0951ccdc25fe1
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   webview_flutter_wkwebview: 1821ceac936eba6f7984d89a9f3bcb4dea99ebb2
 
 PODFILE CHECKSUM: 4305caec6b40dde0ae97be1573c53de1882a07e5

@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:idlefit/constants.dart';
-import 'package:idlefit/services/game_state.dart';
+import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/util.dart';
 import 'package:idlefit/widgets/current_coins.dart';
 import 'common_card.dart';
 
 class GeneratorCard extends StatefulWidget {
-  final GameState gameState;
-  final int generatorIndex;
+  final CoinGenerator generator;
+  final VoidCallback onBuy;
+  final VoidCallback? onUpgrade;
+  final VoidCallback? onUnlock;
+
   const GeneratorCard({
     super.key,
-    required this.gameState,
-    required this.generatorIndex,
+    required this.generator,
+    required this.onBuy,
+    this.onUpgrade,
+    this.onUnlock,
   });
 
   @override
@@ -69,8 +74,7 @@ class _GeneratorCardState extends State<GeneratorCard>
   }
 
   void startProgress(TapDownDetails details) {
-    if (showProgress ||
-        widget.gameState.coinGenerators[widget.generatorIndex].count < 1) {
+    if (showProgress || widget.generator.count < 1) {
       return;
     }
 
@@ -92,9 +96,8 @@ class _GeneratorCardState extends State<GeneratorCard>
         showProgress = false;
       }); // Hide bar after animation completes
 
-      final generator = widget.gameState.coinGenerators[widget.generatorIndex];
-      final double output = generator.tier == 1 ? 15 : generator.singleOutput;
-      widget.gameState.coins.earn(output);
+      final output =
+          widget.generator.tier == 1 ? 15.0 : widget.generator.singleOutput;
       _showFloatingText(toLettersNotation(output));
       CurrentCoins.triggerAnimation();
       // Trigger the animation
@@ -183,7 +186,7 @@ class _GeneratorCardState extends State<GeneratorCard>
 
   @override
   Widget build(BuildContext context) {
-    final generator = widget.gameState.coinGenerators[widget.generatorIndex];
+    final generator = widget.generator;
     final screenWidth = MediaQuery.of(context).size.width;
     final additionalInfo = [
       Row(
@@ -211,6 +214,38 @@ class _GeneratorCardState extends State<GeneratorCard>
         ),
       );
     }
+
+    // Show upgrades if generator is unlocked
+    if (generator.isUnlocked) {
+      additionalInfo.add(
+        Row(
+          children: [
+            Text(
+              'Level: ${generator.level}',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(width: 4),
+            Icon(Icons.upgrade, color: Colors.blue, size: 16),
+          ],
+        ),
+      );
+    } else if (generator.count >= 10) {
+      additionalInfo.add(
+        Row(
+          children: [
+            Text(
+              'Unlock upgrades!',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.amber),
+            ),
+            const SizedBox(width: 4),
+            Icon(Icons.lock_open, color: Colors.amber, size: 16),
+          ],
+        ),
+      );
+    }
+
     return Stack(
       clipBehavior: Clip.none, // Allow animations to move outside bounds
       children: [
@@ -220,13 +255,10 @@ class _GeneratorCardState extends State<GeneratorCard>
           description: generator.description,
           additionalInfo: additionalInfo,
           cost: generator.cost,
-          affordable: widget.gameState.coins.count >= generator.cost,
+          affordable: true, // This will be handled by the game engine
           costIcon: Constants.coinIcon,
           buttonText: 'Add Rep',
-          onButtonPressed:
-              widget.gameState.coins.count >= generator.cost
-                  ? () => widget.gameState.buyCoinGenerator(generator)
-                  : null,
+          onButtonPressed: widget.onBuy,
           onTapDown: showProgress || generator.count < 1 ? null : startProgress,
           progressIndicator:
               showProgress
@@ -237,6 +269,14 @@ class _GeneratorCardState extends State<GeneratorCard>
                     color: Colors.blue,
                   )
                   : null,
+          secondaryButtonText:
+              generator.isUnlocked
+                  ? 'Upgrade'
+                  : (generator.count >= 10 ? 'Unlock' : null),
+          onSecondaryButtonPressed:
+              generator.isUnlocked
+                  ? widget.onUpgrade
+                  : (generator.count >= 10 ? widget.onUnlock : null),
         ),
       ],
     );

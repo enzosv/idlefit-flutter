@@ -5,6 +5,7 @@ class CardButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final String text;
   final Color? backgroundColor;
+  final Color? color;
   final Color? textColor;
   final IconData? icon;
 
@@ -13,6 +14,7 @@ class CardButton extends StatelessWidget {
     required this.text,
     this.onPressed,
     this.backgroundColor,
+    this.color,
     this.textColor,
     this.icon,
   });
@@ -30,7 +32,7 @@ class CardButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor ?? Constants.primaryColor,
+        backgroundColor: color ?? backgroundColor ?? Constants.primaryColor,
         foregroundColor: textColor ?? Colors.black,
         elevation: 2,
         // padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

@@ -3,8 +3,8 @@ import 'package:health/health.dart';
 import 'package:flutter/material.dart';
 import 'package:idlefit/models/health_data_entry.dart';
 import 'package:idlefit/models/health_data_repo.dart';
+import 'package:idlefit/providers/game_engine_provider.dart';
 import 'package:idlefit/services/object_box.dart';
-import 'game_state.dart';
 import 'dart:math';
 
 class HealthService {
@@ -91,7 +91,7 @@ class HealthService {
 
     // Estimate heart rate using rearranged formula
 
-    // Calories per minute= ((heartrate * weight * K)/1000)*5
+    // Calories per minute= ((heartrate * weight * K)/1000)*5
     // cpm = 5*(hr*w*k)/1000
     // (1000*cpm)/5 = hr*w*k
     // 1000*cpm/5/w/k=hr
@@ -144,9 +144,8 @@ class HealthService {
 
   Future<void> syncHealthData(
     ObjectBox objectBoxService,
-    GameState gameState,
+    GameEngine gameEngine,
   ) async {
-    // final store = await openStore(); // Initialize ObjectBox
     final box = objectBoxService.store.box<HealthDataEntry>();
 
     final repo = HealthDataRepo(box: box);
@@ -169,12 +168,12 @@ class HealthService {
     box.putMany(newEntries);
 
     print("new: ${newEntries.length}, from: ${entries.length}");
-    updateHealthState(newEntries, gameState);
+    updateHealthState(newEntries, gameEngine);
   }
 
   void updateHealthState(
     List<HealthDataEntry> newEntries,
-    GameState gameState,
+    GameEngine gameEngine,
   ) {
     double steps = 0;
     double calories = 0;
@@ -193,6 +192,6 @@ class HealthService {
     }
 
     print("got new health data $steps $calories $exercise");
-    gameState.convertHealthStats(steps, calories, exercise);
+    gameEngine.convertHealthStats(steps, calories, exercise);
   }
 }

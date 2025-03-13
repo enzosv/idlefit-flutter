@@ -47,4 +47,31 @@ class PlayerStats {
       'energy_spent': backgroundEnergySpent,
     };
   }
+
+  // Creates a copy of the current PlayerStats with optional field updates
+  PlayerStats copyWith({
+    int? lastGenerated,
+    int? doubleCoinExpiry,
+    double? offlineCoinMultiplier,
+    double? backgroundCoins,
+    double? backgroundEnergy,
+    double? backgroundSpace,
+    double? backgroundEnergySpent,
+  }) {
+    final copy = PlayerStats(
+      lastGenerated: lastGenerated ?? this.lastGenerated,
+      doubleCoinExpiry: doubleCoinExpiry ?? this.doubleCoinExpiry,
+      offlineCoinMultiplier:
+          offlineCoinMultiplier ?? this.offlineCoinMultiplier,
+      backgroundCoins: backgroundCoins ?? this.backgroundCoins,
+      backgroundEnergy: backgroundEnergy ?? this.backgroundEnergy,
+      backgroundSpace: backgroundSpace ?? this.backgroundSpace,
+      backgroundEnergySpent:
+          backgroundEnergySpent ?? this.backgroundEnergySpent,
+    );
+
+    // Preserve the ID for ObjectBox
+    copy.id = this.id;
+    return copy;
+  }
 }

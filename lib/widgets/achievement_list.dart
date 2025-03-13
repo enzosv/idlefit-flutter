@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/services/object_box.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/models/currency.dart';
+import 'package:idlefit/providers/currency_provider.dart';
+import 'package:idlefit/providers/game_engine_provider.dart';
+import 'package:idlefit/providers/objectbox_provider.dart';
 import '../models/achievement.dart';
 import '../models/achievement_repo.dart';
 import '../models/health_data_repo.dart';
 import '../models/health_data_entry.dart';
-import '../services/game_state.dart';
 import 'achievement_card.dart';
 
-class AchievementList extends StatefulWidget {
+class AchievementList extends ConsumerStatefulWidget {
   const AchievementList({super.key});
 
   @override
-  _AchievementListState createState() => _AchievementListState();
+  ConsumerState<AchievementList> createState() => _AchievementListState();
 }
 
-class _AchievementListState extends State<AchievementList> {
+class _AchievementListState extends ConsumerState<AchievementList> {
   List<Achievement> achievements = [];
   Map<String, double> progress = {};
   late AchievementRepo _achievementRepo;
@@ -27,7 +29,7 @@ class _AchievementListState extends State<AchievementList> {
   }
 
   Future<void> _fetchData() async {
-    final objectBox = Provider.of<ObjectBox>(context, listen: false);
+    final objectBox = ref.read(objectBoxProvider);
     final achievementBox = objectBox.store.box<Achievement>();
     _achievementRepo = AchievementRepo(box: achievementBox);
     final newAchievements = await _achievementRepo.loadNewAchievements();
@@ -36,7 +38,11 @@ class _AchievementListState extends State<AchievementList> {
     final healthBox = objectBox.store.box<HealthDataEntry>();
     final healthRepo = HealthDataRepo(box: healthBox);
     final healthStats = await healthRepo.total();
-    final gameState = Provider.of<GameState>(context, listen: false);
+
+    // Use currency provider to get totals
+    final currencyNotifier = ref.read(currencyNotifierProvider);
+    final coins = currencyNotifier[CurrencyType.coin];
+    final energy = currencyNotifier[CurrencyType.energy];
 
     final newProgress = <String, double>{};
     for (final achievement in newAchievements) {
@@ -47,22 +53,23 @@ class _AchievementListState extends State<AchievementList> {
           newProgress[achievement.action] = healthStats.steps;
           break;
         case 'collect':
-          newProgress[achievement.action] = gameState.coins.totalEarned;
+          newProgress[achievement.action] = coins?.totalEarned ?? 0;
           break;
         case 'spend':
-          newProgress[achievement.action] = gameState.energy.totalSpent;
+          newProgress[achievement.action] = energy?.totalSpent ?? 0;
           break;
       }
     }
 
-    setState(() {
-      achievements = newAchievements;
-      progress = newProgress;
-    });
+    if (mounted) {
+      setState(() {
+        achievements = newAchievements;
+        progress = newProgress;
+      });
+    }
   }
 
   void _onClaim(Achievement achievement) async {
-    // final isLast = _isLastAchievement(achievement, allAchievements);
     print("attempting to claim");
     if (!_achievementRepo.claimAchievement(achievement)) {
       return;
@@ -72,23 +79,21 @@ class _AchievementListState extends State<AchievementList> {
     }
     print("claimed, ${achievement.reward}");
 
-    final gameState = Provider.of<GameState>(context, listen: false);
+    final currencyNotifier = ref.read(currencyNotifierProvider.notifier);
     final reward = achievement.reward.toDouble();
+
     // Award the achievement reward
     switch (achievement.rewardUnit.toLowerCase()) {
       case 'space':
-        gameState.space.earn(reward);
+        currencyNotifier.earn(CurrencyType.space, reward);
         break;
       case 'coins':
-        gameState.coins.earn(reward);
+        currencyNotifier.earn(CurrencyType.coin, reward);
         break;
       case 'energy':
-        gameState.energy.earn(reward);
+        currencyNotifier.earn(CurrencyType.energy, reward);
         break;
     }
-    // if (isLast) {
-    //   return;
-    // }
 
     // Refresh the achievement list to update visibility
     _fetchData();
