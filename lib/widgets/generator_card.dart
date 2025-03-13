@@ -93,8 +93,9 @@ class _GeneratorCardState extends State<GeneratorCard>
       }); // Hide bar after animation completes
 
       final generator = widget.gameState.coinGenerators[widget.generatorIndex];
-      widget.gameState.coins.earn(generator.singleOutput);
-      _showFloatingText(toLettersNotation(generator.singleOutput));
+      final double output = generator.tier == 1 ? 15 : generator.singleOutput;
+      widget.gameState.coins.earn(output);
+      _showFloatingText(toLettersNotation(output));
       CurrentCoins.triggerAnimation();
       // Trigger the animation
     });
