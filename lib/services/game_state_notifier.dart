@@ -353,7 +353,7 @@ final gameStateProvider = StateNotifierProvider<GameStateNotifier, GameState>((
       ref
           .read(objectBoxProvider)
           .store; // You'll need to properly initialize this
-
+  final storageService = ref.read(storageServiceProvider);
   return GameStateNotifier(
     GameState(
       isPaused: true,
@@ -386,7 +386,7 @@ final gameStateProvider = StateNotifierProvider<GameStateNotifier, GameState>((
       offlineCoinMultiplier: 0.5,
       coinGenerators: [],
       shopItems: [],
-      // storageService: StorageService(store),
+      storageService: storageService,
       currencyRepo: CurrencyRepo(box: store.box<Currency>()),
       generatorRepo: CoinGeneratorRepo(box: store.box<CoinGenerator>()),
       shopItemRepo: ShopItemsRepo(box: store.box<ShopItem>()),

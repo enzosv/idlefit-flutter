@@ -4,6 +4,7 @@ import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/shop_items_repo.dart';
 import 'package:idlefit/models/currency_repo.dart';
+import 'package:idlefit/services/storage_service.dart';
 import 'package:objectbox/objectbox.dart';
 import '../models/shop_items.dart';
 import 'notification_service.dart';
@@ -28,12 +29,11 @@ class GameState {
   final List<ShopItem> shopItems;
 
   // For saving/loading
-  // final StorageService storageService;
+  final StorageService storageService;
   final CurrencyRepo currencyRepo;
   final CoinGeneratorRepo generatorRepo;
   final ShopItemsRepo shopItemRepo;
   Timer? _autoSaveTimer;
-  Timer? _generatorTimer;
 
   GameState({
     required this.isPaused,
@@ -46,7 +46,7 @@ class GameState {
     required this.offlineCoinMultiplier,
     required this.coinGenerators,
     required this.shopItems,
-    // required StorageService storageService,
+    required this.storageService,
     required CurrencyRepo currencyRepo,
     required CoinGeneratorRepo generatorRepo,
     required ShopItemsRepo shopItemRepo,
@@ -84,7 +84,7 @@ class GameState {
       coinGenerators: coinGenerators ?? this.coinGenerators,
       shopItems: shopItems ?? this.shopItems,
       backgroundState: backgroundState ?? this.backgroundState,
-      // storageService: _storageService,
+      storageService: storageService,
       currencyRepo: currencyRepo,
       generatorRepo: generatorRepo,
       shopItemRepo: shopItemRepo,
@@ -100,7 +100,6 @@ class GameState {
 
     // Start timers
     _startAutoSave();
-    // _startGenerators();
   }
 
   Map<String, dynamic> toJson() {
@@ -112,7 +111,7 @@ class GameState {
   }
 
   void save() {
-    // _storageService.saveGameState(toJson());
+    storageService.saveGameState(toJson());
     currencyRepo.saveCurrencies([coins, energy, gems, space]);
     // not saving generators and shopitems. only changes on buy anyway
   }
@@ -176,6 +175,5 @@ class GameState {
 
   void dispose() {
     _autoSaveTimer?.cancel();
-    _generatorTimer?.cancel();
   }
 }
