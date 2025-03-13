@@ -1,11 +1,10 @@
 import 'package:idlefit/models/time_based_stats.dart';
+import 'package:idlefit/models/base_stats_repo.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:intl/intl.dart';
 
-class TimeBasedStatsRepo {
-  final Box<TimeBasedStats> _box;
-
-  TimeBasedStatsRepo({required Box<TimeBasedStats> box}) : _box = box;
+class TimeBasedStatsRepo extends BaseStatsRepo<TimeBasedStats> {
+  TimeBasedStatsRepo({required Box<TimeBasedStats> box}) : super(box: box);
 
   // Get or create stats for the current day
   TimeBasedStats getOrCreateDailyStats() {
@@ -61,10 +60,7 @@ class TimeBasedStatsRepo {
     StatsPeriod periodType,
     String key,
   ) {
-    // Simple query approach without using generated properties
-    final query = _box.query().build();
-    final allStats = query.find();
-    query.close();
+    final allStats = getAllStats();
 
     // Find matching stats manually
     final existingStats = allStats.where(
@@ -81,15 +77,9 @@ class TimeBasedStatsRepo {
         periodKey: key,
       );
       stats.updateTimestamp();
-      _box.put(stats);
+      saveStats(stats);
       return stats;
     }
-  }
-
-  // Save stats to the database
-  void saveStats(TimeBasedStats stats) {
-    stats.updateTimestamp();
-    _box.put(stats);
   }
 
   // Get stats for a specific day
@@ -118,10 +108,7 @@ class TimeBasedStatsRepo {
 
   // Helper method to get stats by key and period type
   TimeBasedStats? _getStatsByKey(String key, StatsPeriod periodType) {
-    // Simple query approach without using generated properties
-    final query = _box.query().build();
-    final allStats = query.find();
-    query.close();
+    final allStats = getAllStats();
 
     // Find matching stats manually
     final matchingStats = allStats.where(
@@ -179,10 +166,7 @@ class TimeBasedStatsRepo {
     int startTimestamp,
     StatsPeriod periodType,
   ) {
-    // Simple query approach without using generated properties
-    final query = _box.query().build();
-    final allStats = query.find();
-    query.close();
+    final allStats = getAllStats();
 
     // Find matching stats manually and sort them
     final matchingStats =

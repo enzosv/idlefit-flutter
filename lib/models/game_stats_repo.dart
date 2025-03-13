@@ -1,41 +1,28 @@
 import 'package:idlefit/models/game_stats.dart';
+import 'package:idlefit/models/base_stats_repo.dart';
 import 'package:objectbox/objectbox.dart';
 
-class GameStatsRepo {
-  final Box<GameStats> _box;
+class GameStatsRepo extends BaseStatsRepo<GameStats> {
+  GameStatsRepo({required Box<GameStats> box}) : super(box: box);
 
-  GameStatsRepo({required Box<GameStats> box}) : _box = box;
-
-  // Get the singleton instance of GameStats or create a new one if it doesn't exist
+  // Get or create stats
   GameStats getOrCreateStats() {
-    final query = _box.query().build();
-    final results = query.find();
-    query.close();
+    final allStats = getAllStats();
 
-    if (results.isNotEmpty) {
-      return results.first;
+    if (allStats.isNotEmpty) {
+      return allStats.first;
     } else {
       final stats = GameStats();
       stats.updateTimestamp();
-      _box.put(stats);
+      saveStats(stats);
       return stats;
     }
   }
 
-  // Save the stats to the database
-  void saveStats(GameStats stats) {
-    stats.updateTimestamp();
-    _box.put(stats);
-  }
-
-  // Reset all stats (for testing or user-initiated reset)
+  // Reset stats
   void resetStats() {
-    final stats = getOrCreateStats();
-    _box.remove(stats.id);
-
-    final newStats = GameStats();
-    newStats.updateTimestamp();
-    _box.put(newStats);
+    deleteAllStats();
+    getOrCreateStats();
   }
 
   // Get stats for a specific time period (useful for future features)
