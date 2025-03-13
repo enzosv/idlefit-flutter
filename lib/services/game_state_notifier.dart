@@ -77,51 +77,46 @@ class GameStateNotifier extends StateNotifier<GameState> {
   void _processGenerators() {
     if (state.isPaused) return;
 
-    int now = DateTime.now().millisecondsSinceEpoch;
+    final now = DateTime.now().millisecondsSinceEpoch;
     final realDif = state.lastGenerated - now;
-    final availableDif = _validTimeSinceLastGenerate(now, state.lastGenerated);
-    final usesEnergy = realDif > Constants.inactiveThreshold;
+    final dif = state.calculateValidTimeSinceLastGenerate(
+      now,
+      state.lastGenerated,
+    );
 
+    // Handle coin generation
     double coinsGenerated = state.passiveOutput;
-    if (usesEnergy) {
+    if (coinsGenerated <= 0) {
+      // no coins generated, skip
+      return;
+    }
+    coinsGenerated *= (dif / Constants.tickTime);
+
+    var newState = state;
+    if (realDif > Constants.inactiveThreshold && dif > Constants.tickTime) {
+      // consume energy
+      final newEnergy = newState.energy.spend(dif.toDouble());
+      assert(newEnergy != null, "energy spent is more than available");
+      // reduce coins generated offline
       coinsGenerated *= state.offlineCoinMultiplier;
-    }
-    coinsGenerated *= (availableDif / Constants.tickTime);
 
-    if (coinsGenerated > 0) {
-      final newCoins = state.coins.earn(coinsGenerated);
-      state = state.copyWith(coins: newCoins, lastGenerated: now);
-      state.save();
-    }
-  }
-
-  //  a read. move to gamestate?
-  int _validTimeSinceLastGenerate(int now, int previous) {
-    if (state.energy.count <= 0 || previous <= 0) {
-      return Constants.tickTime;
-    }
-
-    int dif = now - previous;
-    if (dif < Constants.inactiveThreshold) {
-      return dif;
-    }
-
-    dif = min(dif, state.energy.count.round());
-
-    // smelly to update state in a read
-    final newEnergy = state.energy.spend(dif.toDouble());
-    if (newEnergy != null) {
+      // track energy spent for popup
       final newBackgroundState = Map<String, double>.from(
         state.backgroundState,
       );
       newBackgroundState['energySpent'] = dif.toDouble();
 
-      state = state.copyWith(
+      // update state
+      newState = newState.copyWith(
         energy: newEnergy,
         backgroundState: newBackgroundState,
       );
     }
-    return dif;
+
+    // earn coins
+    final newCoins = newState.coins.earn(coinsGenerated);
+    state = newState.copyWith(coins: newCoins, lastGenerated: now);
+    state.save();
   }
 
   void convertHealthStats(
@@ -155,14 +150,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
   }
 
   void saveBackgroundState() {
-    state = state.copyWith(
-      backgroundState: {
-        'coins': state.coins.count,
-        'energy': 0,
-        'space': 0,
-        'energySpent': 0,
-      },
-    );
+    state = state.copyWith(backgroundState: state.getBackgroundStateSnapshot());
     _scheduleCoinCapacityNotification();
   }
 
@@ -326,16 +314,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
     state = state.copyWith(coins: newCoins);
     state.save();
     return true;
-  }
-
-  // a read. move to gamestate?
-  Map<String, double> getBackgroundDifferences() {
-    return {
-      'coins': state.coins.count - (state.backgroundState['coins'] ?? 0),
-      'energy_earned': state.backgroundState['energy'] ?? 0,
-      'space': state.backgroundState['space'] ?? 0,
-      'energy_spent': state.backgroundState['energySpent'] ?? 0,
-    };
   }
 }
 

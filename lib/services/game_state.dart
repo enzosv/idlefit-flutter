@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:math';
+import 'package:idlefit/constants.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/shop_items_repo.dart';
@@ -126,5 +128,31 @@ class GameState {
       }
     }
     return output * coinMultiplier;
+  }
+
+  int calculateValidTimeSinceLastGenerate(int now, int previous) {
+    if (energy.count <= 0 || previous <= 0) {
+      return Constants.tickTime;
+    }
+
+    int dif = now - previous;
+    if (dif < Constants.inactiveThreshold) {
+      return dif;
+    }
+
+    return min(dif, energy.count.round());
+  }
+
+  Map<String, double> getBackgroundStateSnapshot() {
+    return {'coins': coins.count, 'energy': 0, 'space': 0, 'energySpent': 0};
+  }
+
+  Map<String, double> getBackgroundDifferences() {
+    return {
+      'coins': coins.count - (backgroundState['coins'] ?? 0),
+      'energy_earned': backgroundState['energy'] ?? 0,
+      'space': backgroundState['space'] ?? 0,
+      'energy_spent': backgroundState['energySpent'] ?? 0,
+    };
   }
 }

@@ -165,7 +165,8 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
       if (!mounted) {
         return;
       }
-      final earnings = gameStateNotifier.getBackgroundDifferences();
+      final gameState = ref.read(gameStateProvider);
+      final earnings = gameState.getBackgroundDifferences();
       if ((earnings['energy_spent'] ?? 0) > 60000) {
         // do not show popup if energy spent is less than 1 minute
         showDialog(
