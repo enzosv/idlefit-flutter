@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
 import 'package:idlefit/widgets/generator_upgrade_card.dart';
 import 'package:idlefit/widgets/shop_item_card.dart';
-import 'package:provider/provider.dart';
 import '../services/game_state.dart';
 import '../widgets/common_widgets.dart';
 
@@ -24,8 +24,10 @@ class ShopScreen extends StatelessWidget {
 
           // Shop items and generator upgrades list
           Expanded(
-            child: Consumer<GameState>(
-              builder: (context, gameState, child) {
+            child: Consumer(
+              builder: (context, ref, child) {
+                final gameState = ref.watch(gameStateProvider);
+
                 // Filter generators that can be upgraded (count >= 10)
                 final upgradableGenerators =
                     gameState.coinGenerators
@@ -50,10 +52,7 @@ class ShopScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       ...upgradableGenerators.map((generator) {
-                        return GeneratorUpgradeCard(
-                          gameState: gameState,
-                          generator: generator,
-                        );
+                        return GeneratorUpgradeCard(generator: generator);
                       }),
                     ],
                   ],

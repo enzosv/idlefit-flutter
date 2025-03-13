@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/services/object_box.dart';
-import 'package:provider/provider.dart';
+import 'package:idlefit/main.dart'; // Import providers from main.dart
 import '../models/achievement.dart';
 import '../models/achievement_repo.dart';
 import '../models/health_data_repo.dart';
@@ -8,14 +9,14 @@ import '../models/health_data_entry.dart';
 import '../services/game_state.dart';
 import 'achievement_card.dart';
 
-class AchievementList extends StatefulWidget {
+class AchievementList extends ConsumerStatefulWidget {
   const AchievementList({super.key});
 
   @override
-  _AchievementListState createState() => _AchievementListState();
+  ConsumerState<AchievementList> createState() => _AchievementListState();
 }
 
-class _AchievementListState extends State<AchievementList> {
+class _AchievementListState extends ConsumerState<AchievementList> {
   List<Achievement> achievements = [];
   Map<String, double> progress = {};
   late AchievementRepo _achievementRepo;
@@ -27,7 +28,7 @@ class _AchievementListState extends State<AchievementList> {
   }
 
   Future<void> _fetchData() async {
-    final objectBox = Provider.of<ObjectBox>(context, listen: false);
+    final objectBox = ref.read(objectBoxProvider);
     final achievementBox = objectBox.store.box<Achievement>();
     _achievementRepo = AchievementRepo(box: achievementBox);
     final newAchievements = await _achievementRepo.loadNewAchievements();
@@ -36,7 +37,7 @@ class _AchievementListState extends State<AchievementList> {
     final healthBox = objectBox.store.box<HealthDataEntry>();
     final healthRepo = HealthDataRepo(box: healthBox);
     final healthStats = await healthRepo.total();
-    final gameState = Provider.of<GameState>(context, listen: false);
+    final gameState = ref.read(gameStateProvider);
 
     final newProgress = <String, double>{};
     for (final achievement in newAchievements) {
@@ -72,7 +73,8 @@ class _AchievementListState extends State<AchievementList> {
     }
     print("claimed, ${achievement.reward}");
 
-    final gameState = Provider.of<GameState>(context, listen: false);
+    final gameState = ref.read(gameStateProvider);
+    final gameStateNotifier = ref.read(gameStateProvider.notifier);
     final reward = achievement.reward.toDouble();
     // Award the achievement reward
     switch (achievement.rewardUnit.toLowerCase()) {
@@ -86,6 +88,7 @@ class _AchievementListState extends State<AchievementList> {
         gameState.energy.earn(reward);
         break;
     }
+    gameStateNotifier.update();
     // if (isLast) {
     //   return;
     // }

@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/health_data_entry.dart';
 import 'package:idlefit/models/health_data_repo.dart';
 import 'package:idlefit/services/object_box.dart';
 import 'package:idlefit/util.dart';
-import 'package:provider/provider.dart';
 import 'package:idlefit/services/health_service.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:idlefit/widgets/card_button.dart';
+import 'package:idlefit/main.dart'; // Import providers from main.dart
 
-class HealthStatsCard extends StatefulWidget {
+class HealthStatsCard extends ConsumerStatefulWidget {
   const HealthStatsCard({super.key});
 
   @override
-  _HealthStatsCardState createState() => _HealthStatsCardState();
+  ConsumerState<HealthStatsCard> createState() => _HealthStatsCardState();
 }
 
 class _HealthStatsTile extends StatelessWidget {
@@ -41,7 +42,7 @@ class _HealthStatsTile extends StatelessWidget {
   }
 }
 
-class _HealthStatsCardState extends State<HealthStatsCard> {
+class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
   HealthStats today = HealthStats();
   HealthStats total = HealthStats();
 
@@ -52,11 +53,7 @@ class _HealthStatsCardState extends State<HealthStatsCard> {
   }
 
   Future<void> _fetchData() async {
-    final healthBox =
-        Provider.of<ObjectBox>(
-          context,
-          listen: false,
-        ).store.box<HealthDataEntry>();
+    final healthBox = ref.read(objectBoxProvider).store.box<HealthDataEntry>();
     final healthRepo = HealthDataRepo(box: healthBox);
     final (healthToday, healthTotal) =
         await (healthRepo.today(DateTime.now()), healthRepo.total()).wait;
@@ -87,10 +84,10 @@ class _HealthStatsCardState extends State<HealthStatsCard> {
                     FutureBuilder<(DateTime?, DateTime?)>(
                       future: () async {
                         final box =
-                            Provider.of<ObjectBox>(
-                              context,
-                              listen: false,
-                            ).store.box<HealthDataEntry>();
+                            ref
+                                .read(objectBoxProvider)
+                                .store
+                                .box<HealthDataEntry>();
                         final repo = HealthDataRepo(box: box);
                         final latest = await repo.latestEntryDate();
                         final earliest = await repo.earliestEntryDate();
@@ -132,18 +129,9 @@ class _HealthStatsCardState extends State<HealthStatsCard> {
                   icon: Icons.sync,
                   text: 'Sync',
                   onPressed: () async {
-                    final healthService = Provider.of<HealthService>(
-                      context,
-                      listen: false,
-                    );
-                    final gameState = Provider.of<GameState>(
-                      context,
-                      listen: false,
-                    );
-                    final objectBox = Provider.of<ObjectBox>(
-                      context,
-                      listen: false,
-                    );
+                    final healthService = ref.read(healthServiceProvider);
+                    final gameState = ref.read(gameStateProvider);
+                    final objectBox = ref.read(objectBoxProvider);
                     await healthService.syncHealthData(objectBox, gameState);
                     setState(
                       () {},

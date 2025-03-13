@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:idlefit/util.dart';
 import 'package:idlefit/widgets/current_coins.dart';
 import 'common_card.dart';
 
-class GeneratorCard extends StatefulWidget {
-  final GameState gameState;
+class GeneratorCard extends ConsumerStatefulWidget {
   final int generatorIndex;
-  const GeneratorCard({
-    super.key,
-    required this.gameState,
-    required this.generatorIndex,
-  });
+
+  const GeneratorCard({super.key, required this.generatorIndex});
 
   @override
-  _GeneratorCardState createState() => _GeneratorCardState();
+  ConsumerState<GeneratorCard> createState() => _GeneratorCardState();
 }
 
-class _GeneratorCardState extends State<GeneratorCard>
+class _GeneratorCardState extends ConsumerState<GeneratorCard>
     with SingleTickerProviderStateMixin {
   double progress = 0.0;
   bool showProgress = false;
@@ -69,8 +66,9 @@ class _GeneratorCardState extends State<GeneratorCard>
   }
 
   void startProgress(TapDownDetails details) {
+    final gameState = ref.read(gameStateProvider);
     if (showProgress ||
-        widget.gameState.coinGenerators[widget.generatorIndex].count < 1) {
+        gameState.coinGenerators[widget.generatorIndex].count < 1) {
       return;
     }
 
@@ -92,9 +90,11 @@ class _GeneratorCardState extends State<GeneratorCard>
         showProgress = false;
       }); // Hide bar after animation completes
 
-      final generator = widget.gameState.coinGenerators[widget.generatorIndex];
+      final gameStateNotifier = ref.read(gameStateProvider.notifier);
+      final generator = gameState.coinGenerators[widget.generatorIndex];
       final double output = generator.tier == 1 ? 15 : generator.singleOutput;
-      widget.gameState.coins.earn(output);
+      gameState.coins.earn(output);
+      gameStateNotifier.update();
       _showFloatingText(toLettersNotation(output));
       CurrentCoins.triggerAnimation();
       // Trigger the animation
@@ -183,7 +183,9 @@ class _GeneratorCardState extends State<GeneratorCard>
 
   @override
   Widget build(BuildContext context) {
-    final generator = widget.gameState.coinGenerators[widget.generatorIndex];
+    final gameState = ref.watch(gameStateProvider);
+    final gameStateNotifier = ref.read(gameStateProvider.notifier);
+    final generator = gameState.coinGenerators[widget.generatorIndex];
     final screenWidth = MediaQuery.of(context).size.width;
     final additionalInfo = [
       Row(
@@ -220,12 +222,12 @@ class _GeneratorCardState extends State<GeneratorCard>
           description: generator.description,
           additionalInfo: additionalInfo,
           cost: generator.cost,
-          affordable: widget.gameState.coins.count >= generator.cost,
+          affordable: gameState.coins.count >= generator.cost,
           costIcon: Constants.coinIcon,
           buttonText: 'Add Rep',
           onButtonPressed:
-              widget.gameState.coins.count >= generator.cost
-                  ? () => widget.gameState.buyCoinGenerator(generator)
+              gameState.coins.count >= generator.cost
+                  ? () => gameStateNotifier.buyCoinGenerator(generator)
                   : null,
           onTapDown: showProgress || generator.count < 1 ? null : startProgress,
           progressIndicator:

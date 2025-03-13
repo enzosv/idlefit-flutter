@@ -1,8 +1,8 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
 import 'package:idlefit/widgets/generator_card.dart';
-import 'package:provider/provider.dart';
 import '../services/game_state.dart';
 import '../widgets/common_widgets.dart';
 
@@ -37,8 +37,10 @@ class MainScreen extends StatelessWidget {
 
               // Generators list
               Expanded(
-                child: Consumer<GameState>(
-                  builder: (context, gameState, child) {
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    final gameState = ref.watch(gameStateProvider);
+
                     // Filter affordable generators and sort by price
                     final affordableGenerators =
                         gameState.coinGenerators
@@ -54,7 +56,6 @@ class MainScreen extends StatelessWidget {
                       itemCount: affordableGenerators.length,
                       itemBuilder: (context, index) {
                         return GeneratorCard(
-                          gameState: gameState,
                           generatorIndex: gameState.coinGenerators.indexOf(
                             affordableGenerators[index],
                           ),

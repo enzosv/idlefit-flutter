@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants.dart';
 import '../services/game_state.dart';
 import '../util.dart';
@@ -30,12 +30,12 @@ class GameStatsCard extends StatelessWidget {
   }
 }
 
-class _DynamicStats extends StatelessWidget {
+class _DynamicStats extends ConsumerWidget {
   const _DynamicStats();
 
   @override
-  Widget build(BuildContext context) {
-    final gameState = Provider.of<GameState>(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final gameState = ref.watch(gameStateProvider);
 
     return _StatListTile(
       icon: Constants.coinIcon,
@@ -50,12 +50,12 @@ class _DynamicStats extends StatelessWidget {
   }
 }
 
-class _StaticStats extends StatelessWidget {
+class _StaticStats extends ConsumerWidget {
   const _StaticStats();
 
   @override
-  Widget build(BuildContext context) {
-    final gameState = Provider.of<GameState>(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final gameState = ref.watch(gameStateProvider);
 
     return Column(
       children: [

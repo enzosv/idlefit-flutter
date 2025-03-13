@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/game_state.dart';
 import '../util.dart';
 
@@ -49,8 +49,9 @@ class _CurrentCoinsState extends State<CurrentCoins>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<GameState>(
-      builder: (context, gameState, child) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final gameState = ref.watch(gameStateProvider);
         return AnimatedBuilder(
           animation: _scaleAnimation,
           builder: (context, child) {

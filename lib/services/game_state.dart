@@ -6,12 +6,13 @@ import 'package:idlefit/models/shop_items_repo.dart';
 import 'package:idlefit/models/currency_repo.dart';
 import 'package:idlefit/util.dart';
 import 'package:objectbox/objectbox.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'storage_service.dart';
 import '../models/shop_items.dart';
 import 'dart:math';
 import 'notification_service.dart';
 
-class GameState with ChangeNotifier {
+class GameState {
   static const _tickTime = 1000; // miliseconds
   static const _inactiveThreshold = 30000; // 30 seconds in milliseocnds
   static const _calorieToEnergyMultiplier =
@@ -156,7 +157,6 @@ class GameState with ChangeNotifier {
 
     if (coinsGenerated > 0) {
       coins.earn(coinsGenerated);
-      notifyListeners();
     }
 
     lastGenerated = now;
@@ -180,7 +180,6 @@ class GameState with ChangeNotifier {
     ); // 2 exercise minutes = 1 gem
     _backgroundSpace = space.earn(steps);
     save();
-    notifyListeners();
   }
 
   bool buyCoinGenerator(CoinGenerator generator) {
@@ -210,7 +209,6 @@ class GameState with ChangeNotifier {
 
     _generatorRepo.saveCoinGenerator(generator);
     save();
-    notifyListeners();
     return true;
   }
 
@@ -239,7 +237,6 @@ class GameState with ChangeNotifier {
     }
     save();
     _shopItemRepo.saveShopItem(item);
-    notifyListeners();
     return true;
   }
 
@@ -254,7 +251,6 @@ class GameState with ChangeNotifier {
     generator.isUnlocked = true;
     _generatorRepo.saveCoinGenerator(generator);
     save();
-    notifyListeners();
     return true;
   }
 
@@ -269,7 +265,6 @@ class GameState with ChangeNotifier {
     generator.level++;
     _generatorRepo.saveCoinGenerator(generator);
     save();
-    notifyListeners();
     return true;
   }
 
@@ -333,10 +328,84 @@ class GameState with ChangeNotifier {
     return output * coinMultiplier;
   }
 
-  @override
   void dispose() {
     _autoSaveTimer?.cancel();
     _generatorTimer?.cancel();
+  }
+}
+
+// Create a StateNotifier for Riverpod
+class GameStateNotifier extends StateNotifier<GameState> {
+  GameStateNotifier(GameState state) : super(state);
+
+  void update() {
+    // This forces a UI refresh when needed
+    state = state;
+  }
+
+  // All the methods that modify state should be moved here
+  // For example:
+  void setIsPaused(bool value) {
+    state.isPaused = value;
+    update();
+  }
+
+  void saveBackgroundState() {
+    state.saveBackgroundState();
+    update();
+  }
+
+  Future<void> initialize(
+    StorageService storageService,
+    Store objectBoxService,
+  ) async {
+    await state.initialize(storageService, objectBoxService);
+    update();
+  }
+
+  void save() {
+    state.save();
+  }
+
+  void convertHealthStats(double steps, calories, exerciseMinutes) {
+    state.convertHealthStats(steps, calories, exerciseMinutes);
+    update();
+  }
+
+  bool buyCoinGenerator(CoinGenerator generator) {
+    final result = state.buyCoinGenerator(generator);
+    update();
+    return result;
+  }
+
+  bool upgradeShopItem(ShopItem item) {
+    final result = state.upgradeShopItem(item);
+    update();
+    return result;
+  }
+
+  bool unlockGenerator(CoinGenerator generator) {
+    final result = state.unlockGenerator(generator);
+    update();
+    return result;
+  }
+
+  bool upgradeGenerator(CoinGenerator generator) {
+    final result = state.upgradeGenerator(generator);
+    update();
+    return result;
+  }
+
+  @override
+  void dispose() {
+    state.dispose();
     super.dispose();
   }
 }
+
+// Create providers
+final gameStateProvider = StateNotifierProvider<GameStateNotifier, GameState>((
+  ref,
+) {
+  return GameStateNotifier(GameState());
+});

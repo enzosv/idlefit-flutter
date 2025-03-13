@@ -1,40 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
 import 'package:idlefit/widgets/current_coins.dart';
-import 'package:provider/provider.dart';
 import '../services/game_state.dart';
 import '../util.dart';
 import '../models/shop_items.dart';
 
-class CoinsInfo extends StatelessWidget {
+class CoinsInfo extends ConsumerWidget {
   const CoinsInfo({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<GameState>(
-      builder: (context, gameState, child) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Flexible(
-              child: Text(
-                '/${toLettersNotation(gameState.coins.max)}',
-                style: const TextStyle(color: Colors.white70, fontSize: 14),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                '${toLettersNotation(gameState.passiveOutput)}/s',
-                style: const TextStyle(color: Colors.white70, fontSize: 14),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        );
-      },
+  Widget build(BuildContext context, WidgetRef ref) {
+    final gameState = ref.watch(gameStateProvider);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(
+          child: Text(
+            '/${toLettersNotation(gameState.coins.max)}',
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            '${toLettersNotation(gameState.passiveOutput)}/s',
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -62,56 +60,52 @@ class CoinsDisplay extends StatelessWidget {
   }
 }
 
-class EnergyCurrency extends StatelessWidget {
+class EnergyCurrency extends ConsumerWidget {
   const EnergyCurrency({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<GameState>(
-      builder: (context, gameState, child) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Constants.energyIcon, color: Colors.greenAccent, size: 20),
-            const SizedBox(width: 4),
-            Flexible(
-              child: Text(
-                '${durationNotation(gameState.energy.count)}/${durationNotation(gameState.energy.max)}',
-                style: const TextStyle(color: Colors.white, fontSize: 14),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        );
-      },
+  Widget build(BuildContext context, WidgetRef ref) {
+    final gameState = ref.watch(gameStateProvider);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Constants.energyIcon, color: Colors.greenAccent, size: 20),
+        const SizedBox(width: 4),
+        Flexible(
+          child: Text(
+            '${durationNotation(gameState.energy.count)}/${durationNotation(gameState.energy.max)}',
+            style: const TextStyle(color: Colors.white, fontSize: 14),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 }
 
-class SpaceCurrency extends StatelessWidget {
+class SpaceCurrency extends ConsumerWidget {
   const SpaceCurrency({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<GameState>(
-      builder: (context, gameState, child) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Constants.spaceIcon, color: Colors.blueAccent, size: 20),
-            const SizedBox(width: 4),
-            Flexible(
-              child: Text(
-                '${toLettersNotation(gameState.space.count)}/${toLettersNotation(gameState.space.max)}',
-                style: const TextStyle(color: Colors.white, fontSize: 14),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        );
-      },
+  Widget build(BuildContext context, WidgetRef ref) {
+    final gameState = ref.watch(gameStateProvider);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Constants.spaceIcon, color: Colors.blueAccent, size: 20),
+        const SizedBox(width: 4),
+        Flexible(
+          child: Text(
+            '${toLettersNotation(gameState.space.count)}/${toLettersNotation(gameState.space.max)}',
+            style: const TextStyle(color: Colors.white, fontSize: 14),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:idlefit/util.dart';
 import 'common_card.dart';
 
-class GeneratorUpgradeCard extends StatelessWidget {
-  final GameState gameState;
+class GeneratorUpgradeCard extends ConsumerWidget {
   final CoinGenerator generator;
 
-  const GeneratorUpgradeCard({
-    super.key,
-    required this.gameState,
-    required this.generator,
-  });
+  const GeneratorUpgradeCard({super.key, required this.generator});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final gameState = ref.watch(gameStateProvider);
+    final gameStateNotifier = ref.read(gameStateProvider.notifier);
+
     final additionalInfo = <Widget>[
       Row(
         children: [
@@ -56,7 +55,7 @@ class GeneratorUpgradeCard extends StatelessWidget {
         buttonText: 'Unlock',
         onButtonPressed:
             gameState.space.count >= generator.upgradeUnlockCost
-                ? () => gameState.unlockGenerator(generator)
+                ? () => gameStateNotifier.unlockGenerator(generator)
                 : null,
       );
     }
@@ -74,7 +73,7 @@ class GeneratorUpgradeCard extends StatelessWidget {
       onButtonPressed:
           (isMaxLevel || gameState.coins.count < generator.upgradeCost)
               ? null
-              : () => gameState.upgradeGenerator(generator),
+              : () => gameStateNotifier.upgradeGenerator(generator),
     );
   }
 }

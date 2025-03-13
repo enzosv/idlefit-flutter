@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:idlefit/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'services/game_state.dart';
 import 'screens/main_screen.dart';
 import 'screens/stats_screen.dart';
@@ -12,6 +12,15 @@ import 'services/object_box.dart';
 import 'widgets/background_earnings_popup.dart';
 import 'services/ad_service.dart';
 import 'services/notification_service.dart';
+
+// Create providers for our services
+final healthServiceProvider = Provider<HealthService>((ref) => HealthService());
+final objectBoxProvider = Provider<ObjectBox>(
+  (ref) => throw UnimplementedError('Initialize in main'),
+);
+final storageServiceProvider = Provider<StorageService>(
+  (ref) => throw UnimplementedError('Initialize in main'),
+);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,17 +34,13 @@ void main() async {
   // Initialize notifications
   await NotificationService.initialize();
 
-  // Load game state
-  final gameState = GameState();
-  await gameState.initialize(storageService, objectBox.store);
-
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: gameState),
-        Provider.value(value: healthService),
-        Provider.value(value: storageService),
-        Provider.value(value: objectBox),
+    ProviderScope(
+      overrides: [
+        // Override the providers with initialized instances
+        healthServiceProvider.overrideWithValue(healthService),
+        objectBoxProvider.overrideWithValue(objectBox),
+        storageServiceProvider.overrideWithValue(storageService),
       ],
       child: const MyApp(),
     ),
@@ -66,19 +71,60 @@ class MyApp extends StatelessWidget {
         /* dark theme settings */
       ),
       themeMode: ThemeMode.dark,
-      home: const GameHomePage(),
+      home: const GameInitializer(),
     );
   }
 }
 
-class GameHomePage extends StatefulWidget {
+// A widget to initialize the game state before showing the home page
+class GameInitializer extends ConsumerStatefulWidget {
+  const GameInitializer({super.key});
+
+  @override
+  ConsumerState<GameInitializer> createState() => _GameInitializerState();
+}
+
+class _GameInitializerState extends ConsumerState<GameInitializer> {
+  bool _isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeGameState();
+  }
+
+  Future<void> _initializeGameState() async {
+    final storageService = ref.read(storageServiceProvider);
+    final objectBox = ref.read(objectBoxProvider);
+
+    // Initialize the game state
+    await ref
+        .read(gameStateProvider.notifier)
+        .initialize(storageService, objectBox.store);
+
+    setState(() {
+      _isInitialized = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_isInitialized) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    return const GameHomePage();
+  }
+}
+
+class GameHomePage extends ConsumerStatefulWidget {
   const GameHomePage({super.key});
 
   @override
-  _GameHomePageState createState() => _GameHomePageState();
+  ConsumerState<GameHomePage> createState() => _GameHomePageState();
 }
 
-class _GameHomePageState extends State<GameHomePage>
+class _GameHomePageState extends ConsumerState<GameHomePage>
     with WidgetsBindingObserver {
   int _selectedIndex = 1; // Start with main screen
 
@@ -97,20 +143,24 @@ class _GameHomePageState extends State<GameHomePage>
     ].contains(state)) {
       return;
     }
-    final gameState = Provider.of<GameState>(context, listen: false);
+    final gameStateNotifier = ref.read(gameStateProvider.notifier);
+
     if (state == AppLifecycleState.paused) {
       // going to background
-      gameState.isPaused = true;
-      gameState.save();
-      gameState.saveBackgroundState();
+      gameStateNotifier.setIsPaused(true);
+      gameStateNotifier.save();
+      gameStateNotifier.saveBackgroundState();
       return;
     }
     // going to foreground
-    final healthService = Provider.of<HealthService>(context, listen: false);
-    final objectBoxService = Provider.of<ObjectBox>(context, listen: false);
+    final healthService = ref.read(healthServiceProvider);
+    final objectBoxService = ref.read(objectBoxProvider);
+    final gameState = ref.read(gameStateProvider);
+
     await healthService.syncHealthData(objectBoxService, gameState);
     NotificationService.cancelAllNotifications();
-    gameState.isPaused = false;
+    gameStateNotifier.setIsPaused(false);
+
     await Future.delayed(const Duration(seconds: 1)).then((_) {
       if (!mounted) {
         return;
@@ -130,16 +180,21 @@ class _GameHomePageState extends State<GameHomePage>
   void initState() {
     super.initState();
     // Initialize health data
-    final healthService = Provider.of<HealthService>(context, listen: false);
-    final gameState = Provider.of<GameState>(context, listen: false);
-    final objectBoxService = Provider.of<ObjectBox>(context, listen: false);
-    gameState.isPaused = true;
+    final healthService = ref.read(healthServiceProvider);
+    final gameStateNotifier = ref.read(gameStateProvider.notifier);
+    final objectBoxService = ref.read(objectBoxProvider);
+    final gameState = ref.read(gameStateProvider);
+
+    gameStateNotifier.setIsPaused(true);
+
     // Initialize ads
     AdService.initialize();
+
     healthService.initialize().then((_) async {
       await healthService.syncHealthData(objectBoxService, gameState);
-      gameState.isPaused = false;
+      gameStateNotifier.setIsPaused(false);
     });
+
     WidgetsBinding.instance.addObserver(this);
   }
 

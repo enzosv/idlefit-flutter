@@ -1,21 +1,21 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:idlefit/services/ad_service.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/game_state.dart';
 import '../models/shop_items.dart';
 import 'common_card.dart';
 
-class DoubleCoinsCard extends StatefulWidget {
+class DoubleCoinsCard extends ConsumerStatefulWidget {
   final ShopItem item;
 
   const DoubleCoinsCard({super.key, required this.item});
 
   @override
-  State<DoubleCoinsCard> createState() => _DoubleCoinsCardState();
+  ConsumerState<DoubleCoinsCard> createState() => _DoubleCoinsCardState();
 }
 
-class _DoubleCoinsCardState extends State<DoubleCoinsCard> {
+class _DoubleCoinsCardState extends ConsumerState<DoubleCoinsCard> {
   Timer? _timer;
   int _timeLeft = 0;
 
@@ -43,7 +43,7 @@ class _DoubleCoinsCardState extends State<DoubleCoinsCard> {
   }
 
   void _updateTimeLeft() {
-    final gameState = Provider.of<GameState>(context, listen: false);
+    final gameState = ref.read(gameStateProvider);
     final now = DateTime.now().millisecondsSinceEpoch;
     final isActive = gameState.doubleCoinExpiry > now;
 
@@ -58,13 +58,18 @@ class _DoubleCoinsCardState extends State<DoubleCoinsCard> {
     }
   }
 
-  void _watchAd(GameState gameState) {
+  void _watchAd() {
+    final gameStateNotifier = ref.read(gameStateProvider.notifier);
+    final gameState = ref.read(gameStateProvider);
+
     AdService.showRewardedAd(
       onRewarded: () {
+        // Update via the notifier
         gameState.doubleCoinExpiry =
             DateTime.now()
                 .add(const Duration(minutes: 1))
                 .millisecondsSinceEpoch;
+        gameStateNotifier.update();
         _startTimer();
       },
       onAdDismissed: () {
@@ -78,7 +83,7 @@ class _DoubleCoinsCardState extends State<DoubleCoinsCard> {
 
   @override
   Widget build(BuildContext context) {
-    final gameState = Provider.of<GameState>(context);
+    final gameState = ref.watch(gameStateProvider);
     final now = DateTime.now().millisecondsSinceEpoch;
     final isActive = gameState.doubleCoinExpiry > now;
     final minutes = _timeLeft ~/ 60;
@@ -97,7 +102,7 @@ class _DoubleCoinsCardState extends State<DoubleCoinsCard> {
               ]
               : [],
       buttonText: isActive ? 'ACTIVE' : 'Watch Ad',
-      onButtonPressed: isActive ? null : () => _watchAd(gameState),
+      onButtonPressed: isActive ? null : () => _watchAd(),
     );
   }
 }
