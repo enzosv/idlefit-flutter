@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/services/game_state_notifier.dart';
 import '../constants.dart';
-import '../services/game_state.dart';
 import '../util.dart';
-import '../models/shop_items.dart';
 
 class GameStatsCard extends StatelessWidget {
   const GameStatsCard({super.key});

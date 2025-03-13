@@ -19,7 +19,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
   Timer? _autoSaveTimer;
   Timer? _generatorTimer;
 
-  GameStateNotifier(GameState state) : super(state) {
+  GameStateNotifier(super.state) {
     print("starting timers");
     _startAutoSave();
     _startGenerators();

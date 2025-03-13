@@ -1,17 +1,11 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:idlefit/constants.dart';
-import 'package:idlefit/main.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/shop_items_repo.dart';
 import 'package:idlefit/models/currency_repo.dart';
-import 'package:idlefit/util.dart';
 import 'package:objectbox/objectbox.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'storage_service.dart';
 import '../models/shop_items.dart';
-import 'dart:math';
 import 'notification_service.dart';
 
 class GameState {

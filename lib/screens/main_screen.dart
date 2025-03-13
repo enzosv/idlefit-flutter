@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
 import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:idlefit/widgets/generator_card.dart';
-import '../services/game_state.dart';
 import '../widgets/common_widgets.dart';
 
 class FlameBackground extends FlameGame {

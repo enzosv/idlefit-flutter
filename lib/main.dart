@@ -3,7 +3,6 @@ import 'package:idlefit/constants.dart';
 import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'services/game_state.dart';
 import 'screens/main_screen.dart';
 import 'screens/stats_screen.dart';
 import 'screens/shop_screen.dart';

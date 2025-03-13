@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/services/game_state_notifier.dart';
-import 'package:idlefit/services/object_box.dart';
 import 'package:idlefit/main.dart'; // Import providers from main.dart
 import '../models/achievement.dart';
 import '../models/achievement_repo.dart';
 import '../models/health_data_repo.dart';
 import '../models/health_data_entry.dart';
-import '../services/game_state.dart';
 import 'achievement_card.dart';
 
 class AchievementList extends ConsumerStatefulWidget {

@@ -3,10 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/health_data_entry.dart';
 import 'package:idlefit/models/health_data_repo.dart';
 import 'package:idlefit/services/game_state_notifier.dart';
-import 'package:idlefit/services/object_box.dart';
 import 'package:idlefit/util.dart';
-import 'package:idlefit/services/health_service.dart';
-import 'package:idlefit/services/game_state.dart';
 import 'package:idlefit/widgets/card_button.dart';
 import 'package:idlefit/main.dart'; // Import providers from main.dart
 

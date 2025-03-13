@@ -5,7 +5,6 @@ import 'package:idlefit/models/health_data_entry.dart';
 import 'package:idlefit/models/health_data_repo.dart';
 import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:idlefit/services/object_box.dart';
-import 'game_state.dart';
 import 'dart:math';
 
 class HealthService {

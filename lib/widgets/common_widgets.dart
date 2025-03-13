@@ -3,9 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
 import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:idlefit/widgets/current_coins.dart';
-import '../services/game_state.dart';
 import '../util.dart';
-import '../models/shop_items.dart';
 
 class CoinsInfo extends ConsumerWidget {
   const CoinsInfo({super.key});
