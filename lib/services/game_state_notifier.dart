@@ -160,10 +160,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
     _save();
   }
 
-  void saveBackgroundState() {
-    _scheduleCoinCapacityNotification();
-  }
-
   @override
   void dispose() {
     _generatorTimer?.cancel();
@@ -195,7 +191,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     _save();
   }
 
-  void _scheduleCoinCapacityNotification() {
+  void scheduleCoinCapacityNotification() {
     if (state.coins.count >= state.coins.max) return;
 
     final coinsToFill = state.coins.max - state.coins.count;

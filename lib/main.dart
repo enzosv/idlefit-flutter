@@ -147,10 +147,8 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
 
     if (state == AppLifecycleState.paused) {
       // going to background
-      // gameStateNotifier
       gameStateNotifier.setIsPaused(true);
-      // gameStateNotifier.save();
-      // gameStateNotifier.saveBackgroundState();
+      gameStateNotifier.scheduleCoinCapacityNotification();
       return;
     }
     // going to foreground
