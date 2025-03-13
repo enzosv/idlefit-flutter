@@ -106,12 +106,6 @@ class GameState {
     };
   }
 
-  void save() {
-    storageService.saveGameState(toJson());
-    currencyRepo.saveCurrencies([coins, energy, gems, space]);
-    // not saving generators and shopitems. only changes on buy anyway
-  }
-
   double get passiveOutput {
     double output = coinGenerators.fold(
       0,
@@ -131,15 +125,20 @@ class GameState {
   }
 
   int calculateValidTimeSinceLastGenerate(int now, int previous) {
-    if (energy.count <= 0 || previous <= 0) {
+    if (previous <= 0) {
+      return Constants.tickTime;
+    }
+    final dif = now - previous;
+    if (dif < 0) {
       return Constants.tickTime;
     }
 
-    int dif = now - previous;
     if (dif < Constants.inactiveThreshold) {
+      // even if app became inactive, it wasn't long enough. don't limit to energy
       return dif;
     }
 
+    // limit to energy
     return min(dif, energy.count.round());
   }
 

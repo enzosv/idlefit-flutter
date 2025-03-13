@@ -64,7 +64,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
   void setIsPaused(bool isPaused) {
     state = state.copyWith(isPaused: isPaused);
-    // state.save();
+    // _save();
   }
 
   void _startGenerators() {
@@ -72,6 +72,17 @@ class GameStateNotifier extends StateNotifier<GameState> {
     _generatorTimer = Timer.periodic(duration, (_) {
       _processGenerators();
     });
+  }
+
+  void _save() {
+    state.storageService.saveGameState(state.toJson());
+    state.currencyRepo.saveCurrencies([
+      state.coins,
+      state.energy,
+      state.gems,
+      state.space,
+    ]);
+    // not saving generators and shopitems. only changes on buy anyway
   }
 
   void _processGenerators() {
@@ -94,12 +105,10 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
     var newState = state;
     if (realDif > Constants.inactiveThreshold && dif > Constants.tickTime) {
-      // consume energy
-      final newEnergy = newState.energy.spend(dif.toDouble());
-      assert(newEnergy != null, "energy spent is more than available");
       // reduce coins generated offline
       coinsGenerated *= state.offlineCoinMultiplier;
-
+      // consume energy
+      final newEnergy = newState.energy.spend(dif.toDouble());
       // track energy spent for popup
       final newBackgroundState = Map<String, double>.from(
         state.backgroundState,
@@ -116,7 +125,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     // earn coins
     final newCoins = newState.coins.earn(coinsGenerated);
     state = newState.copyWith(coins: newCoins, lastGenerated: now);
-    state.save();
+    _save();
   }
 
   void convertHealthStats(
@@ -146,7 +155,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
       backgroundState: newBackgroundState,
     );
 
-    state.save();
+    _save();
   }
 
   void saveBackgroundState() {
@@ -177,12 +186,12 @@ class GameStateNotifier extends StateNotifier<GameState> {
       default:
         return;
     }
-    state.save();
+    _save();
   }
 
   void setDoubleCoinExpiry(int expiry) {
     state = state.copyWith(doubleCoinExpiry: expiry);
-    state.save();
+    _save();
   }
 
   void _scheduleCoinCapacityNotification() {
@@ -210,7 +219,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
   bool buyCoinGenerator(CoinGenerator generator) {
     final newCoins = state.coins.spend(generator.cost);
-    if (newCoins == null) return false;
 
     var newState = state.copyWith(coins: newCoins);
 
@@ -241,7 +249,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     state.generatorRepo.saveCoinGenerator(generator);
 
     state = newState;
-    state.save();
+    _save();
     return true;
   }
 
@@ -249,7 +257,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
     if (item.id == 4 || item.level >= item.maxLevel) return false;
 
     final newSpace = state.space.spend(item.currentCost.toDouble());
-    if (newSpace == null) return false;
 
     item.level++;
     var newState = state.copyWith(space: newSpace);
@@ -284,7 +291,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
     state = newState;
     state.shopItemRepo.saveShopItem(item);
-    state.save();
+    _save();
     return true;
   }
 
@@ -298,7 +305,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     state.generatorRepo.saveCoinGenerator(generator);
 
     state = state.copyWith(space: newSpace);
-    state.save();
+    _save();
     return true;
   }
 
@@ -306,13 +313,11 @@ class GameStateNotifier extends StateNotifier<GameState> {
     if (generator.count < 10 || !generator.isUnlocked) return false;
 
     final newCoins = state.coins.spend(generator.upgradeCost);
-    if (newCoins == null) return false;
-
     generator.level++;
     state.generatorRepo.saveCoinGenerator(generator);
 
     state = state.copyWith(coins: newCoins);
-    state.save();
+    _save();
     return true;
   }
 }

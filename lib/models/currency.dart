@@ -61,9 +61,9 @@ class Currency {
     return copyWith(count: count + amount, totalEarned: totalEarned + amount);
   }
 
-  Currency? spend(double amount) {
+  Currency spend(double amount) {
     if (count < amount) {
-      return null;
+      assert(false, "spend amount is more than available");
     }
     return copyWith(count: count - amount, totalSpent: totalSpent + amount);
   }
