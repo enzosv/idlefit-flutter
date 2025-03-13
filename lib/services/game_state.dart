@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:idlefit/constants.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/shop_items_repo.dart';
@@ -7,7 +6,6 @@ import 'package:idlefit/models/currency_repo.dart';
 import 'package:idlefit/services/storage_service.dart';
 import 'package:objectbox/objectbox.dart';
 import '../models/shop_items.dart';
-import 'notification_service.dart';
 
 class GameState {
   final bool isPaused;
@@ -120,39 +118,6 @@ class GameState {
     _autoSaveTimer = Timer.periodic(const Duration(minutes: 1), (_) {
       save();
     });
-  }
-
-  void saveBackgroundState() {
-    backgroundState['coins'] = coins.count;
-    backgroundState['energySpent'] = 0;
-    backgroundState['energy'] = 0;
-    backgroundState['space'] = 0;
-
-    // Schedule notification for when coins will reach capacity
-    _scheduleCoinCapacityNotification();
-  }
-
-  void _scheduleCoinCapacityNotification() {
-    if (coins.count >= coins.max) return;
-
-    final coinsToFill = coins.max - coins.count;
-    final effectiveOutput = passiveOutput * offlineCoinMultiplier;
-    if (effectiveOutput <= 0) return;
-
-    final secondsToFill = coinsToFill / effectiveOutput;
-    if (secondsToFill <= 0) return;
-
-    final notificationTime = DateTime.now().add(
-      Duration(seconds: secondsToFill.ceil()),
-    );
-
-    NotificationService.scheduleCoinCapacityNotification(
-      id: Constants.notificationId,
-      scheduledDate: notificationTime,
-      title: 'Coin Capacity Full',
-      body:
-          'Your coins have reached maximum capacity! Time to upgrade or spend.',
-    );
   }
 
   double get passiveOutput {

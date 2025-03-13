@@ -18,7 +18,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
   Timer? _generatorTimer;
 
   GameStateNotifier(super.state) {
-    print("starting timers");
     _startAutoSave();
     _startGenerators();
   }
@@ -81,7 +80,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
     _generatorTimer = Timer.periodic(duration, (_) {
       _processGenerators();
     });
-    print("started generator");
   }
 
   void _processGenerators() {
