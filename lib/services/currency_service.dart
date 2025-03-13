@@ -1,98 +1,85 @@
+import 'package:idlefit/repositories/currency_repo.dart';
 import 'package:idlefit/models/currency.dart';
-import 'package:idlefit/models/currency_repo.dart';
 
 class CurrencyService {
   static const _calorieToEnergyMultiplier =
       72000.0; // 1 calorie = 72 seconds of idle fuel
 
-  late final Currency coins;
-  late final Currency gems;
-  late final Currency energy;
-  late final Currency space;
-
   final CurrencyRepo _currencyRepo;
+  late Currency _coins;
+  late Currency _gems;
+  late Currency _energy;
+  late Currency _space;
 
   CurrencyService({required CurrencyRepo currencyRepo})
     : _currencyRepo = currencyRepo;
 
   Future<void> initialize() async {
-    // Ensure default currencies exist and load them
+    // Ensure default currencies exist
     _currencyRepo.ensureDefaultCurrencies();
+
+    // Load currencies
     final currencies = _currencyRepo.loadCurrencies();
-    coins = currencies[CurrencyType.coin]!;
-    gems = currencies[CurrencyType.gem]!;
-    energy = currencies[CurrencyType.energy]!;
-    space = currencies[CurrencyType.space]!;
+    _coins = currencies[CurrencyType.coin]!;
+    _gems = currencies[CurrencyType.gem]!;
+    _energy = currencies[CurrencyType.energy]!;
+    _space = currencies[CurrencyType.space]!;
   }
 
+  // Getters for currencies
+  Currency get coins => _coins;
+  Currency get gems => _gems;
+  Currency get energy => _energy;
+  Currency get space => _space;
+
+  // Save all currencies
   void saveCurrencies() {
-    _currencyRepo.saveCurrencies([coins, energy, gems, space]);
+    _currencyRepo.saveCurrencies([_coins, _gems, _energy, _space]);
   }
 
   // Coin operations
-  bool canSpendCoins(double amount) {
-    return coins.count >= amount;
-  }
-
-  void spendCoins(double amount) {
-    coins.spend(amount);
-  }
-
-  void earnCoins(double amount) {
-    coins.earn(amount);
-  }
-
-  void updateCoinMax(double newMax) {
-    coins.baseMax = newMax;
-  }
-
-  void increaseCoinMaxMultiplier(double amount) {
-    coins.maxMultiplier += amount;
-  }
+  bool canSpendCoins(double amount) => _coins.count >= amount;
+  void earnCoins(double amount) => _coins.earn(amount);
+  bool spendCoins(double amount) => _coins.spend(amount);
+  void updateCoinMax(double newMax) => _coins.baseMax = newMax;
+  void increaseCoinMaxMultiplier(double multiplier) =>
+      _coins.maxMultiplier += multiplier;
 
   // Gem operations
-  void earnGems(double amount) {
-    gems.earn(amount);
-  }
-
-  void increaseGemMax(double amount) {
-    gems.baseMax += amount;
-  }
+  bool canSpendGems(double amount) => _gems.count >= amount;
+  void earnGems(double amount) => _gems.earn(amount);
+  bool spendGems(double amount) => _gems.spend(amount);
+  void increaseGemMax(double amount) => _gems.baseMax += amount;
 
   // Energy operations
-  void spendEnergy(double amount) {
-    energy.spend(amount);
-  }
-
-  double convertCaloriesToEnergy(double calories) {
-    return energy.earn(calories * _calorieToEnergyMultiplier);
-  }
-
-  void increaseEnergyMaxMultiplier(double amount) {
-    energy.maxMultiplier += amount;
-  }
-
+  bool canSpendEnergy(double amount) => _energy.count >= amount;
+  void earnEnergy(double amount) => _energy.earn(amount);
+  bool spendEnergy(double amount) => _energy.spend(amount);
+  void increaseEnergyMaxMultiplier(double multiplier) =>
+      _energy.maxMultiplier += multiplier;
   void increaseEnergyMaxIfBelowLimit() {
-    if (energy.baseMax < 86400000) {
-      // 24 hours in milliseconds
-      energy.baseMax += 3600000; // 1 hour in milliseconds
+    const maxEnergyHours = 24;
+    const hourInMillis = 3600;
+    if (_energy.baseMax < maxEnergyHours * hourInMillis) {
+      _energy.baseMax += hourInMillis;
     }
   }
 
   // Space operations
-  bool canSpendSpace(double amount) {
-    return space.count >= amount;
-  }
-
-  void spendSpace(double amount) {
-    space.spend(amount);
-  }
-
+  bool canSpendSpace(double amount) => _space.count >= amount;
   double earnSpace(double amount) {
-    return space.earn(amount);
+    return _space.earn(amount);
   }
 
-  void increaseSpaceMaxMultiplier(double amount) {
-    space.maxMultiplier += amount;
+  bool spendSpace(double amount) => _space.spend(amount);
+  void increaseSpaceMaxMultiplier(double multiplier) =>
+      _space.maxMultiplier += multiplier;
+
+  // Convert calories to energy
+  double convertCaloriesToEnergy(double calories) {
+    // 1 calorie = 1 second of energy
+    final energyGained = calories;
+    _energy.earn(energyGained);
+    return energyGained;
   }
 }

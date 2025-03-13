@@ -1,6 +1,6 @@
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/shop_items.dart';
-import 'package:idlefit/models/shop_items_repo.dart';
+import 'package:idlefit/repositories/shop_items_repo.dart';
 
 class GeneratorService {
   List<CoinGenerator> coinGenerators = [];

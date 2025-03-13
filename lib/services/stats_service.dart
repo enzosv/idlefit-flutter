@@ -1,17 +1,13 @@
 import 'package:idlefit/models/daily_quest.dart';
-import 'package:idlefit/models/game_stats.dart';
-import 'package:idlefit/models/game_stats_repo.dart';
 import 'package:idlefit/models/time_based_stats.dart';
-import 'package:idlefit/models/time_based_stats_repo.dart';
+import 'package:idlefit/repositories/time_based_stats_repo.dart';
+import 'package:idlefit/services/stats_aggregation_service.dart';
 import 'package:objectbox/objectbox.dart';
 
 class StatsService {
   final DailyQuestRepo _dailyQuestRepo;
-  final GameStatsRepo _gameStatsRepo;
   final TimeBasedStatsRepo _timeBasedStatsRepo;
-
-  // In-memory game statistics
-  late GameStats _gameStats;
+  final StatsAggregationService _statsAggregationService;
 
   // In-memory time-based statistics
   late TimeBasedStats _dailyStats;
@@ -20,13 +16,13 @@ class StatsService {
 
   StatsService({
     required DailyQuestRepo dailyQuestRepo,
-    required GameStatsRepo gameStatsRepo,
     required TimeBasedStatsRepo timeBasedStatsRepo,
   }) : _dailyQuestRepo = dailyQuestRepo,
-       _gameStatsRepo = gameStatsRepo,
-       _timeBasedStatsRepo = timeBasedStatsRepo {
+       _timeBasedStatsRepo = timeBasedStatsRepo,
+       _statsAggregationService = StatsAggregationService(
+         timeBasedStatsRepo: timeBasedStatsRepo,
+       ) {
     // Load stats from repositories
-    _gameStats = _gameStatsRepo.getOrCreateStats();
     _dailyStats = _timeBasedStatsRepo.getOrCreateDailyStats();
     _weeklyStats = _timeBasedStatsRepo.getOrCreateWeeklyStats();
     _monthlyStats = _timeBasedStatsRepo.getOrCreateMonthlyStats();
@@ -34,9 +30,6 @@ class StatsService {
 
   // Track generator interactions
   void trackManualGeneratorClick(int generatorTier) {
-    // Update all-time stats
-    _gameStats.manualGeneratorClicks++;
-
     // Update time-based stats
     _dailyStats.manualGeneratorClicks++;
     _weeklyStats.manualGeneratorClicks++;
@@ -46,9 +39,6 @@ class StatsService {
   }
 
   void trackGeneratorPurchase(int tier) {
-    // Update all-time stats
-    _gameStats.generatorsPurchased++;
-
     // Update time-based stats
     _dailyStats.generatorsPurchased++;
     _weeklyStats.generatorsPurchased++;
@@ -63,9 +53,6 @@ class StatsService {
   }
 
   void trackGeneratorUpgrade(int tier) {
-    // Update all-time stats
-    _gameStats.generatorsUpgraded++;
-
     // Update time-based stats
     _dailyStats.generatorsUpgraded++;
     _weeklyStats.generatorsUpgraded++;
@@ -80,9 +67,6 @@ class StatsService {
   }
 
   void trackGeneratorUnlock(int tier) {
-    // Update all-time stats
-    _gameStats.generatorsUnlocked++;
-
     // Update time-based stats
     _dailyStats.generatorsUnlocked++;
     _weeklyStats.generatorsUnlocked++;
@@ -98,9 +82,6 @@ class StatsService {
 
   // Track shop interactions
   void trackShopItemUpgrade(int itemId) {
-    // Update all-time stats
-    _gameStats.shopItemsUpgraded++;
-
     // Update time-based stats
     _dailyStats.shopItemsUpgraded++;
     _weeklyStats.shopItemsUpgraded++;
@@ -116,24 +97,18 @@ class StatsService {
 
   // Track currency earnings
   void trackPassiveCoinsEarned(double amount) {
-    // Update all-time stats
-    _gameStats.passiveCoinsEarned += amount;
-
     // Update time-based stats
     _dailyStats.passiveCoinsEarned += amount;
     _weeklyStats.passiveCoinsEarned += amount;
     _monthlyStats.passiveCoinsEarned += amount;
 
     // Save less frequently for passive earnings to avoid excessive writes
-    if (_gameStats.passiveCoinsEarned % 1000 < amount) {
+    if (_dailyStats.passiveCoinsEarned % 1000 < amount) {
       _saveStats();
     }
   }
 
   void trackManualCoinsEarned(double amount) {
-    // Update all-time stats
-    _gameStats.manualCoinsEarned += amount;
-
     // Update time-based stats
     _dailyStats.manualCoinsEarned += amount;
     _weeklyStats.manualCoinsEarned += amount;
@@ -144,9 +119,6 @@ class StatsService {
 
   // Track ad interactions
   void trackAdView() {
-    // Update all-time stats
-    _gameStats.adViewCount++;
-
     // Update time-based stats
     _dailyStats.adViewCount++;
     _weeklyStats.adViewCount++;
@@ -161,11 +133,6 @@ class StatsService {
     double calories,
     double exerciseMinutes,
   ) {
-    // Update all-time stats
-    _gameStats.totalSteps += steps;
-    _gameStats.totalCalories += calories;
-    _gameStats.totalExerciseMinutes += exerciseMinutes;
-
     // Update time-based stats
     _dailyStats.steps += steps;
     _dailyStats.calories += calories;
@@ -191,7 +158,7 @@ class StatsService {
 
   // Get all-time statistics as a map for display
   Map<String, dynamic> getStats() {
-    return _gameStats.toMap();
+    return _statsAggregationService.getAllTimeStats();
   }
 
   // Get daily statistics
@@ -233,12 +200,22 @@ class StatsService {
     return statsList.map((stats) => stats.toMap()).toList();
   }
 
+  // Get stats for a specific time range
+  Map<String, dynamic> getStatsForTimeRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) {
+    return _statsAggregationService.getStatsForTimeRange(startDate, endDate);
+  }
+
   // Reset all stats (for testing or user-initiated reset)
   void resetStats() {
-    _gameStatsRepo.resetStats();
-    _gameStats = _gameStatsRepo.getOrCreateStats();
+    _timeBasedStatsRepo.deleteAllStats();
 
-    // We don't reset time-based stats here, as they're historical
+    // Recreate the current period stats
+    _dailyStats = _timeBasedStatsRepo.getOrCreateDailyStats();
+    _weeklyStats = _timeBasedStatsRepo.getOrCreateWeeklyStats();
+    _monthlyStats = _timeBasedStatsRepo.getOrCreateMonthlyStats();
   }
 
   // Check if we need to roll over to new time periods
@@ -264,7 +241,6 @@ class StatsService {
 
   // Private helper to save all stats
   void _saveStats() {
-    _gameStatsRepo.saveStats(_gameStats);
     _timeBasedStatsRepo.saveStats(_dailyStats);
     _timeBasedStatsRepo.saveStats(_weeklyStats);
     _timeBasedStatsRepo.saveStats(_monthlyStats);

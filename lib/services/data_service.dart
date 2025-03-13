@@ -1,13 +1,12 @@
 import 'package:idlefit/models/currency.dart';
-import 'package:idlefit/models/currency_repo.dart';
-import 'package:idlefit/models/game_stats.dart';
-import 'package:idlefit/models/game_stats_repo.dart';
+import 'package:idlefit/repositories/currency_repo.dart';
 import 'package:idlefit/models/time_based_stats.dart';
-import 'package:idlefit/models/time_based_stats_repo.dart';
+import 'package:idlefit/repositories/time_based_stats_repo.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/shop_items.dart';
-import 'package:idlefit/models/shop_items_repo.dart';
+import 'package:idlefit/repositories/shop_items_repo.dart';
 import 'package:idlefit/models/daily_quest.dart';
+import 'package:idlefit/services/stats_aggregation_service.dart';
 import 'package:objectbox/objectbox.dart';
 
 /// A unified service for managing all data repositories
@@ -15,14 +14,15 @@ import 'package:objectbox/objectbox.dart';
 class DataService {
   // Repositories
   final CurrencyRepo currencyRepo;
-  final GameStatsRepo gameStatsRepo;
   final TimeBasedStatsRepo timeBasedStatsRepo;
   final CoinGeneratorRepo generatorRepo;
   final ShopItemsRepo shopItemRepo;
   final DailyQuestRepo dailyQuestRepo;
 
+  // Services
+  late final StatsAggregationService statsAggregationService;
+
   // In-memory cache
-  late GameStats _gameStats;
   late TimeBasedStats _dailyStats;
   late TimeBasedStats _weeklyStats;
   late TimeBasedStats _monthlyStats;
@@ -32,17 +32,19 @@ class DataService {
 
   DataService({
     required this.currencyRepo,
-    required this.gameStatsRepo,
     required this.timeBasedStatsRepo,
     required this.generatorRepo,
     required this.shopItemRepo,
     required this.dailyQuestRepo,
-  });
+  }) {
+    statsAggregationService = StatsAggregationService(
+      timeBasedStatsRepo: timeBasedStatsRepo,
+    );
+  }
 
   /// Initialize all data
   Future<void> initialize() async {
     // Load stats
-    _gameStats = gameStatsRepo.getOrCreateStats();
     _dailyStats = timeBasedStatsRepo.getOrCreateDailyStats();
     _weeklyStats = timeBasedStatsRepo.getOrCreateWeeklyStats();
     _monthlyStats = timeBasedStatsRepo.getOrCreateMonthlyStats();
@@ -68,13 +70,15 @@ class DataService {
   }
 
   // Stats access
-  GameStats get gameStats => _gameStats;
+  Map<String, dynamic> getAllTimeStats() {
+    return statsAggregationService.getAllTimeStats();
+  }
+
   TimeBasedStats get dailyStats => _dailyStats;
   TimeBasedStats get weeklyStats => _weeklyStats;
   TimeBasedStats get monthlyStats => _monthlyStats;
 
   void saveStats() {
-    gameStatsRepo.saveStats(_gameStats);
     timeBasedStatsRepo.saveStats(_dailyStats);
     timeBasedStatsRepo.saveStats(_weeklyStats);
     timeBasedStatsRepo.saveStats(_monthlyStats);
@@ -129,5 +133,23 @@ class DataService {
   List<Map<String, dynamic>> getStatsForLastNMonths(int months) {
     final statsList = timeBasedStatsRepo.getStatsForLastNMonths(months);
     return statsList.map((stats) => stats.toMap()).toList();
+  }
+
+  // Get stats for a specific time range
+  Map<String, dynamic> getStatsForTimeRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) {
+    return statsAggregationService.getStatsForTimeRange(startDate, endDate);
+  }
+
+  // Reset all stats
+  void resetStats() {
+    timeBasedStatsRepo.deleteAllStats();
+
+    // Recreate the current period stats
+    _dailyStats = timeBasedStatsRepo.getOrCreateDailyStats();
+    _weeklyStats = timeBasedStatsRepo.getOrCreateWeeklyStats();
+    _monthlyStats = timeBasedStatsRepo.getOrCreateMonthlyStats();
   }
 }

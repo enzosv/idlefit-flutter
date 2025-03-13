@@ -1,5 +1,5 @@
 import 'package:idlefit/models/time_based_stats.dart';
-import 'package:idlefit/models/base_stats_repo.dart';
+import 'package:idlefit/repositories/base_stats_repo.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:intl/intl.dart';
 

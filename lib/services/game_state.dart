@@ -3,12 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/daily_quest.dart';
-import 'package:idlefit/models/game_stats.dart';
-import 'package:idlefit/models/game_stats_repo.dart';
-import 'package:idlefit/models/shop_items_repo.dart';
-import 'package:idlefit/models/currency_repo.dart';
 import 'package:idlefit/models/time_based_stats.dart';
-import 'package:idlefit/models/time_based_stats_repo.dart';
+import 'package:idlefit/repositories/time_based_stats_repo.dart';
+import 'package:idlefit/repositories/shop_items_repo.dart';
+import 'package:idlefit/repositories/currency_repo.dart';
 import 'package:idlefit/services/generator_service.dart';
 import 'package:idlefit/services/currency_service.dart';
 import 'package:idlefit/services/stats_service.dart';
@@ -76,7 +74,6 @@ class GameState with ChangeNotifier {
 
     _statsService = StatsService(
       dailyQuestRepo: DailyQuestRepo(box: objectBoxService.box<DailyQuest>()),
-      gameStatsRepo: GameStatsRepo(box: objectBoxService.box<GameStats>()),
       timeBasedStatsRepo: TimeBasedStatsRepo(
         box: objectBoxService.box<TimeBasedStats>(),
       ),
@@ -156,6 +153,7 @@ class GameState with ChangeNotifier {
     if (isPaused) {
       return;
     }
+
     int now = DateTime.now().millisecondsSinceEpoch;
     final realDif = now - lastGenerated;
     final availableDif = validTimeSinceLastGenerate(now, lastGenerated);
@@ -419,6 +417,14 @@ class GameState with ChangeNotifier {
   // Get stats for the last N months
   List<Map<String, dynamic>> getStatsForLastNMonths(int months) {
     return _statsService.getStatsForLastNMonths(months);
+  }
+
+  // Get stats for a specific time range
+  Map<String, dynamic> getStatsForTimeRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) {
+    return _statsService.getStatsForTimeRange(startDate, endDate);
   }
 
   // Reset all game statistics

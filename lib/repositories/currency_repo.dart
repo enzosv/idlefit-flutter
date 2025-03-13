@@ -1,5 +1,5 @@
 import 'package:idlefit/models/currency.dart';
-import 'package:idlefit/models/base_entity_repo.dart';
+import 'package:idlefit/repositories/base_entity_repo.dart';
 import 'package:objectbox/objectbox.dart';
 
 class CurrencyRepo extends BaseEntityRepo<Currency> {
