@@ -18,8 +18,10 @@ import 'models/achievement.dart';
 import 'models/coin_generator.dart';
 import 'models/currency.dart';
 import 'models/daily_quest.dart';
+import 'models/game_stats.dart';
 import 'models/health_data_entry.dart';
 import 'models/shop_items.dart';
+import 'models/time_based_stats.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -238,6 +240,174 @@ final _entities = <obx_int.ModelEntity>[
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(9, 1588013501194416749),
+      name: 'GameStats',
+      lastPropertyId: const obx_int.IdUid(13, 7296285796363016621),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 8697241391330884971),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 2758381798066180555),
+            name: 'manualGeneratorClicks',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 154869777890141793),
+            name: 'adViewCount',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 6758404124329333231),
+            name: 'generatorsPurchased',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 2087693039694509539),
+            name: 'generatorsUpgraded',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 7543791878837527894),
+            name: 'generatorsUnlocked',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(7, 8087535931801760927),
+            name: 'shopItemsUpgraded',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(8, 739869056003070641),
+            name: 'passiveCoinsEarned',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(9, 4705106008358792521),
+            name: 'manualCoinsEarned',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(10, 3163768500728714628),
+            name: 'totalSteps',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(11, 2414146639738611978),
+            name: 'totalCalories',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(12, 7576599265764459971),
+            name: 'totalExerciseMinutes',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(13, 7296285796363016621),
+            name: 'lastUpdated',
+            type: 6,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(10, 7327726906271346529),
+      name: 'TimeBasedStats',
+      lastPropertyId: const obx_int.IdUid(18, 1468966932796771532),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 7746616640701635476),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 7383292175966780055),
+            name: 'periodStartTimestamp',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 8557594743992621667),
+            name: 'periodEndTimestamp',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 3122682277122896448),
+            name: 'periodKey',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 4724378341981398817),
+            name: 'manualGeneratorClicks',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(7, 6146907053485470455),
+            name: 'adViewCount',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(8, 6217047593390484033),
+            name: 'generatorsPurchased',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(9, 3197426091773101043),
+            name: 'generatorsUpgraded',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(10, 3025770359063079675),
+            name: 'generatorsUnlocked',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(11, 4724867458922212752),
+            name: 'shopItemsUpgraded',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(12, 5551018493935491489),
+            name: 'passiveCoinsEarned',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(13, 1056790647359864320),
+            name: 'manualCoinsEarned',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(14, 3486308850104237892),
+            name: 'steps',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(15, 396837687818858442),
+            name: 'calories',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(16, 2263266724579161909),
+            name: 'exerciseMinutes',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(17, 3966315334491907743),
+            name: 'lastUpdated',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(18, 1468966932796771532),
+            name: 'periodTypeIndex',
+            type: 6,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
 ];
 
@@ -276,7 +446,7 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(8, 8235573318783332755),
+      lastEntityId: const obx_int.IdUid(10, 7327726906271346529),
       lastIndexId: const obx_int.IdUid(2, 6046711262050609894),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
@@ -310,7 +480,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         7633385983348480139,
         5727768307727832225,
         2592235923790219212,
-        2545780716478496970
+        2545780716478496970,
+        3672730041291203090
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -542,6 +713,140 @@ obx_int.ModelDefinition getObjectBoxModel() {
                 const fb.BoolReader().vTableGet(buffer, rootOffset, 22, false);
 
           return object;
+        }),
+    GameStats: obx_int.EntityDefinition<GameStats>(
+        model: _entities[6],
+        toOneRelations: (GameStats object) => [],
+        toManyRelations: (GameStats object) => {},
+        getId: (GameStats object) => object.id,
+        setId: (GameStats object, int id) {
+          object.id = id;
+        },
+        objectToFB: (GameStats object, fb.Builder fbb) {
+          fbb.startTable(14);
+          fbb.addInt64(0, object.id);
+          fbb.addInt64(1, object.manualGeneratorClicks);
+          fbb.addInt64(2, object.adViewCount);
+          fbb.addInt64(3, object.generatorsPurchased);
+          fbb.addInt64(4, object.generatorsUpgraded);
+          fbb.addInt64(5, object.generatorsUnlocked);
+          fbb.addInt64(6, object.shopItemsUpgraded);
+          fbb.addFloat64(7, object.passiveCoinsEarned);
+          fbb.addFloat64(8, object.manualCoinsEarned);
+          fbb.addFloat64(9, object.totalSteps);
+          fbb.addFloat64(10, object.totalCalories);
+          fbb.addFloat64(11, object.totalExerciseMinutes);
+          fbb.addInt64(12, object.lastUpdated);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+
+          final object = GameStats()
+            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
+            ..manualGeneratorClicks =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0)
+            ..adViewCount =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0)
+            ..generatorsPurchased =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0)
+            ..generatorsUpgraded =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0)
+            ..generatorsUnlocked =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0)
+            ..shopItemsUpgraded =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0)
+            ..passiveCoinsEarned =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 18, 0)
+            ..manualCoinsEarned =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 20, 0)
+            ..totalSteps =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 22, 0)
+            ..totalCalories =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 24, 0)
+            ..totalExerciseMinutes =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 26, 0)
+            ..lastUpdated =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 28, 0);
+
+          return object;
+        }),
+    TimeBasedStats: obx_int.EntityDefinition<TimeBasedStats>(
+        model: _entities[7],
+        toOneRelations: (TimeBasedStats object) => [],
+        toManyRelations: (TimeBasedStats object) => {},
+        getId: (TimeBasedStats object) => object.id,
+        setId: (TimeBasedStats object, int id) {
+          object.id = id;
+        },
+        objectToFB: (TimeBasedStats object, fb.Builder fbb) {
+          final periodKeyOffset = fbb.writeString(object.periodKey);
+          fbb.startTable(19);
+          fbb.addInt64(0, object.id);
+          fbb.addInt64(1, object.periodStartTimestamp);
+          fbb.addInt64(2, object.periodEndTimestamp);
+          fbb.addOffset(4, periodKeyOffset);
+          fbb.addInt64(5, object.manualGeneratorClicks);
+          fbb.addInt64(6, object.adViewCount);
+          fbb.addInt64(7, object.generatorsPurchased);
+          fbb.addInt64(8, object.generatorsUpgraded);
+          fbb.addInt64(9, object.generatorsUnlocked);
+          fbb.addInt64(10, object.shopItemsUpgraded);
+          fbb.addFloat64(11, object.passiveCoinsEarned);
+          fbb.addFloat64(12, object.manualCoinsEarned);
+          fbb.addFloat64(13, object.steps);
+          fbb.addFloat64(14, object.calories);
+          fbb.addFloat64(15, object.exerciseMinutes);
+          fbb.addInt64(16, object.lastUpdated);
+          fbb.addInt64(17, object.periodTypeIndex);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final periodStartTimestampParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
+          final periodEndTimestampParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
+          final periodKeyParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 12, '');
+          final periodTypeIndexParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 38, 0);
+          final object = TimeBasedStats(
+              periodStartTimestamp: periodStartTimestampParam,
+              periodEndTimestamp: periodEndTimestampParam,
+              periodKey: periodKeyParam,
+              periodTypeIndex: periodTypeIndexParam)
+            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
+            ..manualGeneratorClicks =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0)
+            ..adViewCount =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0)
+            ..generatorsPurchased =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0)
+            ..generatorsUpgraded =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 20, 0)
+            ..generatorsUnlocked =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 22, 0)
+            ..shopItemsUpgraded =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 24, 0)
+            ..passiveCoinsEarned =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 26, 0)
+            ..manualCoinsEarned =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 28, 0)
+            ..steps =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 30, 0)
+            ..calories =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 32, 0)
+            ..exerciseMinutes =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 34, 0)
+            ..lastUpdated =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 36, 0);
+
+          return object;
         })
   };
 
@@ -692,4 +997,130 @@ class DailyQuest_ {
   /// See [DailyQuest.isClaimed].
   static final isClaimed =
       obx.QueryBooleanProperty<DailyQuest>(_entities[5].properties[8]);
+}
+
+/// [GameStats] entity fields to define ObjectBox queries.
+class GameStats_ {
+  /// See [GameStats.id].
+  static final id =
+      obx.QueryIntegerProperty<GameStats>(_entities[6].properties[0]);
+
+  /// See [GameStats.manualGeneratorClicks].
+  static final manualGeneratorClicks =
+      obx.QueryIntegerProperty<GameStats>(_entities[6].properties[1]);
+
+  /// See [GameStats.adViewCount].
+  static final adViewCount =
+      obx.QueryIntegerProperty<GameStats>(_entities[6].properties[2]);
+
+  /// See [GameStats.generatorsPurchased].
+  static final generatorsPurchased =
+      obx.QueryIntegerProperty<GameStats>(_entities[6].properties[3]);
+
+  /// See [GameStats.generatorsUpgraded].
+  static final generatorsUpgraded =
+      obx.QueryIntegerProperty<GameStats>(_entities[6].properties[4]);
+
+  /// See [GameStats.generatorsUnlocked].
+  static final generatorsUnlocked =
+      obx.QueryIntegerProperty<GameStats>(_entities[6].properties[5]);
+
+  /// See [GameStats.shopItemsUpgraded].
+  static final shopItemsUpgraded =
+      obx.QueryIntegerProperty<GameStats>(_entities[6].properties[6]);
+
+  /// See [GameStats.passiveCoinsEarned].
+  static final passiveCoinsEarned =
+      obx.QueryDoubleProperty<GameStats>(_entities[6].properties[7]);
+
+  /// See [GameStats.manualCoinsEarned].
+  static final manualCoinsEarned =
+      obx.QueryDoubleProperty<GameStats>(_entities[6].properties[8]);
+
+  /// See [GameStats.totalSteps].
+  static final totalSteps =
+      obx.QueryDoubleProperty<GameStats>(_entities[6].properties[9]);
+
+  /// See [GameStats.totalCalories].
+  static final totalCalories =
+      obx.QueryDoubleProperty<GameStats>(_entities[6].properties[10]);
+
+  /// See [GameStats.totalExerciseMinutes].
+  static final totalExerciseMinutes =
+      obx.QueryDoubleProperty<GameStats>(_entities[6].properties[11]);
+
+  /// See [GameStats.lastUpdated].
+  static final lastUpdated =
+      obx.QueryIntegerProperty<GameStats>(_entities[6].properties[12]);
+}
+
+/// [TimeBasedStats] entity fields to define ObjectBox queries.
+class TimeBasedStats_ {
+  /// See [TimeBasedStats.id].
+  static final id =
+      obx.QueryIntegerProperty<TimeBasedStats>(_entities[7].properties[0]);
+
+  /// See [TimeBasedStats.periodStartTimestamp].
+  static final periodStartTimestamp =
+      obx.QueryIntegerProperty<TimeBasedStats>(_entities[7].properties[1]);
+
+  /// See [TimeBasedStats.periodEndTimestamp].
+  static final periodEndTimestamp =
+      obx.QueryIntegerProperty<TimeBasedStats>(_entities[7].properties[2]);
+
+  /// See [TimeBasedStats.periodKey].
+  static final periodKey =
+      obx.QueryStringProperty<TimeBasedStats>(_entities[7].properties[3]);
+
+  /// See [TimeBasedStats.manualGeneratorClicks].
+  static final manualGeneratorClicks =
+      obx.QueryIntegerProperty<TimeBasedStats>(_entities[7].properties[4]);
+
+  /// See [TimeBasedStats.adViewCount].
+  static final adViewCount =
+      obx.QueryIntegerProperty<TimeBasedStats>(_entities[7].properties[5]);
+
+  /// See [TimeBasedStats.generatorsPurchased].
+  static final generatorsPurchased =
+      obx.QueryIntegerProperty<TimeBasedStats>(_entities[7].properties[6]);
+
+  /// See [TimeBasedStats.generatorsUpgraded].
+  static final generatorsUpgraded =
+      obx.QueryIntegerProperty<TimeBasedStats>(_entities[7].properties[7]);
+
+  /// See [TimeBasedStats.generatorsUnlocked].
+  static final generatorsUnlocked =
+      obx.QueryIntegerProperty<TimeBasedStats>(_entities[7].properties[8]);
+
+  /// See [TimeBasedStats.shopItemsUpgraded].
+  static final shopItemsUpgraded =
+      obx.QueryIntegerProperty<TimeBasedStats>(_entities[7].properties[9]);
+
+  /// See [TimeBasedStats.passiveCoinsEarned].
+  static final passiveCoinsEarned =
+      obx.QueryDoubleProperty<TimeBasedStats>(_entities[7].properties[10]);
+
+  /// See [TimeBasedStats.manualCoinsEarned].
+  static final manualCoinsEarned =
+      obx.QueryDoubleProperty<TimeBasedStats>(_entities[7].properties[11]);
+
+  /// See [TimeBasedStats.steps].
+  static final steps =
+      obx.QueryDoubleProperty<TimeBasedStats>(_entities[7].properties[12]);
+
+  /// See [TimeBasedStats.calories].
+  static final calories =
+      obx.QueryDoubleProperty<TimeBasedStats>(_entities[7].properties[13]);
+
+  /// See [TimeBasedStats.exerciseMinutes].
+  static final exerciseMinutes =
+      obx.QueryDoubleProperty<TimeBasedStats>(_entities[7].properties[14]);
+
+  /// See [TimeBasedStats.lastUpdated].
+  static final lastUpdated =
+      obx.QueryIntegerProperty<TimeBasedStats>(_entities[7].properties[15]);
+
+  /// See [TimeBasedStats.periodTypeIndex].
+  static final periodTypeIndex =
+      obx.QueryIntegerProperty<TimeBasedStats>(_entities[7].properties[16]);
 }
