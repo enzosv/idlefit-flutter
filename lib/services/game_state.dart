@@ -35,6 +35,17 @@ class GameState with ChangeNotifier {
   int doubleCoinExpiry = 0;
   double offlineCoinMultiplier = 0.5;
 
+  // Daily tracking
+  int _lastDailyReset = 0;
+  double _dailyCoinsSpent = 0;
+  double _dailySpaceSpent = 0;
+  int _dailyAdsWatched = 0;
+
+  // Getters for daily stats
+  double get dailyCoinsSpent => _dailyCoinsSpent;
+  double get dailySpaceSpent => _dailySpaceSpent;
+  int get dailyAdsWatched => _dailyAdsWatched;
+
   // Generators and shop items
   List<CoinGenerator> coinGenerators = [];
   List<ShopItem> shopItems = [];
@@ -89,6 +100,12 @@ class GameState with ChangeNotifier {
     lastGenerated = savedState['lastGenerated'] ?? 0;
     offlineCoinMultiplier = savedState['offlineCoinMultiplier'] ?? 0.5;
     doubleCoinExpiry = savedState['doubleCoinExpiry'] ?? 0;
+    _lastDailyReset = savedState['lastDailyReset'] ?? 0;
+    _dailyCoinsSpent = savedState['dailyCoinsSpent'] ?? 0.0;
+    _dailySpaceSpent = savedState['dailySpaceSpent'] ?? 0.0;
+
+    // Check if we need to reset daily stats
+    _checkDailyReset();
   }
 
   Map<String, dynamic> toJson() {
@@ -96,6 +113,9 @@ class GameState with ChangeNotifier {
       'lastGenerated': lastGenerated,
       'offlineCoinMultiplier': offlineCoinMultiplier,
       'doubleCoinExpiry': doubleCoinExpiry,
+      'lastDailyReset': _lastDailyReset,
+      'dailyCoinsSpent': _dailyCoinsSpent,
+      'dailySpaceSpent': _dailySpaceSpent,
     };
   }
 
@@ -163,6 +183,9 @@ class GameState with ChangeNotifier {
   }
 
   void convertHealthStats(double steps, calories, exerciseMinutes) {
+    // Reset daily stats if needed
+    _checkDailyReset();
+
     // Calculate health multiplier from upgrades
     double healthMultiplier = 1.0;
     for (final item in shopItems) {
@@ -181,6 +204,20 @@ class GameState with ChangeNotifier {
     _backgroundSpace = space.earn(steps);
     save();
     notifyListeners();
+  }
+
+  void _checkDailyReset() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final todayTimestamp = today.millisecondsSinceEpoch;
+
+    if (_lastDailyReset != todayTimestamp) {
+      _lastDailyReset = todayTimestamp;
+      _dailyCoinsSpent = 0;
+      _dailySpaceSpent = 0;
+      _dailyAdsWatched = 0;
+      save();
+    }
   }
 
   bool buyCoinGenerator(CoinGenerator generator) {
@@ -331,6 +368,13 @@ class GameState with ChangeNotifier {
       }
     }
     return output * coinMultiplier;
+  }
+
+  void incrementDailyAdsWatched() {
+    _checkDailyReset();
+    _dailyAdsWatched++;
+    save();
+    notifyListeners();
   }
 
   @override
