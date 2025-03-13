@@ -61,16 +61,12 @@ class _DoubleCoinsCardState extends ConsumerState<DoubleCoinsCard> {
 
   void _watchAd() {
     final gameStateNotifier = ref.read(gameStateProvider.notifier);
-    final gameState = ref.read(gameStateProvider);
 
     AdService.showRewardedAd(
       onRewarded: () {
-        // Update via the notifier
-        // gameState.doubleCoinExpiry =
-        //     DateTime.now()
-        //         .add(const Duration(minutes: 1))
-        //         .millisecondsSinceEpoch;
-        // gameStateNotifier.update();
+        gameStateNotifier.setDoubleCoinExpiry(
+          DateTime.now().add(const Duration(minutes: 1)).millisecondsSinceEpoch,
+        );
         _startTimer();
       },
       onAdDismissed: () {

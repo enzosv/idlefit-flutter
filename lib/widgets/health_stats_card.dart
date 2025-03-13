@@ -131,9 +131,14 @@ class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
                   text: 'Sync',
                   onPressed: () async {
                     final healthService = ref.read(healthServiceProvider);
-                    final gameState = ref.read(gameStateProvider);
+                    final gameStateNotifier = ref.read(
+                      gameStateProvider.notifier,
+                    );
                     final objectBox = ref.read(objectBoxProvider);
-                    await healthService.syncHealthData(objectBox, gameState);
+                    await healthService.syncHealthData(
+                      objectBox,
+                      gameStateNotifier,
+                    );
                     setState(
                       () {},
                     ); // Trigger rebuild to refresh last sync time

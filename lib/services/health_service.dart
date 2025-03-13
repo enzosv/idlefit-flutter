@@ -3,6 +3,7 @@ import 'package:health/health.dart';
 import 'package:flutter/material.dart';
 import 'package:idlefit/models/health_data_entry.dart';
 import 'package:idlefit/models/health_data_repo.dart';
+import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:idlefit/services/object_box.dart';
 import 'game_state.dart';
 import 'dart:math';
@@ -144,7 +145,7 @@ class HealthService {
 
   Future<void> syncHealthData(
     ObjectBox objectBoxService,
-    GameState gameState,
+    GameStateNotifier gameStateNotifier,
   ) async {
     // final store = await openStore(); // Initialize ObjectBox
     final box = objectBoxService.store.box<HealthDataEntry>();
@@ -169,12 +170,12 @@ class HealthService {
     box.putMany(newEntries);
 
     print("new: ${newEntries.length}, from: ${entries.length}");
-    updateHealthState(newEntries, gameState);
+    updateHealthState(newEntries, gameStateNotifier);
   }
 
   void updateHealthState(
     List<HealthDataEntry> newEntries,
-    GameState gameState,
+    GameStateNotifier gameStateNotifier,
   ) {
     double steps = 0;
     double calories = 0;
@@ -193,7 +194,6 @@ class HealthService {
     }
 
     print("got new health data $steps $calories $exercise");
-
-    // gameState.convertHealthStats(steps, calories, exercise);
+    gameStateNotifier.convertHealthStats(steps, calories, exercise);
   }
 }

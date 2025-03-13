@@ -155,9 +155,8 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
     // going to foreground
     final healthService = ref.read(healthServiceProvider);
     final objectBoxService = ref.read(objectBoxProvider);
-    final gameState = ref.read(gameStateProvider);
 
-    await healthService.syncHealthData(objectBoxService, gameState);
+    await healthService.syncHealthData(objectBoxService, gameStateNotifier);
     NotificationService.cancelAllNotifications();
     gameStateNotifier.setIsPaused(false);
 
@@ -165,14 +164,14 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
       if (!mounted) {
         return;
       }
-      // final earnings = gameState.getBackgroundDifferences();
-      // if ((earnings['energy_spent'] ?? 0) > 60000) {
-      //   // do not show popup if energy spent is less than 1 minute
-      //   showDialog(
-      //     context: context,
-      //     builder: (context) => BackgroundEarningsPopup(earnings: earnings),
-      //   );
-      // }
+      final earnings = gameStateNotifier.getBackgroundDifferences();
+      if ((earnings['energy_spent'] ?? 0) > 60000) {
+        // do not show popup if energy spent is less than 1 minute
+        showDialog(
+          context: context,
+          builder: (context) => BackgroundEarningsPopup(earnings: earnings),
+        );
+      }
     });
   }
 
@@ -183,15 +182,12 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
     final healthService = ref.read(healthServiceProvider);
     final gameStateNotifier = ref.read(gameStateProvider.notifier);
     final objectBoxService = ref.read(objectBoxProvider);
-    final gameState = ref.read(gameStateProvider);
-
-    // gameStateNotifier.setIsPaused(true);
 
     // Initialize ads
     AdService.initialize();
 
     healthService.initialize().then((_) async {
-      await healthService.syncHealthData(objectBoxService, gameState);
+      await healthService.syncHealthData(objectBoxService, gameStateNotifier);
       gameStateNotifier.setIsPaused(false);
     });
 

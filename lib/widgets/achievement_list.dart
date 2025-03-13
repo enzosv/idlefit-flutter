@@ -74,26 +74,10 @@ class _AchievementListState extends ConsumerState<AchievementList> {
     }
     print("claimed, ${achievement.reward}");
 
-    final gameState = ref.read(gameStateProvider);
     final gameStateNotifier = ref.read(gameStateProvider.notifier);
     final reward = achievement.reward.toDouble();
     // Award the achievement reward
-    switch (achievement.rewardUnit.toLowerCase()) {
-      case 'space':
-        gameState.space.earn(reward);
-        break;
-      case 'coins':
-        gameState.coins.earn(reward);
-        break;
-      case 'energy':
-        gameState.energy.earn(reward);
-        break;
-    }
-    // gameStateNotifier.update();
-    // if (isLast) {
-    //   return;
-    // }
-
+    gameStateNotifier.earnCurrency(achievement.rewardCurrency, reward);
     // Refresh the achievement list to update visibility
     _fetchData();
   }

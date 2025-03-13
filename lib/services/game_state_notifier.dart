@@ -179,9 +179,28 @@ class GameStateNotifier extends StateNotifier<GameState> {
     super.dispose();
   }
 
-  void earnCoins(double amount) {
-    final newCoins = state.coins.earn(amount);
-    state = state.copyWith(coins: newCoins);
+  void earnCurrency(CurrencyType currencyType, double amount) {
+    switch (currencyType) {
+      case CurrencyType.coin:
+        final newCoins = state.coins.earn(amount);
+        state = state.copyWith(coins: newCoins);
+      case CurrencyType.space:
+        final newSpace = state.space.earn(amount);
+        state = state.copyWith(space: newSpace);
+      case CurrencyType.energy:
+        final newEnergy = state.energy.earn(amount);
+        state = state.copyWith(energy: newEnergy);
+      case CurrencyType.gem:
+        final newGems = state.gems.earn(amount);
+        state = state.copyWith(gems: newGems);
+      default:
+        return;
+    }
+    state.save();
+  }
+
+  void setDoubleCoinExpiry(int expiry) {
+    state = state.copyWith(doubleCoinExpiry: expiry);
     state.save();
   }
 

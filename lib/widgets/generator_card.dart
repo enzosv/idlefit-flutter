@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
+import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:idlefit/util.dart';
@@ -94,9 +95,7 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
       final gameStateNotifier = ref.read(gameStateProvider.notifier);
       final generator = gameState.coinGenerators[widget.generatorIndex];
       final double output = generator.tier == 1 ? 15 : generator.singleOutput;
-      // gameState.coins.earn(output);
-      // gameStateNotifier.update();
-      gameStateNotifier.earnCoins(output);
+      gameStateNotifier.earnCurrency(CurrencyType.coin, output);
       _showFloatingText(toLettersNotation(output));
       CurrentCoins.triggerAnimation();
       // Trigger the animation

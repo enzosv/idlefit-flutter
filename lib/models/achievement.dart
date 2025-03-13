@@ -1,3 +1,4 @@
+import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/util.dart';
 import 'package:objectbox/objectbox.dart';
 
@@ -15,6 +16,19 @@ class Achievement {
   String rewardUnit = '';
   @Transient()
   int reward = 0;
+
+  CurrencyType get rewardCurrency {
+    switch (rewardUnit) {
+      case 'space':
+        return CurrencyType.space;
+      case 'energy':
+        return CurrencyType.energy;
+      case 'coin':
+        return CurrencyType.coin;
+      default:
+        return CurrencyType.coin;
+    }
+  }
 
   // Achievement({
   //   required this.id,

@@ -129,25 +129,6 @@ class GameState {
     });
   }
 
-  int validTimeSinceLastGenerate(int now, int previous) {
-    if (energy.count <= 0 || previous <= 0) {
-      return Constants.tickTime;
-    }
-
-    int dif = now - previous;
-    // if last generated > 30s, consume energy
-    if (dif < Constants.inactiveThreshold) {
-      // do not consume energy
-      return dif;
-    }
-    dif = min(dif, energy.count.round());
-    // smelly to perform modification in get
-    backgroundState['energySpent'] = dif.toDouble();
-    energy.spend(dif.toDouble());
-    print("spent energy ${durationNotation(dif.toDouble())}");
-    return dif;
-  }
-
   void saveBackgroundState() {
     backgroundState['coins'] = coins.count;
     backgroundState['energySpent'] = 0;
@@ -204,5 +185,3 @@ class GameState {
     _generatorTimer?.cancel();
   }
 }
-
-// Create a StateNotifier for Riverpod
