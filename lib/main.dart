@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idlefit/constants.dart';
+import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'services/game_state.dart';
@@ -98,9 +99,7 @@ class _GameInitializerState extends ConsumerState<GameInitializer> {
     final objectBox = ref.read(objectBoxProvider);
 
     // Initialize the game state
-    await ref
-        .read(gameStateProvider.notifier)
-        .initialize(storageService, objectBox.store);
+    await ref.read(gameStateProvider.notifier).initialize(objectBox.store);
 
     setState(() {
       _isInitialized = true;
@@ -147,9 +146,10 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
 
     if (state == AppLifecycleState.paused) {
       // going to background
+      // gameStateNotifier
       gameStateNotifier.setIsPaused(true);
-      gameStateNotifier.save();
-      gameStateNotifier.saveBackgroundState();
+      // gameStateNotifier.save();
+      // gameStateNotifier.saveBackgroundState();
       return;
     }
     // going to foreground
@@ -165,14 +165,14 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
       if (!mounted) {
         return;
       }
-      final earnings = gameState.getBackgroundDifferences();
-      if ((earnings['energy_spent'] ?? 0) > 60000) {
-        // do not show popup if energy spent is less than 1 minute
-        showDialog(
-          context: context,
-          builder: (context) => BackgroundEarningsPopup(earnings: earnings),
-        );
-      }
+      // final earnings = gameState.getBackgroundDifferences();
+      // if ((earnings['energy_spent'] ?? 0) > 60000) {
+      //   // do not show popup if energy spent is less than 1 minute
+      //   showDialog(
+      //     context: context,
+      //     builder: (context) => BackgroundEarningsPopup(earnings: earnings),
+      //   );
+      // }
     });
   }
 
@@ -185,7 +185,7 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
     final objectBoxService = ref.read(objectBoxProvider);
     final gameState = ref.read(gameStateProvider);
 
-    gameStateNotifier.setIsPaused(true);
+    // gameStateNotifier.setIsPaused(true);
 
     // Initialize ads
     AdService.initialize();

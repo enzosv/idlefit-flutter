@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:idlefit/services/ad_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/services/game_state_notifier.dart';
 import '../services/game_state.dart';
 import '../models/shop_items.dart';
 import 'common_card.dart';
@@ -65,11 +66,11 @@ class _DoubleCoinsCardState extends ConsumerState<DoubleCoinsCard> {
     AdService.showRewardedAd(
       onRewarded: () {
         // Update via the notifier
-        gameState.doubleCoinExpiry =
-            DateTime.now()
-                .add(const Duration(minutes: 1))
-                .millisecondsSinceEpoch;
-        gameStateNotifier.update();
+        // gameState.doubleCoinExpiry =
+        //     DateTime.now()
+        //         .add(const Duration(minutes: 1))
+        //         .millisecondsSinceEpoch;
+        // gameStateNotifier.update();
         _startTimer();
       },
       onAdDismissed: () {

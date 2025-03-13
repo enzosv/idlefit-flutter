@@ -193,6 +193,7 @@ class HealthService {
     }
 
     print("got new health data $steps $calories $exercise");
-    gameState.convertHealthStats(steps, calories, exercise);
+
+    // gameState.convertHealthStats(steps, calories, exercise);
   }
 }

@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:idlefit/constants.dart';
+import 'package:idlefit/main.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/shop_items_repo.dart';
@@ -13,83 +15,98 @@ import 'dart:math';
 import 'notification_service.dart';
 
 class GameState {
-  static const _tickTime = 1000; // miliseconds
-  static const _inactiveThreshold = 30000; // 30 seconds in milliseocnds
-  static const _calorieToEnergyMultiplier =
-      72000.0; // 1 calorie = 72 seconds of idle fuel
-  static const _notificationId = 1;
-
-  bool isPaused = true;
+  final bool isPaused;
 
   // Background state tracking
-  double _backgroundCoins = 0;
-  double _backgroundEnergy = 0;
-  double _backgroundSpace = 0;
-  double _backgroundEnergySpent = 0;
+  final Map<String, double> backgroundState;
 
-  late final Currency coins;
-  late final Currency gems;
-  late final Currency energy;
-  late final Currency space;
+  final Currency coins;
+  final Currency gems;
+  final Currency energy;
+  final Currency space;
 
-  int lastGenerated = 0;
-  int doubleCoinExpiry = 0;
-  double offlineCoinMultiplier = 0.5;
+  final int lastGenerated;
+  final int doubleCoinExpiry;
+  final double offlineCoinMultiplier;
 
   // Generators and shop items
-  List<CoinGenerator> coinGenerators = [];
-  List<ShopItem> shopItems = [];
+  final List<CoinGenerator> coinGenerators;
+  final List<ShopItem> shopItems;
 
   // For saving/loading
-  late StorageService _storageService;
-  late CurrencyRepo _currencyRepo;
-  late CoinGeneratorRepo _generatorRepo;
-  late ShopItemsRepo _shopItemRepo;
+  // final StorageService storageService;
+  final CurrencyRepo currencyRepo;
+  final CoinGeneratorRepo generatorRepo;
+  final ShopItemsRepo shopItemRepo;
   Timer? _autoSaveTimer;
   Timer? _generatorTimer;
 
-  Future<void> initialize(
-    StorageService storageService,
-    Store objectBoxService,
-  ) async {
-    _storageService = storageService;
+  GameState({
+    required this.isPaused,
+    required this.coins,
+    required this.gems,
+    required this.energy,
+    required this.space,
+    required this.lastGenerated,
+    required this.doubleCoinExpiry,
+    required this.offlineCoinMultiplier,
+    required this.coinGenerators,
+    required this.shopItems,
+    // required StorageService storageService,
+    required CurrencyRepo currencyRepo,
+    required CoinGeneratorRepo generatorRepo,
+    required ShopItemsRepo shopItemRepo,
+    Map<String, double>? backgroundState,
+  }) : currencyRepo = currencyRepo,
+       generatorRepo = generatorRepo,
+       shopItemRepo = shopItemRepo,
+       backgroundState =
+           backgroundState ??
+           {'coins': 0, 'energy': 0, 'space': 0, 'energySpent': 0};
 
-    // Initialize repositories
-    _currencyRepo = CurrencyRepo(box: objectBoxService.box<Currency>());
-    _generatorRepo = CoinGeneratorRepo(
-      box: objectBoxService.box<CoinGenerator>(),
+  GameState copyWith({
+    bool? isPaused,
+    Currency? coins,
+    Currency? gems,
+    Currency? energy,
+    Currency? space,
+    int? lastGenerated,
+    int? doubleCoinExpiry,
+    double? offlineCoinMultiplier,
+    List<CoinGenerator>? coinGenerators,
+    List<ShopItem>? shopItems,
+    Map<String, double>? backgroundState,
+  }) {
+    return GameState(
+      isPaused: isPaused ?? this.isPaused,
+      coins: coins ?? this.coins,
+      gems: gems ?? this.gems,
+      energy: energy ?? this.energy,
+      space: space ?? this.space,
+      lastGenerated: lastGenerated ?? this.lastGenerated,
+      doubleCoinExpiry: doubleCoinExpiry ?? this.doubleCoinExpiry,
+      offlineCoinMultiplier:
+          offlineCoinMultiplier ?? this.offlineCoinMultiplier,
+      coinGenerators: coinGenerators ?? this.coinGenerators,
+      shopItems: shopItems ?? this.shopItems,
+      backgroundState: backgroundState ?? this.backgroundState,
+      // storageService: _storageService,
+      currencyRepo: currencyRepo,
+      generatorRepo: generatorRepo,
+      shopItemRepo: shopItemRepo,
     );
-    _shopItemRepo = ShopItemsRepo(box: objectBoxService.box<ShopItem>());
-
-    // Load data from repositories
-    coinGenerators = await _generatorRepo.parseCoinGenerators(
-      'assets/coin_generators.json',
-    );
-    shopItems = await _shopItemRepo.parseShopItems('assets/shop_items.json');
-
-    // Ensure default currencies exist and load them
-    _currencyRepo.ensureDefaultCurrencies();
-    final currencies = _currencyRepo.loadCurrencies();
-    coins = currencies[CurrencyType.coin]!;
-    gems = currencies[CurrencyType.gem]!;
-    energy = currencies[CurrencyType.energy]!;
-    space = currencies[CurrencyType.space]!;
-    _backgroundCoins = coins.count;
-
-    // Try to load saved state
-    final savedState = await _storageService.loadGameState();
-    if (savedState != null) {
-      _loadFromSavedState(savedState);
-    }
-    // Start timers
-    _startAutoSave();
-    _startGenerators();
   }
 
-  void _loadFromSavedState(Map<String, dynamic> savedState) {
-    lastGenerated = savedState['lastGenerated'] ?? 0;
-    offlineCoinMultiplier = savedState['offlineCoinMultiplier'] ?? 0.5;
-    doubleCoinExpiry = savedState['doubleCoinExpiry'] ?? 0;
+  Future<void> initialize(Store objectBoxService) async {
+    // Ensure default currencies exist and load them
+    currencyRepo.ensureDefaultCurrencies();
+    final currencies = currencyRepo.loadCurrencies();
+    final coins = currencies[CurrencyType.coin]!;
+    backgroundState['coins'] = coins.count;
+
+    // Start timers
+    _startAutoSave();
+    // _startGenerators();
   }
 
   Map<String, dynamic> toJson() {
@@ -101,8 +118,8 @@ class GameState {
   }
 
   void save() {
-    _storageService.saveGameState(toJson());
-    _currencyRepo.saveCurrencies([coins, energy, gems, space]);
+    // _storageService.saveGameState(toJson());
+    currencyRepo.saveCurrencies([coins, energy, gems, space]);
     // not saving generators and shopitems. only changes on buy anyway
   }
 
@@ -112,167 +129,30 @@ class GameState {
     });
   }
 
-  void _startGenerators() {
-    final duration = Duration(milliseconds: _tickTime);
-    _generatorTimer = Timer.periodic(duration, (_) {
-      _processGenerators();
-    });
-  }
-
   int validTimeSinceLastGenerate(int now, int previous) {
     if (energy.count <= 0 || previous <= 0) {
-      return _tickTime;
+      return Constants.tickTime;
     }
 
     int dif = now - previous;
     // if last generated > 30s, consume energy
-    if (dif < _inactiveThreshold) {
+    if (dif < Constants.inactiveThreshold) {
       // do not consume energy
       return dif;
     }
     dif = min(dif, energy.count.round());
     // smelly to perform modification in get
-    _backgroundEnergySpent = dif.toDouble();
+    backgroundState['energySpent'] = dif.toDouble();
     energy.spend(dif.toDouble());
     print("spent energy ${durationNotation(dif.toDouble())}");
     return dif;
   }
 
-  // the main run loop
-  void _processGenerators() {
-    if (isPaused) {
-      return;
-    }
-    int now = DateTime.now().millisecondsSinceEpoch;
-    final realDif = lastGenerated - now;
-    final availableDif = validTimeSinceLastGenerate(now, lastGenerated);
-    final usesEnergy = realDif > _inactiveThreshold;
-
-    double coinsGenerated = passiveOutput;
-    if (usesEnergy) {
-      // reduce speed of coin generation in background
-      coinsGenerated *= offlineCoinMultiplier;
-    }
-    coinsGenerated *= (availableDif / _tickTime);
-
-    if (coinsGenerated > 0) {
-      coins.earn(coinsGenerated);
-    }
-
-    lastGenerated = now;
-  }
-
-  void convertHealthStats(double steps, calories, exerciseMinutes) {
-    // Calculate health multiplier from upgrades
-    double healthMultiplier = 1.0;
-    for (final item in shopItems) {
-      if (item.shopItemEffect == ShopItemEffect.healthMultiplier) {
-        healthMultiplier += item.effectValue * item.level;
-      }
-    }
-
-    _backgroundEnergy = energy.earn(
-      calories * healthMultiplier * _calorieToEnergyMultiplier,
-    );
-    print("new energy $_backgroundEnergy");
-    gems.earn(
-      exerciseMinutes * healthMultiplier / 2,
-    ); // 2 exercise minutes = 1 gem
-    _backgroundSpace = space.earn(steps);
-    save();
-  }
-
-  bool buyCoinGenerator(CoinGenerator generator) {
-    if (!coins.spend(generator.cost)) {
-      return false;
-    }
-    if (generator.count == 0) {
-      // raise maximums
-
-      // 200*pow(10, generator.tier-1) or next tier cost * 1.8
-      final next = coinGenerators[generator.tier].cost;
-      coins.baseMax = max(next, (200 * pow(10, generator.tier - 1).toDouble()));
-
-      if (generator.tier % 10 == 0) {
-        // raise gem limit every 10
-        gems.baseMax += 10;
-      }
-      if (generator.tier % 5 == 0) {
-        // raise energy limit by 1hr every 5
-        // limit to 24hrs
-        if (energy.baseMax < 86400000) {
-          energy.baseMax += 3600000;
-        }
-      }
-    }
-    generator.count++;
-
-    _generatorRepo.saveCoinGenerator(generator);
-    save();
-    return true;
-  }
-
-  bool upgradeShopItem(ShopItem item) {
-    if (item.id == 4) {
-      return false;
-    }
-    if (item.level >= item.maxLevel) return false;
-
-    if (!space.spend(item.currentCost.toDouble())) {
-      return false;
-    }
-
-    item.level++;
-    switch (item.shopItemEffect) {
-      case ShopItemEffect.spaceCapacity:
-        space.maxMultiplier += item.effectValue;
-      case ShopItemEffect.energyCapacity:
-        energy.maxMultiplier += item.effectValue;
-      case ShopItemEffect.offlineCoinMultiplier:
-        offlineCoinMultiplier += item.effectValue;
-      case ShopItemEffect.coinCapacity:
-        coins.maxMultiplier += item.effectValue;
-      default:
-        break;
-    }
-    save();
-    _shopItemRepo.saveShopItem(item);
-    return true;
-  }
-
-  bool unlockGenerator(CoinGenerator generator) {
-    if (generator.count < 10) return false;
-    if (generator.isUnlocked) return false;
-
-    if (!space.spend(generator.upgradeUnlockCost)) {
-      return false;
-    }
-
-    generator.isUnlocked = true;
-    _generatorRepo.saveCoinGenerator(generator);
-    save();
-    return true;
-  }
-
-  bool upgradeGenerator(CoinGenerator generator) {
-    if (generator.count < 10) return false;
-    if (!generator.isUnlocked) return false;
-
-    if (!coins.spend(generator.upgradeCost)) {
-      return false;
-    }
-
-    generator.level++;
-    _generatorRepo.saveCoinGenerator(generator);
-    save();
-    return true;
-  }
-
   void saveBackgroundState() {
-    _backgroundCoins = coins.count;
-    _backgroundEnergySpent = 0;
-    _backgroundEnergy = 0;
-    _backgroundSpace = 0;
+    backgroundState['coins'] = coins.count;
+    backgroundState['energySpent'] = 0;
+    backgroundState['energy'] = 0;
+    backgroundState['space'] = 0;
 
     // Schedule notification for when coins will reach capacity
     _scheduleCoinCapacityNotification();
@@ -293,21 +173,12 @@ class GameState {
     );
 
     NotificationService.scheduleCoinCapacityNotification(
-      id: _notificationId,
+      id: Constants.notificationId,
       scheduledDate: notificationTime,
       title: 'Coin Capacity Full',
       body:
           'Your coins have reached maximum capacity! Time to upgrade or spend.',
     );
-  }
-
-  Map<String, double> getBackgroundDifferences() {
-    return {
-      'coins': coins.count - _backgroundCoins,
-      'energy_earned': _backgroundEnergy,
-      'space': _backgroundSpace,
-      'energy_spent': _backgroundEnergySpent,
-    };
   }
 
   double get passiveOutput {
@@ -335,77 +206,3 @@ class GameState {
 }
 
 // Create a StateNotifier for Riverpod
-class GameStateNotifier extends StateNotifier<GameState> {
-  GameStateNotifier(GameState state) : super(state);
-
-  void update() {
-    // This forces a UI refresh when needed
-    state = state;
-  }
-
-  // All the methods that modify state should be moved here
-  // For example:
-  void setIsPaused(bool value) {
-    state.isPaused = value;
-    update();
-  }
-
-  void saveBackgroundState() {
-    state.saveBackgroundState();
-    update();
-  }
-
-  Future<void> initialize(
-    StorageService storageService,
-    Store objectBoxService,
-  ) async {
-    await state.initialize(storageService, objectBoxService);
-    update();
-  }
-
-  void save() {
-    state.save();
-  }
-
-  void convertHealthStats(double steps, calories, exerciseMinutes) {
-    state.convertHealthStats(steps, calories, exerciseMinutes);
-    update();
-  }
-
-  bool buyCoinGenerator(CoinGenerator generator) {
-    final result = state.buyCoinGenerator(generator);
-    update();
-    return result;
-  }
-
-  bool upgradeShopItem(ShopItem item) {
-    final result = state.upgradeShopItem(item);
-    update();
-    return result;
-  }
-
-  bool unlockGenerator(CoinGenerator generator) {
-    final result = state.unlockGenerator(generator);
-    update();
-    return result;
-  }
-
-  bool upgradeGenerator(CoinGenerator generator) {
-    final result = state.upgradeGenerator(generator);
-    update();
-    return result;
-  }
-
-  @override
-  void dispose() {
-    state.dispose();
-    super.dispose();
-  }
-}
-
-// Create providers
-final gameStateProvider = StateNotifierProvider<GameStateNotifier, GameState>((
-  ref,
-) {
-  return GameStateNotifier(GameState());
-});

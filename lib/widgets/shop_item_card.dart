@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:idlefit/constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/services/game_state_notifier.dart';
 import '../services/game_state.dart';
 import '../models/shop_items.dart';
 import 'common_card.dart';

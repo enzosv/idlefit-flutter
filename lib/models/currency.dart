@@ -7,15 +7,40 @@ enum CurrencyType { unknown, coin, gem, space, energy }
 @Entity()
 class Currency {
   @Id(assignable: true)
-  int id = 0;
+  final int id;
 
-  double count = 0;
-  double totalSpent = 0;
-  double totalEarned = 0;
-  double baseMax = 100;
-  double maxMultiplier = 1;
+  final double count;
+  final double totalSpent;
+  final double totalEarned;
+  final double baseMax;
+  final double maxMultiplier;
 
-  Currency({required this.id, this.count = 0, this.baseMax = 100});
+  Currency({
+    required this.id,
+    this.count = 0,
+    this.totalSpent = 0,
+    this.totalEarned = 0,
+    this.baseMax = 100,
+    this.maxMultiplier = 1,
+  });
+
+  Currency copyWith({
+    int? id,
+    double? count,
+    double? totalSpent,
+    double? totalEarned,
+    double? baseMax,
+    double? maxMultiplier,
+  }) {
+    return Currency(
+      id: id ?? this.id,
+      count: count ?? this.count,
+      totalSpent: totalSpent ?? this.totalSpent,
+      totalEarned: totalEarned ?? this.totalEarned,
+      baseMax: baseMax ?? this.baseMax,
+      maxMultiplier: maxMultiplier ?? this.maxMultiplier,
+    );
+  }
 
   CurrencyType get type {
     _ensureStableEnumValues();
@@ -24,38 +49,23 @@ class Currency {
         : CurrencyType.unknown;
   }
 
-  double get max {
-    return baseMax * maxMultiplier;
-  }
+  double get max => baseMax * maxMultiplier;
 
-  void mirror(Currency currency) {
-    count = currency.count;
-    totalEarned = currency.totalEarned;
-    totalSpent = currency.totalSpent;
-    baseMax = currency.baseMax;
-    maxMultiplier = currency.maxMultiplier;
-  }
-
-  double earn(double amount, [bool allowExcess = false]) {
+  Currency earn(double amount, [bool allowExcess = false]) {
     if (!allowExcess) {
       amount = min(amount, max - count);
     }
     if (amount <= 0) {
-      // TODO: convert unearned coins to energy
-      return 0;
+      return this;
     }
-    count += amount;
-    totalEarned += amount;
-    return amount;
+    return copyWith(count: count + amount, totalEarned: totalEarned + amount);
   }
 
-  bool spend(double amount) {
+  Currency? spend(double amount) {
     if (count < amount) {
-      return false;
+      return null;
     }
-    count -= amount;
-    totalSpent += amount;
-    return true;
+    return copyWith(count: count - amount, totalSpent: totalSpent + amount);
   }
 
   void _ensureStableEnumValues() {

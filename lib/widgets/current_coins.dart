@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/services/game_state_notifier.dart';
 import '../services/game_state.dart';
 import '../util.dart';
 

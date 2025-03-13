@@ -268,7 +268,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
         toManyRelations: (Currency object) => {},
         getId: (Currency object) => object.id,
         setId: (Currency object, int id) {
-          object.id = id;
+          if (object.id != id) {
+            throw ArgumentError('Field Currency.id is read-only '
+                '(final or getter-only) and it was declared to be self-assigned. '
+                'However, the currently inserted object (.id=${object.id}) '
+                "doesn't match the inserted ID (ID $id). "
+                'You must assign an ID before calling [box.put()].');
+          }
         },
         objectToFB: (Currency object, fb.Builder fbb) {
           fbb.startTable(10);
@@ -288,16 +294,21 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0);
           final countParam =
               const fb.Float64Reader().vTableGet(buffer, rootOffset, 6, 0);
+          final totalSpentParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 8, 0);
+          final totalEarnedParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 10, 0);
           final baseMaxParam =
               const fb.Float64Reader().vTableGet(buffer, rootOffset, 18, 0);
+          final maxMultiplierParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 20, 0);
           final object = Currency(
-              id: idParam, count: countParam, baseMax: baseMaxParam)
-            ..totalSpent =
-                const fb.Float64Reader().vTableGet(buffer, rootOffset, 8, 0)
-            ..totalEarned =
-                const fb.Float64Reader().vTableGet(buffer, rootOffset, 10, 0)
-            ..maxMultiplier =
-                const fb.Float64Reader().vTableGet(buffer, rootOffset, 20, 0);
+              id: idParam,
+              count: countParam,
+              totalSpent: totalSpentParam,
+              totalEarned: totalEarnedParam,
+              baseMax: baseMaxParam,
+              maxMultiplier: maxMultiplierParam);
 
           return object;
         }),

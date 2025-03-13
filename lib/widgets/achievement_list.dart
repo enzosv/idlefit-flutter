@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:idlefit/services/object_box.dart';
 import 'package:idlefit/main.dart'; // Import providers from main.dart
 import '../models/achievement.dart';
@@ -88,7 +89,7 @@ class _AchievementListState extends ConsumerState<AchievementList> {
         gameState.energy.earn(reward);
         break;
     }
-    gameStateNotifier.update();
+    // gameStateNotifier.update();
     // if (isLast) {
     //   return;
     // }
