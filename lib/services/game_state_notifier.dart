@@ -5,6 +5,7 @@ import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/shop_items_repo.dart';
 import 'package:idlefit/models/currency_repo.dart';
+import 'package:idlefit/services/background_activity.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,12 +54,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
       lastGenerated: savedState?['lastGenerated'] ?? 0,
       offlineCoinMultiplier: savedState?['offlineCoinMultiplier'] ?? 0.5,
       doubleCoinExpiry: savedState?['doubleCoinExpiry'] ?? 0,
-      backgroundState: {
-        'coins': coins.count,
-        'energy': 0,
-        'space': 0,
-        'energySpent': 0,
-      },
+      backgroundActivity: BackgroundActivity(),
     );
   }
 
@@ -89,7 +85,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     if (state.isPaused) return;
 
     final now = DateTime.now().millisecondsSinceEpoch;
-    final realDif = state.lastGenerated - now;
+    final realDif = now - state.lastGenerated;
     final dif = state.calculateValidTimeSinceLastGenerate(
       now,
       state.lastGenerated,
@@ -102,29 +98,34 @@ class GameStateNotifier extends StateNotifier<GameState> {
       return;
     }
     coinsGenerated *= (dif / Constants.tickTime);
-
-    var newState = state;
-    if (realDif > Constants.inactiveThreshold && dif > Constants.tickTime) {
-      // reduce coins generated offline
-      coinsGenerated *= state.offlineCoinMultiplier;
-      // consume energy
-      final newEnergy = newState.energy.spend(dif.toDouble());
-      // track energy spent for popup
-      final newBackgroundState = Map<String, double>.from(
-        state.backgroundState,
-      );
-      newBackgroundState['energySpent'] = dif.toDouble();
-
-      // update state
-      newState = newState.copyWith(
-        energy: newEnergy,
-        backgroundState: newBackgroundState,
-      );
+    if (realDif < Constants.inactiveThreshold) {
+      // don't use energy
+      // earn coins
+      final newCoins = state.coins.earn(coinsGenerated);
+      state = state.copyWith(coins: newCoins, lastGenerated: now);
+      _save();
+      return;
     }
+    // use energy
+    // reduce coins generated offline
+    coinsGenerated *= state.offlineCoinMultiplier;
+    final newCoins = state.coins.earn(coinsGenerated);
 
-    // earn coins
-    final newCoins = newState.coins.earn(coinsGenerated);
-    state = newState.copyWith(coins: newCoins, lastGenerated: now);
+    // consume energy
+    final newEnergy = state.energy.spend(dif.toDouble());
+    // track energy spent for popup
+    final newBackgroundActivity = state.backgroundActivity.copyWith(
+      energySpent: dif.toDouble(),
+      coinsEarned: newCoins.count,
+    );
+
+    // update state
+    state = state.copyWith(
+      coins: newCoins,
+      energy: newEnergy,
+      backgroundActivity: newBackgroundActivity,
+      lastGenerated: now,
+    );
     _save();
   }
 
@@ -144,22 +145,22 @@ class GameStateNotifier extends StateNotifier<GameState> {
         calories * healthMultiplier * Constants.calorieToEnergyMultiplier;
     final gemGain = exerciseMinutes * healthMultiplier / 2;
 
-    final newBackgroundState = Map<String, double>.from(state.backgroundState);
-    newBackgroundState['energy'] = energyGain;
-    newBackgroundState['space'] = steps;
+    final newBackgroundActivity = state.backgroundActivity.copyWith(
+      energyEarned: energyGain,
+      spaceEarned: steps,
+    );
 
     state = state.copyWith(
       energy: state.energy.earn(energyGain),
       gems: state.gems.earn(gemGain),
       space: state.space.earn(steps),
-      backgroundState: newBackgroundState,
+      backgroundActivity: newBackgroundActivity,
     );
 
     _save();
   }
 
   void saveBackgroundState() {
-    state = state.copyWith(backgroundState: state.getBackgroundStateSnapshot());
     _scheduleCoinCapacityNotification();
   }
 
@@ -299,7 +300,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
     if (generator.count < 10 || generator.isUnlocked) return false;
 
     final newSpace = state.space.spend(generator.upgradeUnlockCost);
-    if (newSpace == null) return false;
 
     generator.isUnlocked = true;
     state.generatorRepo.saveCoinGenerator(generator);

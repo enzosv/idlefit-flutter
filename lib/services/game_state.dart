@@ -5,6 +5,7 @@ import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/shop_items_repo.dart';
 import 'package:idlefit/models/currency_repo.dart';
+import 'package:idlefit/services/background_activity.dart';
 import 'package:idlefit/services/storage_service.dart';
 import 'package:objectbox/objectbox.dart';
 import '../models/shop_items.dart';
@@ -12,8 +13,7 @@ import '../models/shop_items.dart';
 class GameState {
   final bool isPaused;
 
-  // Background state tracking
-  final Map<String, double> backgroundState;
+  final BackgroundActivity backgroundActivity;
 
   final Currency coins;
   final Currency gems;
@@ -49,13 +49,11 @@ class GameState {
     required CurrencyRepo currencyRepo,
     required CoinGeneratorRepo generatorRepo,
     required ShopItemsRepo shopItemRepo,
-    Map<String, double>? backgroundState,
+    BackgroundActivity? backgroundActivity,
   }) : currencyRepo = currencyRepo,
        generatorRepo = generatorRepo,
        shopItemRepo = shopItemRepo,
-       backgroundState =
-           backgroundState ??
-           {'coins': 0, 'energy': 0, 'space': 0, 'energySpent': 0};
+       backgroundActivity = backgroundActivity ?? BackgroundActivity();
 
   GameState copyWith({
     bool? isPaused,
@@ -68,7 +66,7 @@ class GameState {
     double? offlineCoinMultiplier,
     List<CoinGenerator>? coinGenerators,
     List<ShopItem>? shopItems,
-    Map<String, double>? backgroundState,
+    BackgroundActivity? backgroundActivity,
   }) {
     return GameState(
       isPaused: isPaused ?? this.isPaused,
@@ -82,7 +80,7 @@ class GameState {
           offlineCoinMultiplier ?? this.offlineCoinMultiplier,
       coinGenerators: coinGenerators ?? this.coinGenerators,
       shopItems: shopItems ?? this.shopItems,
-      backgroundState: backgroundState ?? this.backgroundState,
+      backgroundActivity: backgroundActivity ?? this.backgroundActivity,
       storageService: storageService,
       currencyRepo: currencyRepo,
       generatorRepo: generatorRepo,
@@ -93,9 +91,7 @@ class GameState {
   Future<void> initialize(Store objectBoxService) async {
     // Ensure default currencies exist and load them
     currencyRepo.ensureDefaultCurrencies();
-    final currencies = currencyRepo.loadCurrencies();
-    final coins = currencies[CurrencyType.coin]!;
-    backgroundState['coins'] = coins.count;
+    currencyRepo.loadCurrencies();
   }
 
   Map<String, dynamic> toJson() {
@@ -140,18 +136,5 @@ class GameState {
 
     // limit to energy
     return min(dif, energy.count.round());
-  }
-
-  Map<String, double> getBackgroundStateSnapshot() {
-    return {'coins': coins.count, 'energy': 0, 'space': 0, 'energySpent': 0};
-  }
-
-  Map<String, double> getBackgroundDifferences() {
-    return {
-      'coins': coins.count - (backgroundState['coins'] ?? 0),
-      'energy_earned': backgroundState['energy'] ?? 0,
-      'space': backgroundState['space'] ?? 0,
-      'energy_spent': backgroundState['energySpent'] ?? 0,
-    };
   }
 }

@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:idlefit/constants.dart';
+import 'package:idlefit/services/background_activity.dart';
 import '../util.dart';
 
 class BackgroundEarningsPopup extends StatelessWidget {
   final msToMins = 60000;
-  final Map<String, double> earnings;
+  final BackgroundActivity backgroundActivity;
 
-  const BackgroundEarningsPopup({super.key, required this.earnings});
+  const BackgroundEarningsPopup({super.key, required this.backgroundActivity});
 
   @override
   Widget build(BuildContext context) {
-    final double energyEarned = (earnings['energy_earned'] ?? 0) / msToMins;
-    final double spaceEarned = earnings['space'] ?? 0;
-    final double coinsEarned = earnings['coins'] ?? 0;
-    final double energySpent = (earnings['energy_spent'] ?? 0) / msToMins;
-    if (coinsEarned < 1 && spaceEarned < 1 && energyEarned < 1) {
+    print("backgroundActivity: ${backgroundActivity.coinsEarned}");
+    if (backgroundActivity.coinsEarned < 1 &&
+        backgroundActivity.spaceEarned < 1) {
+      return const SizedBox.shrink();
+    }
+    final double energyEarned = backgroundActivity.energyEarned / msToMins;
+    final double energySpent = backgroundActivity.energySpent / msToMins;
+    if (energyEarned < 1 && energySpent < 1) {
       return const SizedBox.shrink();
     }
 
@@ -29,23 +33,23 @@ class BackgroundEarningsPopup extends StatelessWidget {
               'While You Were Away',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            if (coinsEarned > 0) const SizedBox(height: 24),
-            if (coinsEarned > 0)
+            if (backgroundActivity.coinsEarned > 0) const SizedBox(height: 24),
+            if (backgroundActivity.coinsEarned > 0)
               _buildEarningRow(
                 context,
                 icon: Constants.coinIcon,
                 label: 'Earned',
-                value: toLettersNotation(coinsEarned),
+                value: toLettersNotation(backgroundActivity.coinsEarned),
                 color: Colors.amber,
               ),
 
-            if (spaceEarned > 0) const SizedBox(height: 16),
-            if (spaceEarned > 0)
+            if (backgroundActivity.spaceEarned > 0) const SizedBox(height: 16),
+            if (backgroundActivity.spaceEarned > 0)
               _buildEarningRow(
                 context,
                 icon: Constants.spaceIcon,
                 label: 'Earned',
-                value: toLettersNotation(spaceEarned),
+                value: toLettersNotation(backgroundActivity.spaceEarned),
                 color: Colors.blueAccent,
               ),
             if (energyEarned > 0) const SizedBox(height: 16),

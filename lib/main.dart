@@ -166,14 +166,18 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
         return;
       }
       final gameState = ref.read(gameStateProvider);
-      final earnings = gameState.getBackgroundDifferences();
-      if ((earnings['energy_spent'] ?? 0) > 60000) {
+      final backgroundActivity = gameState.backgroundActivity;
+
+      if (backgroundActivity.energySpent < 60000) {
         // do not show popup if energy spent is less than 1 minute
+        return;
+      }
         showDialog(
           context: context,
-          builder: (context) => BackgroundEarningsPopup(earnings: earnings),
+        builder:
+            (context) =>
+                BackgroundEarningsPopup(backgroundActivity: backgroundActivity),
         );
-      }
     });
   }
 
