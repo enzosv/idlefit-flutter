@@ -3,39 +3,114 @@ import 'package:flutter/services.dart';
 import 'package:idlefit/objectbox.g.dart';
 import 'package:objectbox/objectbox.dart';
 
+// Define enums for quest properties
+enum QuestAction { spend, walk, watch, burn, collect }
+
+enum QuestUnit { coins, steps, ad, calories, energy, space }
+
+enum RewardUnit { coins, energy, space, gems }
+
+// Extension methods to handle string conversion for JSON and display
+extension QuestActionExtension on QuestAction {
+  String toJson() {
+    return name[0].toUpperCase() + name.substring(1);
+  }
+
+  static QuestAction fromJson(String json) {
+    final normalized = json.toLowerCase();
+    return QuestAction.values.firstWhere(
+      (action) => action.name == normalized,
+      orElse: () => QuestAction.spend,
+    );
+  }
+
+  String get display => name[0].toUpperCase() + name.substring(1);
+}
+
+extension QuestUnitExtension on QuestUnit {
+  String toJson() {
+    return name.toLowerCase();
+  }
+
+  static QuestUnit fromJson(String json) {
+    final normalized = json.toLowerCase();
+    return QuestUnit.values.firstWhere(
+      (unit) => unit.name == normalized,
+      orElse: () => QuestUnit.coins,
+    );
+  }
+
+  String get display => name[0].toUpperCase() + name.substring(1);
+}
+
+extension RewardUnitExtension on RewardUnit {
+  String toJson() {
+    return name.toLowerCase();
+  }
+
+  static RewardUnit fromJson(String json) {
+    final normalized = json.toLowerCase();
+    return RewardUnit.values.firstWhere(
+      (unit) => unit.name == normalized,
+      orElse: () => RewardUnit.coins,
+    );
+  }
+
+  String get display => name[0].toUpperCase() + name.substring(1);
+}
+
 @Entity()
 class DailyQuest {
   @Id()
   int id = 0;
+
+  // Store enum values as strings in the database
   String action = '';
   String unit = '';
+  String rewardUnit = '';
+
   int requirement = 0;
   int reward = 0;
-  String rewardUnit = '';
   double progress = 0; // Track progress
   int dateAssigned = 0;
   bool isClaimed = false;
 
   DailyQuest();
 
+  // Getters and setters for enum properties - marked as @Transient so ObjectBox ignores them
+  @Transient()
+  QuestAction get questAction => QuestActionExtension.fromJson(action);
+  set questAction(QuestAction value) => action = value.toJson();
+
+  @Transient()
+  QuestUnit get questUnit => QuestUnitExtension.fromJson(unit);
+  set questUnit(QuestUnit value) => unit = value.toJson();
+
+  @Transient()
+  RewardUnit get questRewardUnit => RewardUnitExtension.fromJson(rewardUnit);
+  set questRewardUnit(RewardUnit value) => rewardUnit = value.toJson();
+
+  @Transient()
   String get description {
-    return '$action $requirement $unit';
+    return '${questAction.display} $requirement ${questUnit.display}';
   }
 
+  @Transient()
   String get rewardText {
     return reward.toString();
   }
 
+  @Transient()
   bool get isCompleted => progress >= requirement;
 
   factory DailyQuest.fromJson(Map<String, dynamic> json) {
     final quest =
         DailyQuest()
-          ..action = json['action']
-          ..unit = json['unit']
+          ..questAction = QuestActionExtension.fromJson(json['action'])
+          ..questUnit = QuestUnitExtension.fromJson(json['unit'])
           ..requirement = json['requirement']
           ..reward = json['reward']
-          ..rewardUnit = json['reward_unit'];
+          ..questRewardUnit = RewardUnitExtension.fromJson(json['reward_unit']);
     return quest;
   }
 
@@ -86,29 +161,29 @@ class DailyQuestRepo {
 
     final spendCoinQuest =
         DailyQuest()
-          ..action = 'Spend'
-          ..unit = 'Coins'
+          ..questAction = QuestAction.spend
+          ..questUnit = QuestUnit.coins
           ..requirement = 1000
           ..reward = 100
-          ..rewardUnit = 'Coins'
+          ..questRewardUnit = RewardUnit.coins
           ..dateAssigned = todayTimestamp;
 
     final walkQuest =
         DailyQuest()
-          ..action = 'Walk'
-          ..unit = 'Steps'
+          ..questAction = QuestAction.walk
+          ..questUnit = QuestUnit.steps
           ..requirement = 7500
           ..reward = 1000
-          ..rewardUnit = 'Space'
+          ..questRewardUnit = RewardUnit.space
           ..dateAssigned = todayTimestamp;
 
     final watchAdQuest =
         DailyQuest()
-          ..action = 'Watch'
-          ..unit = 'Ad'
+          ..questAction = QuestAction.watch
+          ..questUnit = QuestUnit.ad
           ..requirement = 1
           ..reward = 1000
-          ..rewardUnit = 'Space'
+          ..questRewardUnit = RewardUnit.space
           ..dateAssigned = todayTimestamp;
     final quests = [spendCoinQuest, walkQuest, watchAdQuest];
     box.putMany(quests);
@@ -117,23 +192,41 @@ class DailyQuestRepo {
     return quests;
   }
 
-  Future<void> progressTowards(String unit, action, double progress) async {
+  // Updated to use enum types
+  Future<void> progressTowards(
+    QuestAction action,
+    QuestUnit unit,
+    double progress,
+  ) async {
     final quests = await generateDailyQuests();
     for (final quest in quests) {
-      print('${quest.action} ${action} ${quest.unit} $unit');
+      print('${quest.questAction} ${action} ${quest.questUnit} $unit');
 
-      if (quest.action.toLowerCase() != action.toLowerCase()) {
+      if (quest.questAction != action) {
         continue;
       }
-      if (quest.unit.toLowerCase() != unit.toLowerCase()) {
+      if (quest.questUnit != unit) {
         continue;
       }
-      print('progressing ${quest.action} ${action} ${quest.unit} $unit');
+      print(
+        'progressing ${quest.questAction} ${action} ${quest.questUnit} $unit',
+      );
 
       quest.progress += progress;
       box.put(quest);
       return;
     }
+  }
+
+  // Keep the string-based method for backward compatibility
+  Future<void> progressTowardsString(
+    String actionStr,
+    String unitStr,
+    double progress,
+  ) async {
+    final action = QuestActionExtension.fromJson(actionStr);
+    final unit = QuestUnitExtension.fromJson(unitStr);
+    return progressTowards(action, unit, progress);
   }
 
   void updateQuestProgress(DailyQuest quest, double progress) {

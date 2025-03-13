@@ -71,7 +71,7 @@ class _DailyQuestListState extends State<DailyQuestList> {
             const Divider(),
             ...quests.map((quest) {
               // Skip ad quests since we're auto-claiming
-              if (quest.action.toLowerCase() == 'watch') {
+              if (quest.questAction == QuestAction.watch) {
                 return const SizedBox.shrink();
               }
 
@@ -131,7 +131,7 @@ class _DailyQuestCard extends StatelessWidget {
                 children: [
                   Text('Reward:', style: theme.textTheme.bodySmall),
                   Text(
-                    '${quest.rewardText} ${quest.rewardUnit}',
+                    '${quest.rewardText} ${quest.questRewardUnit.display}',
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.colorScheme.primary,
                     ),

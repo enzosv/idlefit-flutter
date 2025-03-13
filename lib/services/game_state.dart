@@ -182,8 +182,12 @@ class GameState with ChangeNotifier {
       exerciseMinutes * healthMultiplier / 2,
     ); // 2 exercise minutes = 1 gem
     _backgroundSpace = space.earn(steps);
-    _dailyQuestRepo.progressTowards('Walk', 'Steps', steps);
-    _dailyQuestRepo.progressTowards('Calories', 'Burned', calories);
+    _dailyQuestRepo.progressTowards(QuestAction.walk, QuestUnit.steps, steps);
+    _dailyQuestRepo.progressTowards(
+      QuestAction.burn,
+      QuestUnit.calories,
+      calories,
+    );
     save();
     notifyListeners();
   }
@@ -214,7 +218,11 @@ class GameState with ChangeNotifier {
     generator.count++;
 
     _generatorRepo.saveCoinGenerator(generator);
-    _dailyQuestRepo.progressTowards('Coins', 'Spend', generator.cost);
+    _dailyQuestRepo.progressTowards(
+      QuestAction.spend,
+      QuestUnit.coins,
+      generator.cost,
+    );
     save();
     notifyListeners();
     return true;
@@ -245,8 +253,8 @@ class GameState with ChangeNotifier {
     }
     _shopItemRepo.saveShopItem(item);
     _dailyQuestRepo.progressTowards(
-      'Space',
-      'Spend',
+      QuestAction.spend,
+      QuestUnit.space,
       item.currentCost.toDouble(),
     );
     save();
@@ -265,8 +273,8 @@ class GameState with ChangeNotifier {
     generator.isUnlocked = true;
     _generatorRepo.saveCoinGenerator(generator);
     _dailyQuestRepo.progressTowards(
-      'Space',
-      'Spend',
+      QuestAction.spend,
+      QuestUnit.space,
       generator.upgradeUnlockCost,
     );
     save();
@@ -284,7 +292,11 @@ class GameState with ChangeNotifier {
 
     generator.level++;
     _generatorRepo.saveCoinGenerator(generator);
-    _dailyQuestRepo.progressTowards('Coins', 'Spend', generator.upgradeCost);
+    _dailyQuestRepo.progressTowards(
+      QuestAction.spend,
+      QuestUnit.coins,
+      generator.upgradeCost,
+    );
     save();
     notifyListeners();
     return true;
