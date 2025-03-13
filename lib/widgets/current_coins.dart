@@ -8,11 +8,17 @@ import '../util.dart';
 /// Provider that combines the game tick and coin count to ensure consistent updates
 final currentCoinValueProvider = Provider<double>((ref) {
   // Watch the game tick stream to rebuild when the game loop runs
-  ref.watch(gameTickProvider);
+  final tickStatus = ref.watch(gameTickProvider);
+
+  tickStatus.whenData((_) {
+    print("Current coin value rebuilding due to game tick");
+  });
 
   // Get the current coin value
   final currencies = ref.watch(currencyNotifierProvider);
-  return currencies[CurrencyType.coin]?.count ?? 0;
+  final coinValue = currencies[CurrencyType.coin]?.count ?? 0;
+  print("Current coin value: $coinValue");
+  return coinValue;
 });
 
 class CurrentCoins extends ConsumerStatefulWidget {
@@ -63,6 +69,7 @@ class _CurrentCoinsState extends ConsumerState<CurrentCoins>
   Widget build(BuildContext context) {
     // Get coin value from the combined provider that watches the game tick
     final coinCount = ref.watch(currentCoinValueProvider);
+    print("CurrentCoins widget rebuilding with value: $coinCount");
 
     return AnimatedBuilder(
       animation: _scaleAnimation,

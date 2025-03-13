@@ -16,26 +16,9 @@ part 'game_engine_provider.g.dart';
 
 /// Creates a stream that emits a tick event whenever the game loop updates
 final gameTickProvider = StreamProvider<void>((ref) {
-  final controller = StreamController<void>();
-
-  // Listen to the game engine state changes
-  final subscription = ref.listen(gameEngineProvider, (previous, next) {});
-
-  // Create a periodic timer that emits at the same rate as the game loop
-  final timer = Timer.periodic(const Duration(milliseconds: 1000), (_) {
-    if (!ref.read(gameEngineProvider)) {
-      // If game is not paused
-      controller.add(null); // Emit a tick event
-    }
-  });
-
-  ref.onDispose(() {
-    timer.cancel();
-    subscription.close();
-    controller.close();
-  });
-
-  return controller.stream;
+  // Instead of creating our own timer, we'll just expose the stream from the GameEngine
+  final gameEngine = ref.watch(gameEngineProvider.notifier);
+  return gameEngine.tickStream;
 });
 
 @Riverpod(keepAlive: true)
@@ -46,63 +29,127 @@ class GameEngine extends _$GameEngine {
       72000.0; // 1 calorie = 72 seconds of idle fuel
   static const _notificationId = 1;
 
-  Timer? _generatorTimer;
   bool _isPaused = true;
+  Timer? _gameTimer;
+  final StreamController<void> _tickController =
+      StreamController<void>.broadcast();
+
+  // Expose the tick stream
+  Stream<void> get tickStream => _tickController.stream;
 
   @override
   bool build() {
+    print("GameEngine provider building! Creating initial state");
     ref.onDispose(() {
-      _stopGeneratorTimer();
+      print("GameEngine provider disposing!");
+      _gameTimer?.cancel();
+      _tickController.close();
     });
+
+    // Schedule a debug check to see if the timer is running
+    Future.delayed(Duration(milliseconds: 5000), () {
+      print(
+        "Debug check: Game timer is ${_gameTimer != null ? 'running' : 'not running'}",
+      );
+      print("Debug check: Game is ${_isPaused ? 'paused' : 'running'}");
+      print("Debug check: State is ${state}");
+    });
+
     return _isPaused;
   }
 
-  void _stopGeneratorTimer() {
-    _generatorTimer?.cancel();
-    _generatorTimer = null;
-  }
-
   void setPaused(bool paused) {
-    if (paused == _isPaused) return;
+    if (paused == _isPaused) {
+      print(
+        "Game engine already ${paused ? 'paused' : 'running'}, no change needed",
+      );
+      return;
+    }
 
+    print("Setting game engine paused: $paused (was: $_isPaused)");
     _isPaused = paused;
     state = paused;
 
     if (paused) {
-      _stopGeneratorTimer();
+      _stopGameTimer();
     } else {
-      _startGeneratorTimer();
+      _startGameTimer();
+      // Also run one immediate generation
+      print("Running immediate generator processing on unpause");
+      _processGenerators();
     }
   }
 
-  void _startGeneratorTimer() {
-    _stopGeneratorTimer();
-
-    final duration = Duration(milliseconds: _tickTime);
-    _generatorTimer = Timer.periodic(duration, (_) {
-      _processGenerators();
+  void _startGameTimer() {
+    print("Starting game timer");
+    _gameTimer?.cancel();
+    _gameTimer = Timer.periodic(const Duration(milliseconds: _tickTime), (
+      timer,
+    ) {
+      print("Timer tick from GameEngine timer (${timer.isActive})");
+      if (!_isPaused) {
+        print("Game tick emitted from timer inside GameEngine!");
+        _tickController.add(null);
+        _processGenerators();
+      } else {
+        print("Game is paused, not processing tick");
+      }
     });
+    print("Game timer created and scheduled: ${_gameTimer != null}");
+  }
+
+  void _stopGameTimer() {
+    print("Stopping game timer");
+    _gameTimer?.cancel();
+    _gameTimer = null;
   }
 
   void _processGenerators() {
-    if (_isPaused) return;
+    if (_isPaused) {
+      print("Game is paused, skipping _processGenerators");
+      return;
+    }
 
+    print("Processing generators");
     final now = DateTime.now().millisecondsSinceEpoch;
     final playerStats = ref.read(playerStatsNotifierProvider);
     final lastGenerated = playerStats.lastGenerated;
 
-    final realDif = lastGenerated - now;
+    // Calculate time difference
+    final timeSinceLastGen = now - lastGenerated;
+    print(
+      "Time since last generation: ${timeSinceLastGen}ms, last: $lastGenerated, now: $now",
+    );
+
+    // If this is the first time or after a reset, just update the timestamp and return
+    if (lastGenerated <= 0) {
+      print(
+        "First run or reset detected - initializing lastGenerated timestamp",
+      );
+      ref.read(playerStatsNotifierProvider.notifier).updateLastGenerated(now);
+      return;
+    }
+
     final availableDif = _validTimeSinceLastGenerate(now, lastGenerated);
-    final usesEnergy = realDif > _inactiveThreshold;
+    final usesEnergy = timeSinceLastGen > _inactiveThreshold;
 
     double coinsGenerated = _calculatePassiveOutput();
+    print("Base passive output: $coinsGenerated");
+
     if (usesEnergy) {
       // reduce speed of coin generation in background
-      coinsGenerated *= playerStats.offlineCoinMultiplier;
+      final offlineMultiplier = playerStats.offlineCoinMultiplier;
+      print("Using energy - applying offline multiplier: $offlineMultiplier");
+      coinsGenerated *= offlineMultiplier;
     }
-    coinsGenerated *= (availableDif / _tickTime);
+
+    // Apply time factor (normalize to expected tick time)
+    final timeFactor = availableDif / _tickTime;
+    print("Time factor: $timeFactor (${availableDif}ms / ${_tickTime}ms)");
+    coinsGenerated *= timeFactor;
 
     if (coinsGenerated > 0) {
+      print("Earning coins: $coinsGenerated");
       ref
           .read(currencyNotifierProvider.notifier)
           .earn(CurrencyType.coin, coinsGenerated);
@@ -113,30 +160,43 @@ class GameEngine extends _$GameEngine {
 
   int _validTimeSinceLastGenerate(int now, int previous) {
     final energy = ref.read(currencyNotifierProvider)[CurrencyType.energy];
+
+    // Safety checks
     if (energy == null || energy.count <= 0 || previous <= 0) {
+      print(
+        "Energy null/zero or invalid previous timestamp - returning default tick time",
+      );
       return _tickTime;
     }
 
-    int dif = now - previous;
-    // if last generated > 30s, consume energy
-    if (dif < _inactiveThreshold) {
-      // do not consume energy
-      return dif;
+    // Calculate time difference
+    final timeDiff = now - previous;
+    print("Time difference for energy calculation: ${timeDiff}ms");
+
+    // If last generated < 30s ago, don't consume energy
+    if (timeDiff < _inactiveThreshold) {
+      print("Time diff < inactive threshold, not consuming energy");
+      return timeDiff;
     }
 
-    dif = min(dif, energy.count.round());
+    // If we're here, we need to consume energy based on the time difference
+    final energyToSpend = min(timeDiff, energy.count.round());
+    print(
+      "Consuming energy: $energyToSpend (capped by available energy: ${energy.count})",
+    );
+
     // Update energy spent in background tracking
     ref
         .read(playerStatsNotifierProvider.notifier)
-        .setBackgroundEnergySpent(dif.toDouble());
+        .setBackgroundEnergySpent(energyToSpend.toDouble());
 
     // Spend energy
     ref
         .read(currencyNotifierProvider.notifier)
-        .spend(CurrencyType.energy, dif.toDouble());
+        .spend(CurrencyType.energy, energyToSpend.toDouble());
 
-    print("spent energy ${durationNotation(dif.toDouble())}");
-    return dif;
+    print("Spent energy ${durationNotation(energyToSpend.toDouble())}");
+    return energyToSpend;
   }
 
   double _calculatePassiveOutput() {

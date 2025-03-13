@@ -12,30 +12,48 @@ import 'widgets/background_earnings_popup.dart';
 import 'services/ad_service.dart';
 import 'services/notification_service.dart';
 
-// Health service provider
+// Service providers
+final objectBoxProvider = Provider<ObjectBox>((ref) {
+  // We'll manually trigger the initialization in GameHomePage
+  throw UnimplementedError('ObjectBox must be initialized asynchronously');
+});
+
+final notificationServiceProvider = Provider<NotificationService>((ref) {
+  return NotificationService();
+});
+
 final healthServiceProvider = Provider<HealthService>((ref) {
   return HealthService();
 });
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+final adServiceProvider = Provider<AdService>((ref) {
+  return AdService();
+});
 
-  // Initialize services
-  final healthService = HealthService();
+// Provider to handle initialization of services
+final servicesInitializerProvider = FutureProvider<bool>((ref) async {
+  print("Initializing all services via provider");
+
+  // Initialize ObjectBox
   final objectBox = await ObjectBox.create();
+  ref.container.updateOverrides([
+    objectBoxProvider.overrideWithValue(objectBox),
+  ]);
 
-  // Initialize notifications
+  // Initialize notification service
   await NotificationService.initialize();
 
-  runApp(
-    ProviderScope(
-      overrides: [
-        // Override objectBoxProvider with actual instance
-        objectBoxProvider.overrideWithValue(objectBox),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  // Initialize ad service
+  AdService.initialize();
+
+  return true;
+});
+
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  print("App starting - initializing via Riverpod");
+
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -61,7 +79,51 @@ class MyApp extends StatelessWidget {
         highlightColor: Colors.transparent,
       ),
       themeMode: ThemeMode.dark,
-      home: const GameHomePage(),
+      home: const InitializationScreen(),
+    );
+  }
+}
+
+// Screen to handle initialization before showing the main app
+class InitializationScreen extends ConsumerWidget {
+  const InitializationScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final initializationState = ref.watch(servicesInitializerProvider);
+
+    return initializationState.when(
+      data: (_) => const GameHomePage(),
+      loading:
+          () => const Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Initializing game...'),
+                ],
+              ),
+            ),
+          ),
+      error:
+          (error, stack) => Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error, color: Colors.red, size: 48),
+                  const SizedBox(height: 16),
+                  Text('Error initializing: $error'),
+                  ElevatedButton(
+                    onPressed: () => ref.refresh(servicesInitializerProvider),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          ),
     );
   }
 }
@@ -85,7 +147,7 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    print("new state: $state");
+    print("App lifecycle state changed: $state");
     if (![
       AppLifecycleState.paused,
       AppLifecycleState.resumed,
@@ -95,12 +157,14 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
 
     if (state == AppLifecycleState.paused) {
       // going to background
+      print("App going to background - pausing game engine");
       ref.read(gameEngineProvider.notifier).setPaused(true);
       ref.read(gameEngineProvider.notifier).saveBackgroundState();
       return;
     }
 
     // going to foreground
+    print("App returning to foreground - resuming game engine");
     final healthService = ref.read(healthServiceProvider);
     await healthService.syncHealthData(
       ref.read(objectBoxProvider),
@@ -108,6 +172,9 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
     );
 
     NotificationService.cancelAllNotifications();
+
+    // Start the game engine
+    print("Starting game engine after returning to foreground");
     ref.read(gameEngineProvider.notifier).setPaused(false);
 
     await Future.delayed(const Duration(seconds: 1)).then((_) {
@@ -130,28 +197,61 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
   @override
   void initState() {
     super.initState();
+    print("GameHomePage initializing");
+    WidgetsBinding.instance.addObserver(this);
 
-    // Initialize game engine (paused)
+    // We need to wait until after the first build before we can safely access providers
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeGameEngine();
+    });
+  }
+
+  Future<void> _initializeGameEngine() async {
+    print("Initializing game engine (post-frame)");
+
+    // First pause the game engine
+    print("Setting initial game state to paused");
     ref.read(gameEngineProvider.notifier).setPaused(true);
 
-    // Initialize ads
-    AdService.initialize();
-
-    // Initialize health data
-    final healthService = ref.read(healthServiceProvider);
-    healthService.initialize().then((_) async {
-      await healthService.syncHealthData(
-        ref.read(objectBoxProvider),
-        ref.read(gameEngineProvider.notifier),
-      );
-      ref.read(gameEngineProvider.notifier).setPaused(false);
+    // Force a watch on the gameTickProvider to ensure it's created and initialized
+    ref.listen(gameTickProvider, (previous, next) {
+      print("GameTickProvider state changed");
     });
 
-    WidgetsBinding.instance.addObserver(this);
+    // Initialize health data and then start the game
+    print("Initializing health data");
+    final healthService = ref.read(healthServiceProvider);
+    await healthService.initialize();
+
+    print("Health data initialized, syncing health data");
+    await healthService.syncHealthData(
+      ref.read(objectBoxProvider),
+      ref.read(gameEngineProvider.notifier),
+    );
+
+    // Important: Start the game engine
+    print("Starting game engine after health data sync");
+    ref.read(gameEngineProvider.notifier).setPaused(false);
+
+    // Force a check of the game engine state
+    final isPaused = ref.read(gameEngineProvider);
+    print("Game engine paused state after initialization: $isPaused");
+
+    // Explicitly watch the gameTickProvider to ensure it's activated
+    ref
+        .read(gameTickProvider.stream)
+        .listen(
+          (_) => print("Main screen received game tick"),
+          onError: (e) => print("Error in game tick stream: $e"),
+        );
   }
 
   @override
   Widget build(BuildContext context) {
+    // Monitor game engine state in the build method
+    final isPaused = ref.watch(gameEngineProvider);
+    print("Game engine paused state during build: $isPaused");
+
     return Scaffold(
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -179,6 +279,7 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
 
   @override
   void dispose() {
+    print("GameHomePage disposing");
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

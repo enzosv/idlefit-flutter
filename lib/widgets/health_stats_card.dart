@@ -5,7 +5,9 @@ import 'package:idlefit/models/health_data_repo.dart';
 import 'package:idlefit/providers/game_engine_provider.dart';
 import 'package:idlefit/providers/objectbox_provider.dart';
 import 'package:idlefit/util.dart';
-import 'package:idlefit/main.dart'; // For healthServiceProvider
+import 'package:idlefit/main.dart'
+    show
+        healthServiceProvider; // Only import healthServiceProvider from main.dart
 import 'package:idlefit/widgets/card_button.dart';
 
 class HealthStatsCard extends ConsumerStatefulWidget {
@@ -52,7 +54,9 @@ class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
   }
 
   Future<void> _fetchData() async {
-    final healthBox = ref.read(objectBoxStoreProvider).box<HealthDataEntry>();
+    final objectBox = ref.read(objectBoxProvider);
+    final healthBox = objectBox.store.box<HealthDataEntry>();
+
     final healthRepo = HealthDataRepo(box: healthBox);
     final (healthToday, healthTotal) =
         await (healthRepo.today(DateTime.now()), healthRepo.total()).wait;
@@ -85,10 +89,8 @@ class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
                     ),
                     FutureBuilder<(DateTime?, DateTime?)>(
                       future: () async {
-                        final box =
-                            ref
-                                .read(objectBoxStoreProvider)
-                                .box<HealthDataEntry>();
+                        final objectBox = ref.read(objectBoxProvider);
+                        final box = objectBox.store.box<HealthDataEntry>();
                         final repo = HealthDataRepo(box: box);
                         final latest = await repo.latestEntryDate();
                         final earliest = await repo.earliestEntryDate();
