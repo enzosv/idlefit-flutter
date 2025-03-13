@@ -4,7 +4,6 @@ import 'package:idlefit/constants.dart';
 import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:idlefit/widgets/generator_upgrade_card.dart';
 import 'package:idlefit/widgets/shop_item_card.dart';
-import '../services/game_state.dart';
 import '../widgets/common_widgets.dart';
 
 class ShopScreen extends StatelessWidget {

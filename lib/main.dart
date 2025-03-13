@@ -136,7 +136,7 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    print("new state: $state");
+    // print("new state: $state");
     if (![
       AppLifecycleState.paused,
       AppLifecycleState.resumed,
@@ -161,7 +161,7 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
     NotificationService.cancelAllNotifications();
     gameStateNotifier.setIsPaused(false);
 
-    await Future.delayed(const Duration(seconds: 1)).then((_) {
+    await Future.delayed(const Duration(milliseconds: 1200)).then((_) {
       if (!mounted) {
         return;
       }
@@ -172,12 +172,12 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
         // do not show popup if energy spent is less than 1 minute
         return;
       }
-        showDialog(
-          context: context,
+      showDialog(
+        context: context,
         builder:
             (context) =>
                 BackgroundEarningsPopup(backgroundActivity: backgroundActivity),
-        );
+      );
     });
   }
 

@@ -112,13 +112,13 @@ class HealthService {
     );
 
     // Debug logging for available data types
-    print("Available data types: ${newData.map((d) => d.type.name).toSet()}");
-    print("Data sources: ${newData.map((d) => d.sourceName).toSet()}");
+    // print("Available data types: ${newData.map((d) => d.type.name).toSet()}");
+    // print("Data sources: ${newData.map((d) => d.sourceName).toSet()}");
 
     Map<String, double> grouped = {};
     for (final entry in newData) {
       final value = (entry.value as NumericHealthValue).numericValue.toDouble();
-      print("${entry.type.name} from ${entry.sourceName}: $value");
+      // print("${entry.type.name} from ${entry.sourceName}: $value");
       grouped[entry.sourceId] = (grouped[entry.sourceId] ?? 0) + value;
     }
     String? bestSource =
