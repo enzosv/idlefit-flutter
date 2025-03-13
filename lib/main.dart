@@ -98,7 +98,9 @@ class _GameInitializerState extends ConsumerState<GameInitializer> {
     final objectBox = ref.read(objectBoxProvider);
 
     // Initialize the game state
-    await ref.read(gameStateProvider.notifier).initialize(objectBox.store);
+    await ref
+        .read(gameStateProvider.notifier)
+        .initialize(storageService, objectBox.store);
 
     setState(() {
       _isInitialized = true;

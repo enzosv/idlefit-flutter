@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:idlefit/constants.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/coin_generator.dart';
@@ -7,7 +6,6 @@ import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/shop_items_repo.dart';
 import 'package:idlefit/models/currency_repo.dart';
 import 'package:idlefit/services/game_state.dart';
-import 'package:idlefit/util.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'storage_service.dart';
@@ -25,7 +23,10 @@ class GameStateNotifier extends StateNotifier<GameState> {
     _startGenerators();
   }
 
-  Future<void> initialize(Store objectBoxService) async {
+  Future<void> initialize(
+    StorageService storageService,
+    Store objectBoxService,
+  ) async {
     // Load data from repositories
     final coinGenerators = await state.generatorRepo.parseCoinGenerators(
       'assets/coin_generators.json',
@@ -43,7 +44,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     final space = currencies[CurrencyType.space]!;
 
     // Try to load saved state
-    // final savedState = await state._storageService.loadGameState();
+    final savedState = await storageService.loadGameState();
 
     state = state.copyWith(
       coins: coins,
@@ -52,9 +53,9 @@ class GameStateNotifier extends StateNotifier<GameState> {
       space: space,
       coinGenerators: coinGenerators,
       shopItems: shopItems,
-      lastGenerated: 0,
-      offlineCoinMultiplier: 0.5,
-      doubleCoinExpiry: 0,
+      lastGenerated: savedState?['lastGenerated'] ?? 0,
+      offlineCoinMultiplier: savedState?['offlineCoinMultiplier'] ?? 0.5,
+      doubleCoinExpiry: savedState?['doubleCoinExpiry'] ?? 0,
       backgroundState: {
         'coins': coins.count,
         'energy': 0,
