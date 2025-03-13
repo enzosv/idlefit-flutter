@@ -44,12 +44,16 @@ class AchievementRepo {
         achievement.requirement = requirements[i];
 
         final same = getSame(achievement);
-        if (same != null) {
+        if (same != null && same.progress > same.requirement) {
           print(
             "skipping ${action.name} ${reqUnit.name} ${achievement.requirement}",
           );
-          // Skip if already claimed
+          // Skip if already achieved
           continue;
+        }
+        if (same != null) {
+          achievements.add(same);
+          break;
         }
 
         achievement.questRewardUnit = RewardUnitExtension.fromJson(
@@ -66,8 +70,11 @@ class AchievementRepo {
   }
 
   bool claimAchievement(Achievement achievement) {
-    if (achievement.dateClaimed != null) return false;
-    achievement.dateClaimed = DateTime.now().millisecondsSinceEpoch;
+    if (achievement.isClaimed) return false;
+    if (achievement.progress < achievement.requirement) return false;
+    achievement.dateAchieved ??= DateTime.now().millisecondsSinceEpoch;
+    achievement.isClaimed = true;
+    // TODO: give reward
     box.put(achievement);
     return true;
   }
@@ -77,6 +84,13 @@ class AchievementRepo {
   }
 
   Achievement? getSame(Achievement achievement) {
+    if (achievement.id > 0) {
+      final match = box.get(achievement.id);
+      if (match != null) {
+        return match;
+      }
+    }
+
     return box
         .query(
           Achievement_.action
@@ -99,5 +113,97 @@ class AchievementRepo {
         .order(Achievement_.requirement)
         .build()
         .find();
+  }
+
+  /// load existing achivement from box or json
+  Future<Achievement?> loadAchivement(
+    QuestAction action,
+    QuestUnit unit,
+  ) async {
+    //load from box
+    final same =
+        box
+            .query(
+              Achievement_.action
+                  .equals(action.name)
+                  .and(Achievement_.reqUnit.equals(unit.name))
+                  .and(Achievement_.isClaimed.equals(false)),
+            )
+            .build()
+            .findFirst();
+    if (same != null) {
+      return same;
+    }
+
+    // get latest
+    // the one to be loaded from json should have higher requirement
+    final latest =
+        box
+            .query(
+              Achievement_.action
+                  .equals(action.name)
+                  .and(Achievement_.reqUnit.equals(unit.name)),
+            )
+            .order(Achievement_.requirement, flags: Order.descending)
+            .build()
+            .findFirst(); //TODO: just get requirement property
+    //load from json
+
+    final String response = await rootBundle.loadString(
+      'assets/achievements.json',
+    );
+    final List<dynamic> data = jsonDecode(response);
+    for (final item in data) {
+      final QuestAction itemAction = QuestActionExtension.fromJson(
+        item['action'],
+      );
+      if (itemAction != action) {
+        continue;
+      }
+      final QuestUnit itemReqUnit = QuestUnitExtension.fromJson(
+        item['req_unit'],
+      );
+      if (itemReqUnit != unit) {
+        continue;
+      }
+      final List<int> requirements = List<int>.from(item['requirements']);
+      final List<int> rewards = List<int>.from(item['rewards']);
+      assert(requirements.length == rewards.length);
+      for (int i = 0; i < requirements.length; i++) {
+        if (requirements[i] <= (latest?.requirement ?? 0)) {
+          // loaded from json should have higher requirement
+          continue;
+        }
+        final Achievement achievement = Achievement();
+        achievement.questAction = action;
+        achievement.questReqUnit = unit;
+        achievement.requirement = requirements[i];
+        achievement.questRewardUnit = RewardUnitExtension.fromJson(
+          item['reward_unit'],
+        );
+        achievement.reward = rewards[i];
+        box.put(achievement);
+        return achievement;
+      }
+    }
+    return null;
+  }
+
+  Future<void> progressTowards(
+    QuestAction action,
+    QuestUnit unit,
+    double progress,
+  ) async {
+    final quest = await loadAchivement(action, unit);
+    if (quest == null) {
+      return;
+    }
+    quest.progress += progress;
+    if (quest.progress >= quest.requirement) {
+      quest.dateAchieved = DateTime.now().millisecondsSinceEpoch;
+    }
+    box.put(quest);
+    // progress towards the next achievement
+    progressTowards(action, unit, quest.progress);
   }
 }

@@ -192,7 +192,6 @@ class DailyQuestRepo {
     return quests;
   }
 
-  // Updated to use enum types
   Future<void> progressTowards(
     QuestAction action,
     QuestUnit unit,

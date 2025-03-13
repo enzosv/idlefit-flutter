@@ -154,7 +154,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(7, 2119159745219438621),
       name: 'Achievement',
-      lastPropertyId: const obx_int.IdUid(13, 5316489849535110872),
+      lastPropertyId: const obx_int.IdUid(16, 3292906399986489350),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -162,11 +162,6 @@ final _entities = <obx_int.ModelEntity>[
             name: 'id',
             type: 6,
             flags: 1),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(10, 2084831577797524984),
-            name: 'dateClaimed',
-            type: 6,
-            flags: 0),
         obx_int.ModelProperty(
             id: const obx_int.IdUid(11, 6913876187873743667),
             name: 'action',
@@ -181,6 +176,21 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(13, 5316489849535110872),
             name: 'requirement',
             type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(14, 6523118473529924233),
+            name: 'dateAchieved',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(15, 4933960999106437162),
+            name: 'progress',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(16, 3292906399986489350),
+            name: 'isClaimed',
+            type: 1,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -310,7 +320,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         7633385983348480139,
         5727768307727832225,
         2592235923790219212,
-        2545780716478496970
+        2545780716478496970,
+        2084831577797524984
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -467,12 +478,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
         objectToFB: (Achievement object, fb.Builder fbb) {
           final actionOffset = fbb.writeString(object.action);
           final reqUnitOffset = fbb.writeString(object.reqUnit);
-          fbb.startTable(14);
+          fbb.startTable(17);
           fbb.addInt64(0, object.id);
-          fbb.addInt64(9, object.dateClaimed);
           fbb.addOffset(10, actionOffset);
           fbb.addOffset(11, reqUnitOffset);
           fbb.addInt64(12, object.requirement);
+          fbb.addInt64(13, object.dateAchieved);
+          fbb.addFloat64(14, object.progress);
+          fbb.addBool(15, object.isClaimed);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -482,14 +495,18 @@ obx_int.ModelDefinition getObjectBoxModel() {
 
           final object = Achievement()
             ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
-            ..dateClaimed =
-                const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 22)
             ..action = const fb.StringReader(asciiOptimization: true)
                 .vTableGet(buffer, rootOffset, 24, '')
             ..reqUnit = const fb.StringReader(asciiOptimization: true)
                 .vTableGet(buffer, rootOffset, 26, '')
             ..requirement =
-                const fb.Int64Reader().vTableGet(buffer, rootOffset, 28, 0);
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 28, 0)
+            ..dateAchieved =
+                const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 30)
+            ..progress =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 32, 0)
+            ..isClaimed =
+                const fb.BoolReader().vTableGet(buffer, rootOffset, 34, false);
 
           return object;
         }),
@@ -638,21 +655,29 @@ class Achievement_ {
   static final id =
       obx.QueryIntegerProperty<Achievement>(_entities[4].properties[0]);
 
-  /// See [Achievement.dateClaimed].
-  static final dateClaimed =
-      obx.QueryIntegerProperty<Achievement>(_entities[4].properties[1]);
-
   /// See [Achievement.action].
   static final action =
-      obx.QueryStringProperty<Achievement>(_entities[4].properties[2]);
+      obx.QueryStringProperty<Achievement>(_entities[4].properties[1]);
 
   /// See [Achievement.reqUnit].
   static final reqUnit =
-      obx.QueryStringProperty<Achievement>(_entities[4].properties[3]);
+      obx.QueryStringProperty<Achievement>(_entities[4].properties[2]);
 
   /// See [Achievement.requirement].
   static final requirement =
+      obx.QueryIntegerProperty<Achievement>(_entities[4].properties[3]);
+
+  /// See [Achievement.dateAchieved].
+  static final dateAchieved =
       obx.QueryIntegerProperty<Achievement>(_entities[4].properties[4]);
+
+  /// See [Achievement.progress].
+  static final progress =
+      obx.QueryDoubleProperty<Achievement>(_entities[4].properties[5]);
+
+  /// See [Achievement.isClaimed].
+  static final isClaimed =
+      obx.QueryBooleanProperty<Achievement>(_entities[4].properties[6]);
 }
 
 /// [DailyQuest] entity fields to define ObjectBox queries.

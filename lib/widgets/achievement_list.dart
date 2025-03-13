@@ -4,8 +4,6 @@ import 'package:provider/provider.dart';
 import '../models/achievement.dart';
 import '../models/achievement_repo.dart';
 import '../models/daily_quest.dart';
-import '../models/health_data_repo.dart';
-import '../models/health_data_entry.dart';
 import '../services/game_state.dart';
 import 'achievement_card.dart';
 
@@ -18,7 +16,6 @@ class AchievementList extends StatefulWidget {
 
 class _AchievementListState extends State<AchievementList> {
   List<Achievement> achievements = [];
-  Map<QuestAction, double> progress = {};
   late AchievementRepo _achievementRepo;
 
   @override
@@ -33,34 +30,8 @@ class _AchievementListState extends State<AchievementList> {
     _achievementRepo = AchievementRepo(box: achievementBox);
     final newAchievements = await _achievementRepo.loadNewAchievements();
 
-    // Get progress for each achievement type
-    final healthBox = objectBox.store.box<HealthDataEntry>();
-    final healthRepo = HealthDataRepo(box: healthBox);
-    final healthStats = await healthRepo.total();
-    final gameState = Provider.of<GameState>(context, listen: false);
-
-    final newProgress = <QuestAction, double>{};
-    for (final achievement in newAchievements) {
-      if (achievement.dateClaimed != null) continue;
-
-      switch (achievement.questAction) {
-        case QuestAction.walk:
-          newProgress[achievement.questAction] = healthStats.steps;
-          break;
-        case QuestAction.collect:
-          newProgress[achievement.questAction] = gameState.coins.totalEarned;
-          break;
-        case QuestAction.spend:
-          newProgress[achievement.questAction] = gameState.energy.totalSpent;
-          break;
-        default:
-          break;
-      }
-    }
-
     setState(() {
       achievements = newAchievements;
-      progress = newProgress;
     });
   }
 
@@ -113,15 +84,12 @@ class _AchievementListState extends State<AchievementList> {
             ),
             const Divider(),
             ...achievements.map((achievement) {
-              final currentProgress = progress[achievement.questAction] ?? 0;
-              final bool isCompleted = achievement.dateClaimed != null;
-              final bool canClaim =
-                  currentProgress >= achievement.requirement && !isCompleted;
-
               return AchievementCard(
                 achievement: achievement,
-                progress: currentProgress,
-                onClaim: canClaim ? () => _onClaim(achievement) : null,
+                onClaim:
+                    achievement.progress >= achievement.requirement
+                        ? () => _onClaim(achievement)
+                        : null,
               );
             }),
           ],

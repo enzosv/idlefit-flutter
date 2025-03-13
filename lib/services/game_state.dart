@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:idlefit/models/achievement.dart';
+import 'package:idlefit/models/achievement_repo.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/daily_quest.dart';
@@ -46,6 +48,7 @@ class GameState with ChangeNotifier {
   late CoinGeneratorRepo _generatorRepo;
   late ShopItemsRepo _shopItemRepo;
   late DailyQuestRepo _dailyQuestRepo;
+  late AchievementRepo _achievementRepo;
   Timer? _autoSaveTimer;
   Timer? _generatorTimer;
 
@@ -62,7 +65,12 @@ class GameState with ChangeNotifier {
     );
     _shopItemRepo = ShopItemsRepo(box: objectBoxService.box<ShopItem>());
     _dailyQuestRepo = DailyQuestRepo(box: objectBoxService.box<DailyQuest>());
+    _achievementRepo = AchievementRepo(
+      box: objectBoxService.box<Achievement>(),
+    );
 
+    final achievements = await _achievementRepo.loadNewAchievements();
+    print("loaded ${achievements.length} achievements");
     // Load data from repositories
     coinGenerators = await _generatorRepo.parseCoinGenerators(
       'assets/coin_generators.json',
@@ -159,6 +167,7 @@ class GameState with ChangeNotifier {
 
     if (coinsGenerated > 0) {
       coins.earn(coinsGenerated);
+      _progressTowards(QuestAction.collect, QuestUnit.coins, coinsGenerated);
       notifyListeners();
     }
 
@@ -182,14 +191,16 @@ class GameState with ChangeNotifier {
       exerciseMinutes * healthMultiplier / 2,
     ); // 2 exercise minutes = 1 gem
     _backgroundSpace = space.earn(steps);
-    _dailyQuestRepo.progressTowards(QuestAction.walk, QuestUnit.steps, steps);
-    _dailyQuestRepo.progressTowards(
-      QuestAction.burn,
-      QuestUnit.calories,
-      calories,
-    );
+
+    _progressTowards(QuestAction.walk, QuestUnit.steps, steps);
+    _progressTowards(QuestAction.burn, QuestUnit.calories, calories);
     save();
     notifyListeners();
+  }
+
+  void _progressTowards(QuestAction action, QuestUnit unit, double progress) {
+    _achievementRepo.progressTowards(action, unit, progress);
+    _dailyQuestRepo.progressTowards(action, unit, progress);
   }
 
   bool buyCoinGenerator(CoinGenerator generator) {
@@ -218,11 +229,7 @@ class GameState with ChangeNotifier {
     generator.count++;
 
     _generatorRepo.saveCoinGenerator(generator);
-    _dailyQuestRepo.progressTowards(
-      QuestAction.spend,
-      QuestUnit.coins,
-      generator.cost,
-    );
+    _progressTowards(QuestAction.spend, QuestUnit.coins, generator.cost);
     save();
     notifyListeners();
     return true;
@@ -252,7 +259,7 @@ class GameState with ChangeNotifier {
         break;
     }
     _shopItemRepo.saveShopItem(item);
-    _dailyQuestRepo.progressTowards(
+    _progressTowards(
       QuestAction.spend,
       QuestUnit.space,
       item.currentCost.toDouble(),
@@ -272,7 +279,7 @@ class GameState with ChangeNotifier {
 
     generator.isUnlocked = true;
     _generatorRepo.saveCoinGenerator(generator);
-    _dailyQuestRepo.progressTowards(
+    _progressTowards(
       QuestAction.spend,
       QuestUnit.space,
       generator.upgradeUnlockCost,
@@ -292,11 +299,7 @@ class GameState with ChangeNotifier {
 
     generator.level++;
     _generatorRepo.saveCoinGenerator(generator);
-    _dailyQuestRepo.progressTowards(
-      QuestAction.spend,
-      QuestUnit.coins,
-      generator.upgradeCost,
-    );
+    _progressTowards(QuestAction.spend, QuestUnit.coins, generator.upgradeCost);
     save();
     notifyListeners();
     return true;
@@ -336,6 +339,7 @@ class GameState with ChangeNotifier {
   }
 
   Map<String, double> getBackgroundDifferences() {
+    //TODO: reset background state
     return {
       'coins': coins.count - _backgroundCoins,
       'energy_earned': _backgroundEnergy,

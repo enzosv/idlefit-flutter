@@ -4,23 +4,15 @@ import '../models/daily_quest.dart';
 
 class AchievementCard extends StatelessWidget {
   final Achievement achievement;
-  final double progress;
   final VoidCallback? onClaim;
 
-  const AchievementCard({
-    super.key,
-    required this.achievement,
-    required this.progress,
-    this.onClaim,
-  });
+  const AchievementCard({super.key, required this.achievement, this.onClaim});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final progressPercent = (progress / achievement.requirement).clamp(
-      0.0,
-      1.0,
-    );
+    final progressPercent = (achievement.progress / achievement.requirement)
+        .clamp(0.0, 1.0);
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -73,14 +65,14 @@ class AchievementCard extends StatelessWidget {
                 '${(progressPercent * 100).toInt()}%',
                 style: theme.textTheme.bodySmall,
               ),
-              if (achievement.dateClaimed != null)
+              if (achievement.dateAchieved != null && achievement.isClaimed)
                 Text(
-                  'Completed ${_formatDate(DateTime.fromMillisecondsSinceEpoch(achievement.dateClaimed!))}',
+                  'Completed ${_formatDate(DateTime.fromMillisecondsSinceEpoch(achievement.dateAchieved!))}',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.primary,
                   ),
                 )
-              else if (progress >= achievement.requirement)
+              else if (achievement.progress >= achievement.requirement)
                 ElevatedButton(onPressed: onClaim, child: const Text('Claim')),
             ],
           ),

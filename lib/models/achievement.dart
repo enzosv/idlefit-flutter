@@ -6,12 +6,14 @@ import 'package:objectbox/objectbox.dart';
 class Achievement {
   @Id()
   int id = 0;
-  int? dateClaimed;
+  int? dateAchieved;
 
   // Store enum values as strings in the database
   String action = '';
   String reqUnit = '';
   int requirement = 0;
+  double progress = 0;
+  bool isClaimed = false;
 
   @Transient()
   String rewardUnit = '';
