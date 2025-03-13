@@ -2,11 +2,12 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
+import 'package:idlefit/models/player_stats.dart';
+import 'package:idlefit/models/player_stats_repo.dart';
 import 'package:idlefit/models/shop_items_repo.dart';
 import 'package:idlefit/models/currency_repo.dart';
 import 'package:idlefit/util.dart';
 import 'package:objectbox/objectbox.dart';
-import 'storage_service.dart';
 import '../models/shop_items.dart';
 import 'dart:math';
 import 'notification_service.dart';
@@ -20,45 +21,36 @@ class GameState with ChangeNotifier {
 
   bool isPaused = true;
 
-  // Background state tracking
-  double _backgroundCoins = 0;
-  double _backgroundEnergy = 0;
-  double _backgroundSpace = 0;
-  double _backgroundEnergySpent = 0;
+  // Player stats (previously stored in SharedPreferences)
+  late PlayerStats playerStats;
 
   late final Currency coins;
   late final Currency gems;
   late final Currency energy;
   late final Currency space;
 
-  int lastGenerated = 0;
-  int doubleCoinExpiry = 0;
-  double offlineCoinMultiplier = 0.5;
-
   // Generators and shop items
   List<CoinGenerator> coinGenerators = [];
   List<ShopItem> shopItems = [];
 
   // For saving/loading
-  late StorageService _storageService;
+  late PlayerStatsRepo _playerStatsRepo;
   late CurrencyRepo _currencyRepo;
   late CoinGeneratorRepo _generatorRepo;
   late ShopItemsRepo _shopItemRepo;
   Timer? _autoSaveTimer;
   Timer? _generatorTimer;
 
-  Future<void> initialize(
-    StorageService storageService,
-    Store objectBoxService,
-  ) async {
-    _storageService = storageService;
-
+  Future<void> initialize(Store objectBoxService) async {
     // Initialize repositories
     _currencyRepo = CurrencyRepo(box: objectBoxService.box<Currency>());
     _generatorRepo = CoinGeneratorRepo(
       box: objectBoxService.box<CoinGenerator>(),
     );
     _shopItemRepo = ShopItemsRepo(box: objectBoxService.box<ShopItem>());
+    _playerStatsRepo = PlayerStatsRepo(
+      box: objectBoxService.box<PlayerStats>(),
+    );
 
     // Load data from repositories
     coinGenerators = await _generatorRepo.parseCoinGenerators(
@@ -73,34 +65,18 @@ class GameState with ChangeNotifier {
     gems = currencies[CurrencyType.gem]!;
     energy = currencies[CurrencyType.energy]!;
     space = currencies[CurrencyType.space]!;
-    _backgroundCoins = coins.count;
 
-    // Try to load saved state
-    final savedState = await _storageService.loadGameState();
-    if (savedState != null) {
-      _loadFromSavedState(savedState);
-    }
+    // Load player stats
+    playerStats = _playerStatsRepo.loadPlayerStats();
+    playerStats.backgroundCoins = coins.count;
+
     // Start timers
     _startAutoSave();
     _startGenerators();
   }
 
-  void _loadFromSavedState(Map<String, dynamic> savedState) {
-    lastGenerated = savedState['lastGenerated'] ?? 0;
-    offlineCoinMultiplier = savedState['offlineCoinMultiplier'] ?? 0.5;
-    doubleCoinExpiry = savedState['doubleCoinExpiry'] ?? 0;
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'lastGenerated': lastGenerated,
-      'offlineCoinMultiplier': offlineCoinMultiplier,
-      'doubleCoinExpiry': doubleCoinExpiry,
-    };
-  }
-
   void save() {
-    _storageService.saveGameState(toJson());
+    _playerStatsRepo.savePlayerStats(playerStats);
     _currencyRepo.saveCurrencies([coins, energy, gems, space]);
     // not saving generators and shopitems. only changes on buy anyway
   }
@@ -131,7 +107,7 @@ class GameState with ChangeNotifier {
     }
     dif = min(dif, energy.count.round());
     // smelly to perform modification in get
-    _backgroundEnergySpent = dif.toDouble();
+    playerStats.backgroundEnergySpent = dif.toDouble();
     energy.spend(dif.toDouble());
     print("spent energy ${durationNotation(dif.toDouble())}");
     return dif;
@@ -143,14 +119,17 @@ class GameState with ChangeNotifier {
       return;
     }
     int now = DateTime.now().millisecondsSinceEpoch;
-    final realDif = lastGenerated - now;
-    final availableDif = validTimeSinceLastGenerate(now, lastGenerated);
+    final realDif = playerStats.lastGenerated - now;
+    final availableDif = validTimeSinceLastGenerate(
+      now,
+      playerStats.lastGenerated,
+    );
     final usesEnergy = realDif > _inactiveThreshold;
 
     double coinsGenerated = passiveOutput;
     if (usesEnergy) {
       // reduce speed of coin generation in background
-      coinsGenerated *= offlineCoinMultiplier;
+      coinsGenerated *= playerStats.offlineCoinMultiplier;
     }
     coinsGenerated *= (availableDif / _tickTime);
 
@@ -159,7 +138,7 @@ class GameState with ChangeNotifier {
       notifyListeners();
     }
 
-    lastGenerated = now;
+    playerStats.lastGenerated = now;
   }
 
   void convertHealthStats(double steps, calories, exerciseMinutes) {
@@ -171,14 +150,14 @@ class GameState with ChangeNotifier {
       }
     }
 
-    _backgroundEnergy = energy.earn(
+    playerStats.backgroundEnergy = energy.earn(
       calories * healthMultiplier * _calorieToEnergyMultiplier,
     );
-    print("new energy $_backgroundEnergy");
+    print("new energy ${playerStats.backgroundEnergy}");
     gems.earn(
       exerciseMinutes * healthMultiplier / 2,
     ); // 2 exercise minutes = 1 gem
-    _backgroundSpace = space.earn(steps);
+    playerStats.backgroundSpace = space.earn(steps);
     save();
     notifyListeners();
   }
@@ -231,7 +210,7 @@ class GameState with ChangeNotifier {
       case ShopItemEffect.energyCapacity:
         energy.maxMultiplier += item.effectValue;
       case ShopItemEffect.offlineCoinMultiplier:
-        offlineCoinMultiplier += item.effectValue;
+        playerStats.offlineCoinMultiplier += item.effectValue;
       case ShopItemEffect.coinCapacity:
         coins.maxMultiplier += item.effectValue;
       default:
@@ -274,10 +253,8 @@ class GameState with ChangeNotifier {
   }
 
   void saveBackgroundState() {
-    _backgroundCoins = coins.count;
-    _backgroundEnergySpent = 0;
-    _backgroundEnergy = 0;
-    _backgroundSpace = 0;
+    playerStats.updateBackgroundState(coins.count, energy.count, space.count);
+    save();
 
     // Schedule notification for when coins will reach capacity
     _scheduleCoinCapacityNotification();
@@ -287,7 +264,7 @@ class GameState with ChangeNotifier {
     if (coins.count >= coins.max) return;
 
     final coinsToFill = coins.max - coins.count;
-    final effectiveOutput = passiveOutput * offlineCoinMultiplier;
+    final effectiveOutput = passiveOutput * playerStats.offlineCoinMultiplier;
     if (effectiveOutput <= 0) return;
 
     final secondsToFill = coinsToFill / effectiveOutput;
@@ -307,12 +284,11 @@ class GameState with ChangeNotifier {
   }
 
   Map<String, double> getBackgroundDifferences() {
-    return {
-      'coins': coins.count - _backgroundCoins,
-      'energy_earned': _backgroundEnergy,
-      'space': _backgroundSpace,
-      'energy_spent': _backgroundEnergySpent,
-    };
+    return playerStats.getBackgroundDifferences(
+      coins.count,
+      energy.count,
+      space.count,
+    );
   }
 
   double get passiveOutput {
@@ -321,7 +297,7 @@ class GameState with ChangeNotifier {
       (sum, generator) => sum + generator.output,
     );
     double coinMultiplier = 1.0;
-    if (doubleCoinExpiry >= DateTime.now().millisecondsSinceEpoch) {
+    if (playerStats.doubleCoinExpiry >= DateTime.now().millisecondsSinceEpoch) {
       // TODO: what if doubler is active for part of the time?
       coinMultiplier += 1;
     }

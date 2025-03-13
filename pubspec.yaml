@@ -33,7 +33,6 @@ dependencies:
   cupertino_icons: ^1.0.2
   flame: ^1.8.2
   provider: ^6.0.5
-  shared_preferences: ^2.2.0
   health: ^12.0.1
   objectbox: ^4.1.0
   objectbox_sync_flutter_libs: any

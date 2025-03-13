@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:idlefit/constants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'services/game_state.dart';
 import 'screens/main_screen.dart';
 import 'screens/stats_screen.dart';
 import 'screens/shop_screen.dart';
 import 'services/health_service.dart';
-import 'services/storage_service.dart';
 import 'services/object_box.dart';
 import 'widgets/background_earnings_popup.dart';
 import 'services/ad_service.dart';
@@ -17,8 +15,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize services
-  final prefs = await SharedPreferences.getInstance();
-  final storageService = StorageService(prefs);
   final healthService = HealthService();
   final objectBox = await ObjectBox.create();
 
@@ -27,14 +23,13 @@ void main() async {
 
   // Load game state
   final gameState = GameState();
-  await gameState.initialize(storageService, objectBox.store);
+  await gameState.initialize(objectBox.store);
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: gameState),
         Provider.value(value: healthService),
-        Provider.value(value: storageService),
         Provider.value(value: objectBox),
       ],
       child: const MyApp(),

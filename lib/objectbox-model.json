@@ -164,9 +164,58 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "8:526711981233017643",
+      "lastPropertyId": "8:7587945699305886124",
+      "name": "PlayerStats",
+      "properties": [
+        {
+          "id": "1:4723250085788609786",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:71122456532953252",
+          "name": "lastGenerated",
+          "type": 6
+        },
+        {
+          "id": "3:7820277724301724072",
+          "name": "doubleCoinExpiry",
+          "type": 6
+        },
+        {
+          "id": "4:7310535696540147261",
+          "name": "offlineCoinMultiplier",
+          "type": 8
+        },
+        {
+          "id": "5:2338366855126056027",
+          "name": "backgroundCoins",
+          "type": 8
+        },
+        {
+          "id": "6:6967058664402187682",
+          "name": "backgroundEnergy",
+          "type": 8
+        },
+        {
+          "id": "7:3503436713827419899",
+          "name": "backgroundSpace",
+          "type": 8
+        },
+        {
+          "id": "8:7587945699305886124",
+          "name": "backgroundEnergySpent",
+          "type": 8
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "7:2119159745219438621",
+  "lastEntityId": "8:526711981233017643",
   "lastIndexId": "2:6046711262050609894",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

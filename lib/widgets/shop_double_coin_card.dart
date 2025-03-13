@@ -45,10 +45,11 @@ class _DoubleCoinsCardState extends State<DoubleCoinsCard> {
   void _updateTimeLeft() {
     final gameState = Provider.of<GameState>(context, listen: false);
     final now = DateTime.now().millisecondsSinceEpoch;
-    final isActive = gameState.doubleCoinExpiry > now;
+    final isActive = gameState.playerStats.doubleCoinExpiry > now;
 
     setState(() {
-      _timeLeft = isActive ? (gameState.doubleCoinExpiry - now) ~/ 1000 : 0;
+      _timeLeft =
+          isActive ? (gameState.playerStats.doubleCoinExpiry - now) ~/ 1000 : 0;
     });
 
     // Stop timer if boost is no longer active
@@ -61,7 +62,7 @@ class _DoubleCoinsCardState extends State<DoubleCoinsCard> {
   void _watchAd(GameState gameState) {
     AdService.showRewardedAd(
       onRewarded: () {
-        gameState.doubleCoinExpiry =
+        gameState.playerStats.doubleCoinExpiry =
             DateTime.now()
                 .add(const Duration(minutes: 1))
                 .millisecondsSinceEpoch;
@@ -80,7 +81,7 @@ class _DoubleCoinsCardState extends State<DoubleCoinsCard> {
   Widget build(BuildContext context) {
     final gameState = Provider.of<GameState>(context);
     final now = DateTime.now().millisecondsSinceEpoch;
-    final isActive = gameState.doubleCoinExpiry > now;
+    final isActive = gameState.playerStats.doubleCoinExpiry > now;
     final minutes = _timeLeft ~/ 60;
     final seconds = _timeLeft % 60;
 

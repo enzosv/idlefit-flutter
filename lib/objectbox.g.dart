@@ -18,6 +18,7 @@ import 'models/achievement.dart';
 import 'models/coin_generator.dart';
 import 'models/currency.dart';
 import 'models/health_data_entry.dart';
+import 'models/player_stats.dart';
 import 'models/shop_items.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
@@ -183,6 +184,55 @@ final _entities = <obx_int.ModelEntity>[
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(8, 526711981233017643),
+      name: 'PlayerStats',
+      lastPropertyId: const obx_int.IdUid(8, 7587945699305886124),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 4723250085788609786),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 71122456532953252),
+            name: 'lastGenerated',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 7820277724301724072),
+            name: 'doubleCoinExpiry',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 7310535696540147261),
+            name: 'offlineCoinMultiplier',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 2338366855126056027),
+            name: 'backgroundCoins',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 6967058664402187682),
+            name: 'backgroundEnergy',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(7, 3503436713827419899),
+            name: 'backgroundSpace',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(8, 7587945699305886124),
+            name: 'backgroundEnergySpent',
+            type: 8,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
 ];
 
@@ -221,7 +271,7 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(7, 2119159745219438621),
+      lastEntityId: const obx_int.IdUid(8, 526711981233017643),
       lastIndexId: const obx_int.IdUid(2, 6046711262050609894),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
@@ -436,6 +486,56 @@ obx_int.ModelDefinition getObjectBoxModel() {
                 const fb.Int64Reader().vTableGet(buffer, rootOffset, 28, 0);
 
           return object;
+        }),
+    PlayerStats: obx_int.EntityDefinition<PlayerStats>(
+        model: _entities[5],
+        toOneRelations: (PlayerStats object) => [],
+        toManyRelations: (PlayerStats object) => {},
+        getId: (PlayerStats object) => object.id,
+        setId: (PlayerStats object, int id) {
+          object.id = id;
+        },
+        objectToFB: (PlayerStats object, fb.Builder fbb) {
+          fbb.startTable(9);
+          fbb.addInt64(0, object.id);
+          fbb.addInt64(1, object.lastGenerated);
+          fbb.addInt64(2, object.doubleCoinExpiry);
+          fbb.addFloat64(3, object.offlineCoinMultiplier);
+          fbb.addFloat64(4, object.backgroundCoins);
+          fbb.addFloat64(5, object.backgroundEnergy);
+          fbb.addFloat64(6, object.backgroundSpace);
+          fbb.addFloat64(7, object.backgroundEnergySpent);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final lastGeneratedParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
+          final doubleCoinExpiryParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
+          final offlineCoinMultiplierParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 10, 0);
+          final backgroundCoinsParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 12, 0);
+          final backgroundEnergyParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 14, 0);
+          final backgroundSpaceParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 16, 0);
+          final backgroundEnergySpentParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 18, 0);
+          final object = PlayerStats(
+              lastGenerated: lastGeneratedParam,
+              doubleCoinExpiry: doubleCoinExpiryParam,
+              offlineCoinMultiplier: offlineCoinMultiplierParam,
+              backgroundCoins: backgroundCoinsParam,
+              backgroundEnergy: backgroundEnergyParam,
+              backgroundSpace: backgroundSpaceParam,
+              backgroundEnergySpent: backgroundEnergySpentParam)
+            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+
+          return object;
         })
   };
 
@@ -547,4 +647,39 @@ class Achievement_ {
   /// See [Achievement.requirement].
   static final requirement =
       obx.QueryIntegerProperty<Achievement>(_entities[4].properties[4]);
+}
+
+/// [PlayerStats] entity fields to define ObjectBox queries.
+class PlayerStats_ {
+  /// See [PlayerStats.id].
+  static final id =
+      obx.QueryIntegerProperty<PlayerStats>(_entities[5].properties[0]);
+
+  /// See [PlayerStats.lastGenerated].
+  static final lastGenerated =
+      obx.QueryIntegerProperty<PlayerStats>(_entities[5].properties[1]);
+
+  /// See [PlayerStats.doubleCoinExpiry].
+  static final doubleCoinExpiry =
+      obx.QueryIntegerProperty<PlayerStats>(_entities[5].properties[2]);
+
+  /// See [PlayerStats.offlineCoinMultiplier].
+  static final offlineCoinMultiplier =
+      obx.QueryDoubleProperty<PlayerStats>(_entities[5].properties[3]);
+
+  /// See [PlayerStats.backgroundCoins].
+  static final backgroundCoins =
+      obx.QueryDoubleProperty<PlayerStats>(_entities[5].properties[4]);
+
+  /// See [PlayerStats.backgroundEnergy].
+  static final backgroundEnergy =
+      obx.QueryDoubleProperty<PlayerStats>(_entities[5].properties[5]);
+
+  /// See [PlayerStats.backgroundSpace].
+  static final backgroundSpace =
+      obx.QueryDoubleProperty<PlayerStats>(_entities[5].properties[6]);
+
+  /// See [PlayerStats.backgroundEnergySpent].
+  static final backgroundEnergySpent =
+      obx.QueryDoubleProperty<PlayerStats>(_entities[5].properties[7]);
 }
