@@ -3,6 +3,7 @@ import 'package:idlefit/services/object_box.dart';
 import 'package:provider/provider.dart';
 import '../models/achievement.dart';
 import '../models/achievement_repo.dart';
+import '../models/daily_quest.dart';
 import '../models/health_data_repo.dart';
 import '../models/health_data_entry.dart';
 import '../services/game_state.dart';
@@ -17,7 +18,7 @@ class AchievementList extends StatefulWidget {
 
 class _AchievementListState extends State<AchievementList> {
   List<Achievement> achievements = [];
-  Map<String, double> progress = {};
+  Map<QuestAction, double> progress = {};
   late AchievementRepo _achievementRepo;
 
   @override
@@ -38,19 +39,21 @@ class _AchievementListState extends State<AchievementList> {
     final healthStats = await healthRepo.total();
     final gameState = Provider.of<GameState>(context, listen: false);
 
-    final newProgress = <String, double>{};
+    final newProgress = <QuestAction, double>{};
     for (final achievement in newAchievements) {
       if (achievement.dateClaimed != null) continue;
 
-      switch (achievement.action.toLowerCase()) {
-        case 'walk':
-          newProgress[achievement.action] = healthStats.steps;
+      switch (achievement.questAction) {
+        case QuestAction.walk:
+          newProgress[achievement.questAction] = healthStats.steps;
           break;
-        case 'collect':
-          newProgress[achievement.action] = gameState.coins.totalEarned;
+        case QuestAction.collect:
+          newProgress[achievement.questAction] = gameState.coins.totalEarned;
           break;
-        case 'spend':
-          newProgress[achievement.action] = gameState.energy.totalSpent;
+        case QuestAction.spend:
+          newProgress[achievement.questAction] = gameState.energy.totalSpent;
+          break;
+        default:
           break;
       }
     }
@@ -75,15 +78,17 @@ class _AchievementListState extends State<AchievementList> {
     final gameState = Provider.of<GameState>(context, listen: false);
     final reward = achievement.reward.toDouble();
     // Award the achievement reward
-    switch (achievement.rewardUnit.toLowerCase()) {
-      case 'space':
+    switch (achievement.questRewardUnit) {
+      case RewardUnit.space:
         gameState.space.earn(reward);
         break;
-      case 'coins':
+      case RewardUnit.coins:
         gameState.coins.earn(reward);
         break;
-      case 'energy':
+      case RewardUnit.energy:
         gameState.energy.earn(reward);
+        break;
+      default:
         break;
     }
     // if (isLast) {
@@ -108,7 +113,7 @@ class _AchievementListState extends State<AchievementList> {
             ),
             const Divider(),
             ...achievements.map((achievement) {
-              final currentProgress = progress[achievement.action] ?? 0;
+              final currentProgress = progress[achievement.questAction] ?? 0;
               final bool isCompleted = achievement.dateClaimed != null;
               final bool canClaim =
                   currentProgress >= achievement.requirement && !isCompleted;

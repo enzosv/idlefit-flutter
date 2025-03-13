@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/achievement.dart';
+import '../models/daily_quest.dart';
 
 class AchievementCard extends StatelessWidget {
   final Achievement achievement;
@@ -46,7 +47,7 @@ class AchievementCard extends StatelessWidget {
                 children: [
                   Text('Reward:', style: theme.textTheme.bodySmall),
                   Text(
-                    achievement.rewardText,
+                    '${achievement.rewardText} ${achievement.questRewardUnit.display}',
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.colorScheme.primary,
                     ),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/objectbox.g.dart';
 import 'package:idlefit/util.dart';
 import 'achievement.dart';
@@ -25,29 +26,35 @@ class AchievementRepo {
         requirements.length == rewards.length,
         "${item["action"]} invalid",
       );
-      final String action = item['action'];
-      final String reqUnit = item['req_unit'];
+      final QuestAction action = QuestActionExtension.fromJson(item['action']);
+      final QuestUnit reqUnit = QuestUnitExtension.fromJson(item['req_unit']);
       assert(
         achievements
-            .where((a) => (a.action == action && a.reqUnit == reqUnit))
+            .where(
+              (a) => (a.questAction == action && a.questReqUnit == reqUnit),
+            )
             .isEmpty,
         "there should only be one achivement per action and requirement pair",
       );
 
       for (int i = 0; i < requirements.length; i++) {
         Achievement achievement = Achievement();
-        achievement.action = action;
-        achievement.reqUnit = reqUnit;
+        achievement.questAction = action;
+        achievement.questReqUnit = reqUnit;
         achievement.requirement = requirements[i];
 
         final same = getSame(achievement);
         if (same != null) {
-          print("skipping $action $reqUnit ${achievement.requirement}");
+          print(
+            "skipping ${action.name} ${reqUnit.name} ${achievement.requirement}",
+          );
           // Skip if already claimed
           continue;
         }
 
-        achievement.rewardUnit = item['reward_unit'];
+        achievement.questRewardUnit = RewardUnitExtension.fromJson(
+          item['reward_unit'],
+        );
         achievement.reward = rewards[i];
         achievements.add(achievement);
         // only get the achievement with the lowest requirement
