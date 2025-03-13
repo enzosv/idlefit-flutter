@@ -3,9 +3,6 @@ import 'package:idlefit/services/object_box.dart';
 import 'package:provider/provider.dart';
 import '../models/daily_quest.dart';
 import '../services/game_state.dart';
-import '../models/health_data_repo.dart';
-import '../models/health_data_entry.dart';
-import '../util.dart';
 
 class DailyQuestList extends StatefulWidget {
   const DailyQuestList({super.key});
@@ -17,7 +14,6 @@ class DailyQuestList extends StatefulWidget {
 class _DailyQuestListState extends State<DailyQuestList> {
   List<DailyQuest> quests = [];
   late DailyQuestRepo _questRepo;
-  late HealthDataRepo _healthRepo;
   bool allQuestsCompleted = false;
 
   @override
@@ -29,9 +25,7 @@ class _DailyQuestListState extends State<DailyQuestList> {
   Future<void> _fetchData() async {
     final objectBox = Provider.of<ObjectBox>(context, listen: false);
     final questBox = objectBox.store.box<DailyQuest>();
-    final healthBox = objectBox.store.box<HealthDataEntry>();
     _questRepo = DailyQuestRepo(box: questBox);
-    _healthRepo = HealthDataRepo(box: healthBox);
 
     // Generate daily quests if needed
     await _questRepo.generateDailyQuests();
@@ -39,43 +33,6 @@ class _DailyQuestListState extends State<DailyQuestList> {
     // Get active quests
     final activeQuests = _questRepo.getActiveQuests();
     final gameState = Provider.of<GameState>(context, listen: false);
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final healthStats = await _healthRepo.today(today);
-
-    // Update progress for each quest
-    for (final quest in activeQuests) {
-      double progress = 0;
-      switch (quest.action.toLowerCase()) {
-        case 'walk':
-          progress = healthStats.steps.toDouble();
-          break;
-        case 'spend':
-          if (quest.unit.toLowerCase() == 'coins') {
-            progress = gameState.dailyCoinsSpent;
-          } else if (quest.unit.toLowerCase() == 'space') {
-            progress = gameState.dailySpaceSpent;
-          }
-          break;
-        case 'burn':
-          progress = healthStats.calories;
-          break;
-        case 'watch':
-          // Skip ad quests since we're auto-claiming
-          continue;
-      }
-
-      // Update quest progress
-      if (progress != quest.progress) {
-        _questRepo.updateQuestProgress(quest, progress);
-
-        // If quest just completed, give reward
-        if (progress >= quest.requirement &&
-            quest.progress < quest.requirement) {
-          _giveReward(quest);
-        }
-      }
-    }
 
     // Check if all quests are completed for bonus
     final wasCompleted = allQuestsCompleted;
@@ -90,26 +47,6 @@ class _DailyQuestListState extends State<DailyQuestList> {
       quests = activeQuests;
       allQuestsCompleted = isNowCompleted;
     });
-  }
-
-  void _giveReward(DailyQuest quest) {
-    if (!mounted) return;
-
-    final gameState = Provider.of<GameState>(context, listen: false);
-    final reward = quest.reward.toDouble();
-
-    // Award the quest reward
-    switch (quest.rewardUnit.toLowerCase()) {
-      case 'space':
-        gameState.space.earn(reward);
-        break;
-      case 'coins':
-        gameState.coins.earn(reward);
-        break;
-      case 'energy':
-        gameState.energy.earn(reward);
-        break;
-    }
   }
 
   @override
