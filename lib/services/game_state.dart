@@ -31,7 +31,6 @@ class GameState {
   final CurrencyRepo currencyRepo;
   final CoinGeneratorRepo generatorRepo;
   final ShopItemsRepo shopItemRepo;
-  Timer? _autoSaveTimer;
 
   GameState({
     required this.isPaused,
@@ -95,9 +94,6 @@ class GameState {
     final currencies = currencyRepo.loadCurrencies();
     final coins = currencies[CurrencyType.coin]!;
     backgroundState['coins'] = coins.count;
-
-    // Start timers
-    _startAutoSave();
   }
 
   Map<String, dynamic> toJson() {
@@ -112,12 +108,6 @@ class GameState {
     storageService.saveGameState(toJson());
     currencyRepo.saveCurrencies([coins, energy, gems, space]);
     // not saving generators and shopitems. only changes on buy anyway
-  }
-
-  void _startAutoSave() {
-    _autoSaveTimer = Timer.periodic(const Duration(minutes: 1), (_) {
-      save();
-    });
   }
 
   double get passiveOutput {
@@ -136,9 +126,5 @@ class GameState {
       }
     }
     return output * coinMultiplier;
-  }
-
-  void dispose() {
-    _autoSaveTimer?.cancel();
   }
 }

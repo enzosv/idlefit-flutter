@@ -14,11 +14,9 @@ import 'dart:math';
 import 'notification_service.dart';
 
 class GameStateNotifier extends StateNotifier<GameState> {
-  Timer? _autoSaveTimer;
   Timer? _generatorTimer;
 
   GameStateNotifier(super.state) {
-    _startAutoSave();
     _startGenerators();
   }
 
@@ -69,12 +67,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
     // state.save();
   }
 
-  void _startAutoSave() {
-    _autoSaveTimer = Timer.periodic(const Duration(minutes: 1), (_) {
-      state.save();
-    });
-  }
-
   void _startGenerators() {
     final duration = Duration(milliseconds: Constants.tickTime);
     _generatorTimer = Timer.periodic(duration, (_) {
@@ -103,6 +95,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     }
   }
 
+  //  a read. move to gamestate?
   int _validTimeSinceLastGenerate(int now, int previous) {
     if (state.energy.count <= 0 || previous <= 0) {
       return Constants.tickTime;
@@ -114,6 +107,8 @@ class GameStateNotifier extends StateNotifier<GameState> {
     }
 
     dif = min(dif, state.energy.count.round());
+
+    // smelly to update state in a read
     final newEnergy = state.energy.spend(dif.toDouble());
     if (newEnergy != null) {
       final newBackgroundState = Map<String, double>.from(
@@ -173,7 +168,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
   @override
   void dispose() {
-    _autoSaveTimer?.cancel();
     _generatorTimer?.cancel();
     super.dispose();
   }
@@ -334,6 +328,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     return true;
   }
 
+  // a read. move to gamestate?
   Map<String, double> getBackgroundDifferences() {
     return {
       'coins': state.coins.count - (state.backgroundState['coins'] ?? 0),
