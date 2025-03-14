@@ -91,7 +91,7 @@ class DailyQuestNotifier extends StateNotifier<List<DailyQuest>> {
           ..reward = 1000
           ..rewardUnit = CurrencyType.space.name
           ..dateAssigned = todayTimestamp;
-    final quests = [spendCoinQuest, walkQuest];
+    final quests = [spendCoinQuest, walkQuest, watchAdQuest];
     box.putMany(quests);
     assert(quests.isNotEmpty);
     assert(quests[0].id > 0);

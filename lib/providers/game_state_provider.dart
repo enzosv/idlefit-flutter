@@ -64,7 +64,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
   void setIsPaused(bool isPaused) {
     state = state.copyWith(isPaused: isPaused);
     if (isPaused) {
-      _save();
+      save();
       _scheduleCoinCapacityNotification();
     }
   }
@@ -76,7 +76,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     });
   }
 
-  void _save() {
+  void save() async {
     state.storageService.saveGameState(state.toJson());
     state.currencyRepo.saveCurrencies([
       ref.read(coinProvider),
@@ -153,7 +153,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
     state = state.copyWith(backgroundActivity: newBackgroundActivity);
 
-    _save();
+    save();
   }
 
   @override
@@ -164,7 +164,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
   void setDoubleCoinExpiry(int expiry) {
     state = state.copyWith(doubleCoinExpiry: expiry);
-    _save();
+    save();
   }
 
   void _scheduleCoinCapacityNotification() {

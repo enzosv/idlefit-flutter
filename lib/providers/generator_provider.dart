@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/providers/currency_provider.dart';
+import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:objectbox/objectbox.dart';
 
 class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
@@ -45,6 +46,7 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
         energyNotifier.setMax(energy.baseMax + 3600000);
       }
     }
+    ref.read(gameStateProvider.notifier).save();
     return true;
   }
 
@@ -60,6 +62,7 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
     coinsNotifier.spend(generator.upgradeCost);
     generator.level++;
     _updateGenerator(generator);
+    ref.read(gameStateProvider.notifier).save();
     return true;
   }
 
@@ -72,6 +75,7 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
     spaceNotifier.spend(generator.upgradeUnlockCost);
     generator.isUnlocked = true;
     _updateGenerator(generator);
+    ref.read(gameStateProvider.notifier).save();
     return true;
   }
 
