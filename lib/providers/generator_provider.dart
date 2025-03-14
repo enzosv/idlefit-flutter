@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/coin_generator.dart';
-import 'package:idlefit/providers/coin_provider.dart';
+import 'package:idlefit/providers/currency_provider.dart';
 import 'package:objectbox/objectbox.dart';
 
 class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {

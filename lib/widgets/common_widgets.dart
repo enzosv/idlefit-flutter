@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/constants.dart';
+import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:idlefit/widgets/current_coins.dart';
-import '../util.dart';
+import '../helpers/util.dart';
 
 class CoinsInfo extends ConsumerWidget {
   const CoinsInfo({super.key});

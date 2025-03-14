@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/providers/coin_provider.dart';
-import '../util.dart';
+import 'package:idlefit/providers/currency_provider.dart';
+import '../helpers/util.dart';
 
 class CurrentCoins extends StatefulWidget {
   static final globalKey = GlobalKey<_CurrentCoinsState>();
@@ -52,7 +52,7 @@ class _CurrentCoinsState extends State<CurrentCoins>
     return Consumer(
       builder: (context, ref, child) {
         final coins = ref.watch(coinProvider);
-        return AnimatedBuilder(
+r        return AnimatedBuilder(
           animation: _scaleAnimation,
           builder: (context, child) {
             return Transform.scale(
