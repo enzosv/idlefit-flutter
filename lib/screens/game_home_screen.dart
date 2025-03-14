@@ -67,6 +67,7 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
             (context) =>
                 BackgroundEarningsPopup(backgroundActivity: backgroundActivity),
       );
+      gameStateNotifier.resetBackgroundActivity();
     });
   }
 

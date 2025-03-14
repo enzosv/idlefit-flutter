@@ -65,9 +65,14 @@ class GameStateNotifier extends StateNotifier<GameState> {
   void setIsPaused(bool isPaused) {
     state = state.copyWith(isPaused: isPaused);
     if (isPaused) {
+      resetBackgroundActivity();
       save();
       _scheduleCoinCapacityNotification();
     }
+  }
+
+  void resetBackgroundActivity() {
+    state = state.copyWith(backgroundActivity: BackgroundActivity());
   }
 
   void _startGenerators() {
@@ -101,7 +106,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
       return;
     }
     coinsGenerated *= (dif / Constants.tickTime);
-
     final coinsNotifier = ref.read(coinProvider.notifier);
     if (realDif < Constants.inactiveThreshold) {
       // don't use energy
