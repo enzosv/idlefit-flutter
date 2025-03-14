@@ -35,6 +35,10 @@ class CurrencyNotifier extends StateNotifier<Currency> {
   }
 
   void setMax(double max) {
+    assert(
+      max > state.baseMax && max > 0,
+      'max must be greater than current max',
+    );
     state = state.copyWith(baseMax: max);
   }
 
