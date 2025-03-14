@@ -4,7 +4,6 @@ import 'package:idlefit/constants.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/providers/coin_provider.dart';
 import 'package:idlefit/providers/generator_provider.dart';
-import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:idlefit/util.dart';
 import 'common_card.dart';
 
@@ -15,7 +14,6 @@ class GeneratorUpgradeCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gameState = ref.watch(gameStateProvider);
     final coinGeneratorNotifier = ref.read(generatorProvider.notifier);
 
     final additionalInfo = <Widget>[

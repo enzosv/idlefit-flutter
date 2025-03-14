@@ -19,6 +19,7 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("building main screen");
     return Stack(
       children: [
         // Game background using Flame

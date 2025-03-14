@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
 import 'package:idlefit/providers/coin_provider.dart';
 import 'package:idlefit/providers/generator_provider.dart';
-import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:idlefit/util.dart';
 import 'package:idlefit/widgets/current_coins.dart';
 import 'common_card.dart';

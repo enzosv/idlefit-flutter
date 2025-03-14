@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:idlefit/constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/providers/coin_provider.dart';
-import 'package:idlefit/services/game_state_notifier.dart';
+import 'package:idlefit/providers/shop_item_provider.dart';
 import '../models/shop_items.dart';
 import 'common_card.dart';
 import 'shop_double_coin_card.dart';
@@ -18,7 +18,6 @@ class ShopItemCard extends ConsumerWidget {
       return DoubleCoinsCard(item: item);
     }
 
-    final gameStateNotifier = ref.read(gameStateProvider.notifier);
     final isMaxLevel = item.level >= item.maxLevel;
     final space = ref.watch(spaceProvider);
     return CommonCard(
@@ -36,7 +35,7 @@ class ShopItemCard extends ConsumerWidget {
       onButtonPressed:
           (isMaxLevel || space.count < item.currentCost)
               ? null
-              : () => gameStateNotifier.upgradeShopItem(item),
+              : () => ref.read(shopItemProvider.notifier).upgradeShopItem(item),
     );
   }
 }

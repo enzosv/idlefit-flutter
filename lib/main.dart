@@ -112,7 +112,7 @@ class _GameInitializerState extends ConsumerState<GameInitializer> {
     if (!_isInitialized) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-
+    print("building widgets");
     return const GameHomePage();
   }
 }

@@ -1,0 +1,82 @@
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/main.dart';
+import 'package:idlefit/models/shop_items.dart';
+import 'package:idlefit/providers/coin_provider.dart';
+import 'package:objectbox/objectbox.dart';
+
+class ShopItemNotifier extends StateNotifier<List<ShopItem>> {
+  final Box<ShopItem> box;
+  final Ref ref;
+  ShopItemNotifier(this.ref, this.box, super.state);
+
+  Future<void> initialize() async {
+    state = await _parseShopItems('assets/shop_items.json');
+  }
+
+  bool upgradeShopItem(ShopItem item) {
+    if (item.id == 4 || item.level >= item.maxLevel) return false;
+
+    if (ref.read(spaceProvider).count < item.currentCost.toDouble()) {
+      return false;
+    }
+
+    final spaceNotifier = ref.read(spaceProvider.notifier);
+
+    spaceNotifier.spend(item.currentCost.toDouble());
+    item.level++;
+    switch (item.shopItemEffect) {
+      case ShopItemEffect.spaceCapacity:
+        spaceNotifier.updateMaxMultiplier(item.effectValue);
+      case ShopItemEffect.energyCapacity:
+        ref.read(energyProvider.notifier).updateMaxMultiplier(item.effectValue);
+      case ShopItemEffect.offlineCoinMultiplier:
+        //handled simply by updating level
+        break;
+      case ShopItemEffect.coinCapacity:
+        final coinsNotifier = ref.read(coinProvider.notifier);
+        coinsNotifier.updateMaxMultiplier(item.effectValue);
+      default:
+        assert(false, 'Unhandled shop item effect: ${item.shopItemEffect}');
+    }
+    final newState = List<ShopItem>.from(state);
+    newState[item.id - 1] = item;
+    state = newState;
+    box.put(item);
+    return true;
+  }
+
+  Future<List<ShopItem>> _parseShopItems(String jsonString) async {
+    final String response = await rootBundle.loadString(jsonString);
+    final List<dynamic> data = jsonDecode(response);
+
+    return data.map((d) {
+      ShopItem item = ShopItem.fromJson(d);
+      final stored = box.get(item.id);
+      if (stored == null) {
+        return item;
+      }
+      item.level = stored.level;
+      return item;
+    }).toList();
+  }
+
+  double multiplier(ShopItemEffect effect) {
+    final double start =
+        effect == ShopItemEffect.offlineCoinMultiplier ? 0.2 : 1;
+    return state
+        .where((item) => item.shopItemEffect == effect)
+        .fold(start, (sum, item) => sum + (item.effectValue * item.level));
+  }
+}
+
+final shopItemProvider =
+    StateNotifierProvider<ShopItemNotifier, List<ShopItem>>((ref) {
+      return ShopItemNotifier(
+        ref,
+        ref.read(objectBoxProvider).store.box<ShopItem>(),
+        [],
+      );
+    });
