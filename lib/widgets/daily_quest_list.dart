@@ -1,35 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/main.dart';
+import 'package:idlefit/providers/daily_quest_provider.dart';
 import '../models/daily_quest.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DailyQuestList extends ConsumerStatefulWidget {
+class DailyQuestList extends ConsumerWidget {
   const DailyQuestList({super.key});
   @override
-  ConsumerState<DailyQuestList> createState() => _DailyQuestListState();
-}
-
-class _DailyQuestListState extends ConsumerState<DailyQuestList> {
-  List<DailyQuest> quests = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchData();
-  }
-
-  Future<void> _fetchData() async {
-    final objectBox = ref.read(objectBoxProvider);
-    final dailyQuestBox = objectBox.store.box<DailyQuest>();
-    final dailyQuestRepo = DailyQuestRepo(box: dailyQuestBox);
-    final quests = await dailyQuestRepo.getActiveQuests();
-    setState(() {
-      if (mounted) this.quests = quests;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final quests = ref.watch(dailyQuestProvider);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -47,11 +25,6 @@ class _DailyQuestListState extends ConsumerState<DailyQuestList> {
             ),
             const Divider(),
             ...quests.map((quest) {
-              // Skip ad quests since we're auto-claiming
-              if (quest.questAction == QuestAction.watch) {
-                return const SizedBox.shrink();
-              }
-
               return _DailyQuestCard(quest: quest);
             }),
           ],
