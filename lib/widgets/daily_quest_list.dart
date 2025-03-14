@@ -102,7 +102,7 @@ class _DailyQuestCard extends ConsumerWidget {
               if (quest.isCompleted)
                 if (quest.isClaimed)
                   Text(
-                    'Completed',
+                    'Claimed',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.primary,
                     ),

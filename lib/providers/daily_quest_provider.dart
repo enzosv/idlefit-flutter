@@ -123,16 +123,16 @@ class DailyQuestNotifier extends StateNotifier<List<DailyQuest>> {
       return;
     }
 
+    final updatedQuest = quest.updateProgress(progress);
     print('progressing ${quest.questAction} $action ${quest.questUnit} $unit');
     state =
         state.map((q) {
-          if (q.id == quest.id) {
-            return quest.updateProgress(progress);
+          if (q.id == updatedQuest.id) {
+            return updatedQuest;
           }
           return q;
         }).toList();
-    box.putAsync(quest);
-    return;
+    box.putAsync(updatedQuest);
   }
 
   void claim(DailyQuest quest) {
@@ -150,15 +150,16 @@ class DailyQuestNotifier extends StateNotifier<List<DailyQuest>> {
         assert(false, 'unhandled currency type ${quest.rewardCurrency}');
         return;
     }
+    final updatedQuest = quest.claim();
     state =
         state.map((q) {
-          if (q.id == quest.id) {
-            return quest.claim();
+          if (q.id == updatedQuest.id) {
+            return updatedQuest;
           }
           return q;
         }).toList();
     ref.read(gameStateProvider.notifier).save();
-    box.putAsync(quest);
+    box.putAsync(updatedQuest);
   }
 
   void updateQuestProgress(DailyQuest quest, double progress) {
