@@ -1,56 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/services/object_box.dart';
-import 'package:provider/provider.dart';
+import 'package:idlefit/services/game_state_notifier.dart';
 import '../models/daily_quest.dart';
-import '../services/game_state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DailyQuestList extends StatefulWidget {
+class DailyQuestList extends ConsumerWidget {
   const DailyQuestList({super.key});
 
   @override
-  _DailyQuestListState createState() => _DailyQuestListState();
-}
-
-class _DailyQuestListState extends State<DailyQuestList> {
-  List<DailyQuest> quests = [];
-  late DailyQuestRepo _questRepo;
-  bool allQuestsCompleted = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchData();
-  }
-
-  Future<void> _fetchData() async {
-    final objectBox = Provider.of<ObjectBox>(context, listen: false);
-    final questBox = objectBox.store.box<DailyQuest>();
-    _questRepo = DailyQuestRepo(box: questBox);
-
-    // Generate daily quests if needed
-    await _questRepo.generateDailyQuests();
-
-    // Get active quests
-    final activeQuests = _questRepo.getActiveQuests();
-    final gameState = Provider.of<GameState>(context, listen: false);
-
-    // Check if all quests are completed for bonus
-    final wasCompleted = allQuestsCompleted;
-    final isNowCompleted = _questRepo.areAllQuestsCompleted();
-
-    if (!wasCompleted && isNowCompleted) {
-      // Give bonus reward (100 gems) when all quests are completed
-      gameState.gems.earn(100);
-    }
-
-    setState(() {
-      quests = activeQuests;
-      allQuestsCompleted = isNowCompleted;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final gameState = ref.read(gameStateProvider);
+    final quests = gameState.dailyQuestRepo.getActiveQuests();
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -64,8 +23,6 @@ class _DailyQuestListState extends State<DailyQuestList> {
                   'Daily Quests',
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
-                if (allQuestsCompleted)
-                  const Icon(Icons.star, color: Colors.amber),
               ],
             ),
             const Divider(),
@@ -77,18 +34,6 @@ class _DailyQuestListState extends State<DailyQuestList> {
 
               return _DailyQuestCard(quest: quest);
             }),
-            if (allQuestsCompleted) ...[
-              const Divider(),
-              const Center(
-                child: Text(
-                  'All quests completed! +100 gems bonus!',
-                  style: TextStyle(
-                    color: Colors.amber,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
           ],
         ),
       ),
