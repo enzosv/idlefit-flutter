@@ -25,7 +25,6 @@ class Currency {
   });
 
   Currency copyWith({
-    int? id,
     double? count,
     double? totalSpent,
     double? totalEarned,
@@ -33,7 +32,7 @@ class Currency {
     double? maxMultiplier,
   }) {
     return Currency(
-      id: id ?? this.id,
+      id: id,
       count: count ?? this.count,
       totalSpent: totalSpent ?? this.totalSpent,
       totalEarned: totalEarned ?? this.totalEarned,
