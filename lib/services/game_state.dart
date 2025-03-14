@@ -1,19 +1,11 @@
-import 'dart:async';
-import 'dart:math';
 import 'package:collection/collection.dart';
-import 'package:idlefit/constants.dart';
-import 'package:idlefit/models/coin_generator.dart';
-import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/models/shop_items_repo.dart';
 import 'package:idlefit/models/currency_repo.dart';
 import 'package:idlefit/services/background_activity.dart';
 import 'package:idlefit/services/storage_service.dart';
-import 'package:objectbox/objectbox.dart';
 import '../models/shop_items.dart';
-import 'package:flutter/foundation.dart';
 
-@immutable
 class GameState {
   // Game state
   final bool _isPaused;
@@ -86,12 +78,6 @@ class GameState {
       shopItemRepo: _shopItemRepo,
       dailyQuestRepo: _dailyQuestRepo,
     );
-  }
-
-  /// **Initialize Game (Persistence)**
-  Future<void> initialize(Store objectBoxService) async {
-    _currencyRepo.ensureDefaultCurrencies();
-    _currencyRepo.loadCurrencies();
   }
 
   /// **Convert to JSON (Persistence)**

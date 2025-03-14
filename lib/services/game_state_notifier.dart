@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:idlefit/constants.dart';
 import 'package:idlefit/main.dart';
-import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/models/shop_items_repo.dart';
