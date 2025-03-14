@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:idlefit/services/ad_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/services/game_state_notifier.dart';
+import 'package:idlefit/providers/game_state_provider.dart';
 import '../models/shop_items.dart';
 import 'common_card.dart';
 

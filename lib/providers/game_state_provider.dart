@@ -4,17 +4,17 @@ import 'package:idlefit/main.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/models/currency_repo.dart';
-import 'package:idlefit/providers/coin_provider.dart';
+import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/generator_provider.dart';
 import 'package:idlefit/providers/shop_item_provider.dart';
-import 'package:idlefit/services/background_activity.dart';
+import 'package:idlefit/models/background_activity.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'storage_service.dart';
+import '../services/storage_service.dart';
 import '../models/shop_items.dart';
 import 'dart:math';
-import 'notification_service.dart';
+import '../services/notification_service.dart';
 import 'package:flutter/material.dart';
 
 class GameStateNotifier extends StateNotifier<GameState> {

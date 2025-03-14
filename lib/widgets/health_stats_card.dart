@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/health_data_entry.dart';
 import 'package:idlefit/models/health_data_repo.dart';
-import 'package:idlefit/services/game_state_notifier.dart';
+import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:idlefit/util.dart';
 import 'package:idlefit/widgets/card_button.dart';
 import 'package:idlefit/main.dart'; // Import providers from main.dart

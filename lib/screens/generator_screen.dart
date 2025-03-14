@@ -2,7 +2,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
-import 'package:idlefit/providers/coin_provider.dart';
+import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/generator_provider.dart';
 import 'package:idlefit/widgets/generator_card.dart';
 import '../widgets/common_widgets.dart';
@@ -14,8 +14,8 @@ class FlameBackground extends FlameGame {
   }
 }
 
-class MainScreen extends StatelessWidget {
-  const MainScreen({super.key});
+class GeneratorsScreen extends StatelessWidget {
+  const GeneratorsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

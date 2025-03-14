@@ -3,7 +3,7 @@ import 'package:health/health.dart';
 import 'package:flutter/material.dart';
 import 'package:idlefit/models/health_data_entry.dart';
 import 'package:idlefit/models/health_data_repo.dart';
-import 'package:idlefit/services/game_state_notifier.dart';
+import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:idlefit/services/object_box.dart';
 import 'dart:math';
 

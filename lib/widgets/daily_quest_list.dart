@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/services/game_state_notifier.dart';
+import 'package:idlefit/providers/game_state_provider.dart';
 import '../models/daily_quest.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
