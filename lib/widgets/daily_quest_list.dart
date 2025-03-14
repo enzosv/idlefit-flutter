@@ -1,15 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/providers/game_state_provider.dart';
+import 'package:idlefit/main.dart';
 import '../models/daily_quest.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DailyQuestList extends ConsumerWidget {
+class DailyQuestList extends ConsumerStatefulWidget {
   const DailyQuestList({super.key});
+  @override
+  ConsumerState<DailyQuestList> createState() => _DailyQuestListState();
+}
+
+class _DailyQuestListState extends ConsumerState<DailyQuestList> {
+  List<DailyQuest> quests = [];
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final gameState = ref.read(gameStateProvider);
-    final quests = gameState.dailyQuestRepo.getActiveQuests();
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    final objectBox = ref.read(objectBoxProvider);
+    final dailyQuestBox = objectBox.store.box<DailyQuest>();
+    final dailyQuestRepo = DailyQuestRepo(box: dailyQuestBox);
+    final quests = await dailyQuestRepo.getActiveQuests();
+    setState(() {
+      if (mounted) this.quests = quests;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),

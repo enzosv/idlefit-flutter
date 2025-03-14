@@ -75,14 +75,19 @@ class DailyQuestRepo {
     return data.map((item) => DailyQuest.fromJson(item)).toList();
   }
 
-  List<DailyQuest> getActiveQuests() {
+  Future<List<DailyQuest>> getActiveQuests() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final todayTimestamp = today.millisecondsSinceEpoch;
-    return box
-        .query(DailyQuest_.dateAssigned.equals(todayTimestamp))
-        .build()
-        .find();
+    final quests =
+        await box
+            .query(DailyQuest_.dateAssigned.equals(todayTimestamp))
+            .build()
+            .findAsync();
+    if (quests.isNotEmpty) {
+      return quests;
+    }
+    return generateDailyQuests();
   }
 
   Future<List<DailyQuest>> generateDailyQuests() async {
@@ -119,15 +124,15 @@ class DailyQuestRepo {
           ..rewardUnit = CurrencyType.space.name
           ..dateAssigned = todayTimestamp;
 
-    final watchAdQuest =
-        DailyQuest()
-          ..action = QuestAction.watch.name
-          ..unit = QuestUnit.ad.name
-          ..requirement = 1
-          ..reward = 1000
-          ..rewardUnit = CurrencyType.space.name
-          ..dateAssigned = todayTimestamp;
-    final quests = [spendCoinQuest, walkQuest, watchAdQuest];
+    // final watchAdQuest =
+    //     DailyQuest()
+    //       ..action = QuestAction.watch.name
+    //       ..unit = QuestUnit.ad.name
+    //       ..requirement = 1
+    //       ..reward = 1000
+    //       ..rewardUnit = CurrencyType.space.name
+    //       ..dateAssigned = todayTimestamp;
+    final quests = [spendCoinQuest, walkQuest];
     box.putMany(quests);
     assert(quests.isNotEmpty);
     assert(quests[0].id > 0);
