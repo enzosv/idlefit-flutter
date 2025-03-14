@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:flutter/rendering.dart';
+
 String durationNotation(double milliseconds) {
   if (milliseconds < 3600000) {
     final mins = (milliseconds / 60000);
@@ -73,4 +75,24 @@ bool isSorted<T extends Comparable>(List<T> list) {
     }
   }
   return true;
+}
+
+void debugPrintWithCaller(String message, {int depth = 2}) {
+  final stackTrace = StackTrace.current.toString().split("\n");
+
+  if (stackTrace.length > depth) {
+    final traceLine = stackTrace[depth]; // Get caller info
+    final match = RegExp(r'^(.*) \((.*):(\d+):(\d+)\)$').firstMatch(traceLine);
+
+    if (match != null) {
+      final filePath = match.group(2); // File path
+      final lineNumber = match.group(3); // Line number
+
+      debugPrint("[$filePath:$lineNumber] $message");
+    } else {
+      debugPrint(message);
+    }
+  } else {
+    debugPrint(message);
+  }
 }
