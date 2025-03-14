@@ -3,6 +3,7 @@ import 'package:idlefit/constants.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
+import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/models/shop_items_repo.dart';
 import 'package:idlefit/models/currency_repo.dart';
 import 'package:idlefit/services/background_activity.dart';
@@ -363,6 +364,7 @@ final gameStateProvider = StateNotifierProvider<GameStateNotifier, GameState>((
       currencyRepo: CurrencyRepo(box: store.box<Currency>()),
       generatorRepo: CoinGeneratorRepo(box: store.box<CoinGenerator>()),
       shopItemRepo: ShopItemsRepo(box: store.box<ShopItem>()),
+      dailyQuestRepo: DailyQuestRepo(box: store.box<DailyQuest>()),
     ),
   );
 });
