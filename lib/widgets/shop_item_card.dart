@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/constants.dart';
+import 'package:idlefit/helpers/constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/providers/coin_provider.dart';
+import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/shop_item_provider.dart';
 import '../models/shop_items.dart';
 import 'common_card.dart';

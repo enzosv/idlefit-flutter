@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/constants.dart';
+import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/widgets/achievement_list.dart';
 import 'package:idlefit/widgets/health_stats_card.dart';
 import 'package:idlefit/widgets/game_stats_card.dart';

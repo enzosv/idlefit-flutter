@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
-import '../constants.dart';
-import '../util.dart';
+import '../helpers/constants.dart';
+import '../helpers/util.dart';
 
 class GameStatsCard extends StatelessWidget {
   const GameStatsCard({super.key});

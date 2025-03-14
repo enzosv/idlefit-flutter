@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/constants.dart';
-import 'package:idlefit/providers/coin_provider.dart';
+import 'package:idlefit/helpers/constants.dart';
+import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/generator_provider.dart';
-import 'package:idlefit/util.dart';
+import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/widgets/current_coins.dart';
 import 'common_card.dart';
 

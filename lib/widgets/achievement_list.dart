@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
-import 'package:idlefit/providers/coin_provider.dart';
+import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/main.dart'; // Import providers from main.dart
 import '../models/achievement.dart';
 import '../models/achievement_repo.dart';

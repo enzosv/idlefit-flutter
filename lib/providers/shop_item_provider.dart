@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/shop_items.dart';
-import 'package:idlefit/providers/coin_provider.dart';
+import 'package:idlefit/providers/currency_provider.dart';
 import 'package:objectbox/objectbox.dart';
 
 class ShopItemNotifier extends StateNotifier<List<ShopItem>> {

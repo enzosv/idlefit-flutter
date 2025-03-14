@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/constants.dart';
+import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/models/coin_generator.dart';
-import 'package:idlefit/providers/coin_provider.dart';
+import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/generator_provider.dart';
-import 'package:idlefit/util.dart';
+import 'package:idlefit/helpers/util.dart';
 import 'common_card.dart';
 
 class GeneratorUpgradeCard extends ConsumerWidget {
