@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/constants.dart';
-import 'package:idlefit/services/background_activity.dart';
-import '../util.dart';
+import 'package:idlefit/helpers/constants.dart';
+import 'package:idlefit/models/background_activity.dart';
+import '../helpers/util.dart';
 
 class BackgroundEarningsPopup extends StatelessWidget {
   final msToMins = 60000;

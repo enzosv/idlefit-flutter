@@ -1,6 +1,6 @@
 import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/models/currency_repo.dart';
-import 'package:idlefit/services/background_activity.dart';
+import 'package:idlefit/models/background_activity.dart';
 import 'package:idlefit/services/storage_service.dart';
 
 class GameState {
