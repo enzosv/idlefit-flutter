@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:idlefit/models/daily_quest.dart';
+import 'package:idlefit/providers/daily_quest_provider.dart';
 import 'package:idlefit/services/ad_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
@@ -59,13 +61,18 @@ class _DoubleCoinsCardState extends ConsumerState<DoubleCoinsCard> {
   }
 
   void _watchAd() {
-    final gameStateNotifier = ref.read(gameStateProvider.notifier);
-
     AdService.showRewardedAd(
       onRewarded: () {
-        gameStateNotifier.setDoubleCoinExpiry(
-          DateTime.now().add(const Duration(minutes: 1)).millisecondsSinceEpoch,
-        );
+        ref
+            .read(gameStateProvider.notifier)
+            .setDoubleCoinExpiry(
+              DateTime.now()
+                  .add(const Duration(minutes: 1))
+                  .millisecondsSinceEpoch,
+            );
+        ref
+            .read(dailyQuestProvider.notifier)
+            .progressTowards(QuestAction.watch, QuestUnit.ad, 1);
         _startTimer();
       },
       onAdDismissed: () {
