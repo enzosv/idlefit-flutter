@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/constants.dart';
+import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/screens/generator_screen.dart';
 import 'package:idlefit/screens/shop_screen.dart';
 import 'package:idlefit/screens/stats_screen.dart';
@@ -40,7 +40,6 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
     if (state == AppLifecycleState.paused) {
       // going to background
       gameStateNotifier.setIsPaused(true);
-      gameStateNotifier.scheduleCoinCapacityNotification();
       return;
     }
     // going to foreground

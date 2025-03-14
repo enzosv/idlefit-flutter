@@ -62,7 +62,10 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
   void setIsPaused(bool isPaused) {
     state = state.copyWith(isPaused: isPaused);
-    _save();
+    if (isPaused) {
+      _save();
+      _scheduleCoinCapacityNotification();
+    }
   }
 
   void _startGenerators() {
@@ -163,7 +166,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     _save();
   }
 
-  void scheduleCoinCapacityNotification() {
+  void _scheduleCoinCapacityNotification() {
     final coins = ref.read(coinProvider);
     if (coins.count >= coins.max) return;
 
