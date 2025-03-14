@@ -19,31 +19,17 @@ class Achievement {
   @Transient()
   int reward = 0;
 
-  CurrencyType get rewardCurrency {
-    switch (rewardUnit) {
-      case 'space':
-        return CurrencyType.space;
-      case 'energy':
-        return CurrencyType.energy;
-      case 'coin':
-        return CurrencyType.coin;
-      default:
-        return CurrencyType.coin;
-    }
+  QuestAction get questAction {
+    return QuestAction.values.byName(action);
   }
 
-  // Getters and setters for enum properties - marked as @Transient so ObjectBox ignores them
-  @Transient()
-  QuestAction get questAction => QuestActionExtension.fromJson(action);
-  set questAction(QuestAction value) => action = value.toJson();
+  QuestUnit get questUnit {
+    return QuestUnit.values.byName(reqUnit);
+  }
 
-  @Transient()
-  QuestUnit get questReqUnit => QuestUnitExtension.fromJson(reqUnit);
-  set questReqUnit(QuestUnit value) => reqUnit = value.toJson();
-
-  @Transient()
-  RewardUnit get questRewardUnit => RewardUnitExtension.fromJson(rewardUnit);
-  set questRewardUnit(RewardUnit value) => rewardUnit = value.toJson();
+  CurrencyType get rewardCurrency {
+    return CurrencyType.values.byName(rewardUnit);
+  }
 
   // Achievement({
   //   required this.id,
@@ -55,14 +41,14 @@ class Achievement {
   // });
 
   String get description {
-    if (questReqUnit == QuestUnit.energy) {
-      return '${questAction.display} ${durationNotation(requirement.toDouble())} ${questReqUnit.display}';
+    if (questUnit == QuestUnit.energy) {
+      return '${questAction.name} ${durationNotation(requirement.toDouble())} ${questUnit.name}';
     }
-    return '${questAction.display} ${toLettersNotation(requirement.toDouble())} ${questReqUnit.display}';
+    return '${questAction.name} ${toLettersNotation(requirement.toDouble())} ${questUnit.name}';
   }
 
   String get rewardText {
-    if (questRewardUnit == RewardUnit.energy) {
+    if (rewardCurrency == CurrencyType.energy) {
       return durationNotation(reward.toDouble());
     }
     return toLettersNotation(reward.toDouble());

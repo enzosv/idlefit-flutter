@@ -47,7 +47,7 @@ class AchievementCard extends StatelessWidget {
                 children: [
                   Text('Reward:', style: theme.textTheme.bodySmall),
                   Text(
-                    '${achievement.rewardText} ${achievement.questRewardUnit.display}',
+                    '${achievement.rewardText} ${achievement.rewardCurrency.name}',
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.colorScheme.primary,
                     ),

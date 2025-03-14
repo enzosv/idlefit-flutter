@@ -1,63 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'package:idlefit/helpers/util.dart';
+import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/objectbox.g.dart';
-import 'package:objectbox/objectbox.dart';
 
 // Define enums for quest properties
 enum QuestAction { spend, walk, watch, burn, collect }
 
 enum QuestUnit { coins, steps, ad, calories, energy, space }
-
-enum RewardUnit { coins, energy, space, gems }
-
-// Extension methods to handle string conversion for JSON and display
-extension QuestActionExtension on QuestAction {
-  String toJson() {
-    return name[0].toUpperCase() + name.substring(1);
-  }
-
-  static QuestAction fromJson(String json) {
-    final normalized = json.toLowerCase();
-    return QuestAction.values.firstWhere(
-      (action) => action.name == normalized,
-      orElse: () => QuestAction.spend,
-    );
-  }
-
-  String get display => name[0].toUpperCase() + name.substring(1);
-}
-
-extension QuestUnitExtension on QuestUnit {
-  String toJson() {
-    return name.toLowerCase();
-  }
-
-  static QuestUnit fromJson(String json) {
-    final normalized = json.toLowerCase();
-    return QuestUnit.values.firstWhere(
-      (unit) => unit.name == normalized,
-      orElse: () => QuestUnit.coins,
-    );
-  }
-
-  String get display => name[0].toUpperCase() + name.substring(1);
-}
-
-extension RewardUnitExtension on RewardUnit {
-  String toJson() {
-    return name.toLowerCase();
-  }
-
-  static RewardUnit fromJson(String json) {
-    final normalized = json.toLowerCase();
-    return RewardUnit.values.firstWhere(
-      (unit) => unit.name == normalized,
-      orElse: () => RewardUnit.coins,
-    );
-  }
-
-  String get display => name[0].toUpperCase() + name.substring(1);
-}
 
 @Entity()
 class DailyQuest {
@@ -77,45 +27,37 @@ class DailyQuest {
 
   DailyQuest();
 
-  // Getters and setters for enum properties - marked as @Transient so ObjectBox ignores them
-  @Transient()
-  QuestAction get questAction => QuestActionExtension.fromJson(action);
-  set questAction(QuestAction value) => action = value.toJson();
-
-  @Transient()
-  QuestUnit get questUnit => QuestUnitExtension.fromJson(unit);
-  set questUnit(QuestUnit value) => unit = value.toJson();
-
-  @Transient()
-  RewardUnit get questRewardUnit => RewardUnitExtension.fromJson(rewardUnit);
-  set questRewardUnit(RewardUnit value) => rewardUnit = value.toJson();
-
-  @Transient()
-  String get description {
-    return '${questAction.display} $requirement ${questUnit.display}';
+  QuestAction get questAction {
+    return QuestAction.values.byName(action);
   }
 
-  @Transient()
-  String get rewardText {
-    return reward.toString();
+  QuestUnit get questUnit {
+    return QuestUnit.values.byName(unit);
   }
 
-  @Transient()
+  CurrencyType get rewardCurrency {
+    return CurrencyType.values.byName(rewardUnit);
+  }
+
   bool get isCompleted => progress >= requirement;
 
   factory DailyQuest.fromJson(Map<String, dynamic> json) {
     final quest =
         DailyQuest()
-          ..questAction = QuestActionExtension.fromJson(json['action'])
-          ..questUnit = QuestUnitExtension.fromJson(json['unit'])
+          ..action = json['action']
+          ..unit = json['unit']
+          ..rewardUnit = json['reward_unit']
           ..requirement = json['requirement']
-          ..reward = json['reward']
-          ..questRewardUnit = RewardUnitExtension.fromJson(json['reward_unit']);
+          ..reward = json['reward'];
     return quest;
   }
 
   void updateProgress(double newProgress) {
     progress += newProgress;
+  }
+
+  String get description {
+    return '${questAction.name} ${toLettersNotation(requirement.toDouble())} ${questUnit.name}';
   }
 }
 
@@ -161,29 +103,29 @@ class DailyQuestRepo {
 
     final spendCoinQuest =
         DailyQuest()
-          ..questAction = QuestAction.spend
-          ..questUnit = QuestUnit.coins
+          ..action = QuestAction.spend.name
+          ..unit = QuestUnit.coins.name
           ..requirement = 1000
           ..reward = 100
-          ..questRewardUnit = RewardUnit.coins
+          ..rewardUnit = CurrencyType.coin.name
           ..dateAssigned = todayTimestamp;
 
     final walkQuest =
         DailyQuest()
-          ..questAction = QuestAction.walk
-          ..questUnit = QuestUnit.steps
+          ..action = QuestAction.walk.name
+          ..unit = QuestUnit.steps.name
           ..requirement = 7500
           ..reward = 1000
-          ..questRewardUnit = RewardUnit.space
+          ..rewardUnit = CurrencyType.space.name
           ..dateAssigned = todayTimestamp;
 
     final watchAdQuest =
         DailyQuest()
-          ..questAction = QuestAction.watch
-          ..questUnit = QuestUnit.ad
+          ..action = QuestAction.watch.name
+          ..unit = QuestUnit.ad.name
           ..requirement = 1
           ..reward = 1000
-          ..questRewardUnit = RewardUnit.space
+          ..rewardUnit = CurrencyType.space.name
           ..dateAssigned = todayTimestamp;
     final quests = [spendCoinQuest, walkQuest, watchAdQuest];
     box.putMany(quests);
@@ -216,17 +158,6 @@ class DailyQuestRepo {
       box.put(quest);
       return;
     }
-  }
-
-  // Keep the string-based method for backward compatibility
-  Future<void> progressTowardsString(
-    String actionStr,
-    String unitStr,
-    double progress,
-  ) async {
-    final action = QuestActionExtension.fromJson(actionStr);
-    final unit = QuestUnitExtension.fromJson(unitStr);
-    return progressTowards(action, unit, progress);
   }
 
   void updateQuestProgress(DailyQuest quest, double progress) {

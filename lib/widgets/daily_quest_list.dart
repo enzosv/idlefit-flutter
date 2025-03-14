@@ -76,7 +76,7 @@ class _DailyQuestCard extends StatelessWidget {
                 children: [
                   Text('Reward:', style: theme.textTheme.bodySmall),
                   Text(
-                    '${quest.rewardText} ${quest.questRewardUnit.display}',
+                    '${quest.reward} ${quest.rewardCurrency.name}',
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.colorScheme.primary,
                     ),
