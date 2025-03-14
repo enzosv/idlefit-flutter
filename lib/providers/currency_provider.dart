@@ -1,8 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
+import 'package:idlefit/models/daily_quest.dart';
+import 'package:idlefit/providers/daily_quest_provider.dart';
 
 class CurrencyNotifier extends StateNotifier<Currency> {
-  CurrencyNotifier(super.state);
+  final Ref ref;
+  CurrencyNotifier(this.ref, super.state);
 
   void initialize(Currency currency) {
     state = currency;
@@ -10,10 +13,24 @@ class CurrencyNotifier extends StateNotifier<Currency> {
 
   void earn(double amount) {
     state = state.earn(amount);
+    ref
+        .read(dailyQuestProvider.notifier)
+        .progressTowards(
+          QuestAction.collect,
+          QuestUnit.values.byName(state.type.name),
+          amount,
+        );
   }
 
   void spend(double amount) {
     state = state.spend(amount);
+    ref
+        .read(dailyQuestProvider.notifier)
+        .progressTowards(
+          QuestAction.spend,
+          QuestUnit.values.byName(state.type.name),
+          amount,
+        );
   }
 
   void setMax(double max) {
@@ -27,12 +44,14 @@ class CurrencyNotifier extends StateNotifier<Currency> {
 
 final coinProvider = StateNotifierProvider<CurrencyNotifier, Currency>((ref) {
   return CurrencyNotifier(
+    ref,
     Currency(id: CurrencyType.coin.index, count: 10, baseMax: 100),
   );
 });
 
 final energyProvider = StateNotifierProvider<CurrencyNotifier, Currency>((ref) {
   return CurrencyNotifier(
+    ref,
     Currency(
       id: CurrencyType.energy.index,
       count: 0,
@@ -43,12 +62,14 @@ final energyProvider = StateNotifierProvider<CurrencyNotifier, Currency>((ref) {
 
 final spaceProvider = StateNotifierProvider<CurrencyNotifier, Currency>((ref) {
   return CurrencyNotifier(
+    ref,
     Currency(id: CurrencyType.space.index, count: 0, baseMax: 5000),
   );
 });
 
 final gemProvider = StateNotifierProvider<CurrencyNotifier, Currency>((ref) {
   return CurrencyNotifier(
+    ref,
     Currency(id: CurrencyType.gem.index, count: 10, baseMax: 100),
   );
 });
