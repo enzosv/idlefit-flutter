@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:collection/collection.dart';
 import 'package:idlefit/constants.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
@@ -10,55 +11,88 @@ import 'package:idlefit/services/background_activity.dart';
 import 'package:idlefit/services/storage_service.dart';
 import 'package:objectbox/objectbox.dart';
 import '../models/shop_items.dart';
+import 'package:flutter/foundation.dart';
 
+@immutable
 class GameState {
-  final bool isPaused;
+  // Game state
+  final bool _isPaused;
+  final int _lastGenerated;
+  final int _doubleCoinExpiry;
+  final double _offlineCoinMultiplier;
 
-  final BackgroundActivity backgroundActivity;
-
-  final Currency coins;
-  final Currency gems;
-  final Currency energy;
-  final Currency space;
-
-  final int lastGenerated;
-  final int doubleCoinExpiry;
-  final double offlineCoinMultiplier;
+  // Currencies
+  final Currency _coins;
+  final Currency _gems;
+  final Currency _energy;
+  final Currency _space;
 
   // Generators and shop items
-  final List<CoinGenerator> coinGenerators;
-  final List<ShopItem> shopItems;
+  final List<CoinGenerator> _coinGenerators;
+  final List<ShopItem> _shopItems;
 
-  // For saving/loading
+  // Services
+  final BackgroundActivity _backgroundActivity;
   final StorageService storageService;
-  final CurrencyRepo currencyRepo;
-  final CoinGeneratorRepo generatorRepo;
-  final ShopItemsRepo shopItemRepo;
-  final DailyQuestRepo dailyQuestRepo;
+  final CurrencyRepo _currencyRepo;
+  final CoinGeneratorRepo _generatorRepo;
+  final ShopItemsRepo _shopItemRepo;
+  final DailyQuestRepo _dailyQuestRepo;
 
   GameState({
-    required this.isPaused,
-    required this.coins,
-    required this.gems,
-    required this.energy,
-    required this.space,
-    required this.lastGenerated,
-    required this.doubleCoinExpiry,
-    required this.offlineCoinMultiplier,
-    required this.coinGenerators,
-    required this.shopItems,
+    required bool isPaused,
+    required Currency coins,
+    required Currency gems,
+    required Currency energy,
+    required Currency space,
+    required int lastGenerated,
+    required int doubleCoinExpiry,
+    required double offlineCoinMultiplier,
+    required List<CoinGenerator> coinGenerators,
+    required List<ShopItem> shopItems,
     required this.storageService,
     required CurrencyRepo currencyRepo,
     required CoinGeneratorRepo generatorRepo,
     required ShopItemsRepo shopItemRepo,
     required DailyQuestRepo dailyQuestRepo,
     BackgroundActivity? backgroundActivity,
-  }) : currencyRepo = currencyRepo,
-       generatorRepo = generatorRepo,
-       shopItemRepo = shopItemRepo,
-       dailyQuestRepo = dailyQuestRepo,
-       backgroundActivity = backgroundActivity ?? BackgroundActivity();
+  }) : _isPaused = isPaused,
+       _coins = coins,
+       _gems = gems,
+       _energy = energy,
+       _space = space,
+       _lastGenerated = lastGenerated,
+       _doubleCoinExpiry = doubleCoinExpiry,
+       _offlineCoinMultiplier = offlineCoinMultiplier,
+       _coinGenerators = List.unmodifiable(coinGenerators), // Prevents mutation
+       _shopItems = List.unmodifiable(shopItems),
+       _currencyRepo = currencyRepo,
+       _generatorRepo = generatorRepo,
+       _shopItemRepo = shopItemRepo,
+       _dailyQuestRepo = dailyQuestRepo,
+       _backgroundActivity = backgroundActivity ?? BackgroundActivity();
 
+  /// **Public Getters (Encapsulation)**
+  bool get isPaused => _isPaused;
+  Currency get coins => _coins;
+  Currency get gems => _gems;
+  Currency get energy => _energy;
+  Currency get space => _space;
+  int get lastGenerated => _lastGenerated;
+  int get doubleCoinExpiry => _doubleCoinExpiry;
+  double get offlineCoinMultiplier => _offlineCoinMultiplier;
+  List<CoinGenerator> get coinGenerators =>
+      UnmodifiableListView(_coinGenerators);
+  List<ShopItem> get shopItems => UnmodifiableListView(_shopItems);
+  BackgroundActivity get backgroundActivity => _backgroundActivity;
+
+  /// **Repositories (Encapsulation)**
+  CurrencyRepo get currencyRepo => _currencyRepo;
+  CoinGeneratorRepo get generatorRepo => _generatorRepo;
+  ShopItemsRepo get shopItemRepo => _shopItemRepo;
+  DailyQuestRepo get dailyQuestRepo => _dailyQuestRepo;
+
+  /// **CopyWith (Immutable Updates)**
   GameState copyWith({
     bool? isPaused,
     Currency? coins,
@@ -73,58 +107,62 @@ class GameState {
     BackgroundActivity? backgroundActivity,
   }) {
     return GameState(
-      isPaused: isPaused ?? this.isPaused,
-      coins: coins ?? this.coins,
-      gems: gems ?? this.gems,
-      energy: energy ?? this.energy,
-      space: space ?? this.space,
-      lastGenerated: lastGenerated ?? this.lastGenerated,
-      doubleCoinExpiry: doubleCoinExpiry ?? this.doubleCoinExpiry,
-      offlineCoinMultiplier:
-          offlineCoinMultiplier ?? this.offlineCoinMultiplier,
-      coinGenerators: coinGenerators ?? this.coinGenerators,
-      shopItems: shopItems ?? this.shopItems,
-      backgroundActivity: backgroundActivity ?? this.backgroundActivity,
+      isPaused: isPaused ?? _isPaused,
+      coins: coins ?? _coins,
+      gems: gems ?? _gems,
+      energy: energy ?? _energy,
+      space: space ?? _space,
+      lastGenerated: lastGenerated ?? _lastGenerated,
+      doubleCoinExpiry: doubleCoinExpiry ?? _doubleCoinExpiry,
+      offlineCoinMultiplier: offlineCoinMultiplier ?? _offlineCoinMultiplier,
+      coinGenerators: coinGenerators ?? _coinGenerators,
+      shopItems: shopItems ?? _shopItems,
+      backgroundActivity: backgroundActivity ?? _backgroundActivity,
       storageService: storageService,
-      currencyRepo: currencyRepo,
-      generatorRepo: generatorRepo,
-      shopItemRepo: shopItemRepo,
-      dailyQuestRepo: dailyQuestRepo,
+      currencyRepo: _currencyRepo,
+      generatorRepo: _generatorRepo,
+      shopItemRepo: _shopItemRepo,
+      dailyQuestRepo: _dailyQuestRepo,
     );
   }
 
+  /// **Initialize Game (Persistence)**
   Future<void> initialize(Store objectBoxService) async {
-    // Ensure default currencies exist and load them
-    currencyRepo.ensureDefaultCurrencies();
-    currencyRepo.loadCurrencies();
+    _currencyRepo.ensureDefaultCurrencies();
+    _currencyRepo.loadCurrencies();
   }
 
+  /// **Convert to JSON (Persistence)**
   Map<String, dynamic> toJson() {
     return {
-      'lastGenerated': lastGenerated,
-      'offlineCoinMultiplier': offlineCoinMultiplier,
-      'doubleCoinExpiry': doubleCoinExpiry,
+      'lastGenerated': _lastGenerated,
+      'offlineCoinMultiplier': _offlineCoinMultiplier,
+      'doubleCoinExpiry': _doubleCoinExpiry,
     };
   }
 
+  /// **Calculate Passive Output**
   double get passiveOutput {
-    double output = coinGenerators.fold(
+    double output = _coinGenerators.fold(
       0,
       (sum, generator) => sum + generator.output,
     );
     double coinMultiplier = 1.0;
-    if (doubleCoinExpiry >= DateTime.now().millisecondsSinceEpoch) {
+    if (_doubleCoinExpiry >= DateTime.now().millisecondsSinceEpoch) {
       // TODO: what if doubler is active for part of the time?
       coinMultiplier += 1;
     }
-    for (final item in shopItems) {
+
+    for (final item in _shopItems) {
       if (item.shopItemEffect == ShopItemEffect.coinMultiplier) {
         coinMultiplier += item.effectValue * item.level;
       }
     }
+
     return output * coinMultiplier;
   }
 
+  /// **Calculate Valid Time Since Last Generate**
   int calculateValidTimeSinceLastGenerate(int now, int previous) {
     if (previous <= 0) {
       return Constants.tickTime;
@@ -138,8 +176,7 @@ class GameState {
       // even if app became inactive, it wasn't long enough. don't limit to energy
       return dif;
     }
-
     // limit to energy
-    return min(dif, energy.count.round());
+    return min(dif, _energy.count.round());
   }
 }
