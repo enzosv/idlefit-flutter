@@ -3,6 +3,7 @@ import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/currency_repo.dart';
+import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/daily_quest_provider.dart';
 import 'package:idlefit/providers/generator_provider.dart';
@@ -147,9 +148,21 @@ class GameStateNotifier extends StateNotifier<GameState> {
       energyEarned: energyGain,
       spaceEarned: spaceGain,
     );
-    ref.read(energyProvider.notifier).earn(energyGain);
-    ref.read(gemProvider.notifier).earn(gemGain);
-    ref.read(spaceProvider.notifier).earn(spaceGain);
+    if (steps > 0) {
+      ref
+          .read(dailyQuestProvider.notifier)
+          .progressTowards(QuestAction.walk, QuestUnit.steps, steps);
+      ref.read(spaceProvider.notifier).earn(spaceGain);
+    }
+    if (calories > 0) {
+      ref
+          .read(dailyQuestProvider.notifier)
+          .progressTowards(QuestAction.burn, QuestUnit.calories, calories);
+      ref.read(energyProvider.notifier).earn(energyGain);
+    }
+    if (gemGain > 0) {
+      ref.read(gemProvider.notifier).earn(gemGain);
+    }
 
     state = state.copyWith(backgroundActivity: newBackgroundActivity);
 

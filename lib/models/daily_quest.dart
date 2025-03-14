@@ -65,15 +65,12 @@ class DailyQuest {
   }
 
   String get description {
-    if (questUnit == QuestUnit.space && questAction == QuestAction.collect) {
-      // convert collect space to walk steps
-      return 'Walk ${toLettersNotation(requirement.toDouble())} steps';
-    }
     return '${questAction.name.capitalize()} ${toLettersNotation(requirement.toDouble())} ${questUnit.name}';
   }
 
   DailyQuest copyWith({double? progress, bool? isClaimed}) {
     return DailyQuest()
+      ..id = id
       ..action = action
       ..unit = unit
       ..rewardUnit = rewardUnit
