@@ -4,6 +4,7 @@ import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:idlefit/main.dart'; // Import providers from main.dart
 import '../models/achievement.dart';
 import '../models/achievement_repo.dart';
+import '../models/daily_quest.dart';
 import '../models/health_data_repo.dart';
 import '../models/health_data_entry.dart';
 import 'achievement_card.dart';
@@ -17,7 +18,7 @@ class AchievementList extends ConsumerStatefulWidget {
 
 class _AchievementListState extends ConsumerState<AchievementList> {
   List<Achievement> achievements = [];
-  Map<String, double> progress = {};
+  Map<QuestAction, double> progress = {};
   late AchievementRepo _achievementRepo;
 
   @override
@@ -38,19 +39,21 @@ class _AchievementListState extends ConsumerState<AchievementList> {
     final healthStats = await healthRepo.total();
     final gameState = ref.read(gameStateProvider);
 
-    final newProgress = <String, double>{};
+    final newProgress = <QuestAction, double>{};
     for (final achievement in newAchievements) {
       if (achievement.dateClaimed != null) continue;
 
-      switch (achievement.action.toLowerCase()) {
-        case 'walk':
-          newProgress[achievement.action] = healthStats.steps;
+      switch (achievement.questAction) {
+        case QuestAction.walk:
+          newProgress[achievement.questAction] = healthStats.steps;
           break;
-        case 'collect':
-          newProgress[achievement.action] = gameState.coins.totalEarned;
+        case QuestAction.collect:
+          newProgress[achievement.questAction] = gameState.coins.totalEarned;
           break;
-        case 'spend':
-          newProgress[achievement.action] = gameState.energy.totalSpent;
+        case QuestAction.spend:
+          newProgress[achievement.questAction] = gameState.energy.totalSpent;
+          break;
+        default:
           break;
       }
     }
@@ -94,7 +97,7 @@ class _AchievementListState extends ConsumerState<AchievementList> {
             ),
             const Divider(),
             ...achievements.map((achievement) {
-              final currentProgress = progress[achievement.action] ?? 0;
+              final currentProgress = progress[achievement.questAction] ?? 0;
               final bool isCompleted = achievement.dateClaimed != null;
               final bool canClaim =
                   currentProgress >= achievement.requirement && !isCompleted;

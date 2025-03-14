@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:idlefit/constants.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
+import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/models/shop_items_repo.dart';
 import 'package:idlefit/models/currency_repo.dart';
 import 'package:idlefit/services/background_activity.dart';
@@ -33,6 +34,7 @@ class GameState {
   final CurrencyRepo currencyRepo;
   final CoinGeneratorRepo generatorRepo;
   final ShopItemsRepo shopItemRepo;
+  final DailyQuestRepo dailyQuestRepo;
 
   GameState({
     required this.isPaused,
@@ -49,10 +51,12 @@ class GameState {
     required CurrencyRepo currencyRepo,
     required CoinGeneratorRepo generatorRepo,
     required ShopItemsRepo shopItemRepo,
+    required DailyQuestRepo dailyQuestRepo,
     BackgroundActivity? backgroundActivity,
   }) : currencyRepo = currencyRepo,
        generatorRepo = generatorRepo,
        shopItemRepo = shopItemRepo,
+       dailyQuestRepo = dailyQuestRepo,
        backgroundActivity = backgroundActivity ?? BackgroundActivity();
 
   GameState copyWith({
@@ -85,6 +89,7 @@ class GameState {
       currencyRepo: currencyRepo,
       generatorRepo: generatorRepo,
       shopItemRepo: shopItemRepo,
+      dailyQuestRepo: dailyQuestRepo,
     );
   }
 
