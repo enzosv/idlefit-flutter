@@ -35,7 +35,7 @@ class _DynamicStats extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gameState = ref.watch(gameStateProvider);
+    final gameStateNotifier = ref.watch(gameStateProvider.notifier);
     final coins = ref.watch(coinProvider);
     return _StatListTile(
       icon: Constants.coinIcon,
@@ -43,7 +43,7 @@ class _DynamicStats extends ConsumerWidget {
       title: 'Gains',
       current: coins.count,
       max: coins.max,
-      perSecond: gameState.passiveOutput,
+      perSecond: gameStateNotifier.passiveOutput,
       earned: coins.totalEarned,
       spent: coins.totalSpent,
     );
@@ -55,27 +55,27 @@ class _StaticStats extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gameState = ref.watch(gameStateProvider);
-
+    final energy = ref.watch(energyProvider);
+    final space = ref.watch(spaceProvider);
     return Column(
       children: [
         _StatListTile(
           icon: Constants.energyIcon,
           iconColor: Colors.greenAccent,
           title: 'Energy',
-          current: gameState.energy.count,
-          max: gameState.energy.max,
-          earned: gameState.energy.totalEarned,
-          spent: gameState.energy.totalSpent,
+          current: energy.count,
+          max: energy.max,
+          earned: energy.totalEarned,
+          spent: energy.totalSpent,
         ),
         _StatListTile(
           icon: Constants.spaceIcon,
           iconColor: Colors.blueAccent,
           title: 'Space',
-          current: gameState.space.count,
-          max: gameState.space.max,
-          earned: gameState.space.totalEarned,
-          spent: gameState.space.totalSpent,
+          current: space.count,
+          max: space.max,
+          earned: space.totalEarned,
+          spent: space.totalSpent,
         ),
       ],
     );

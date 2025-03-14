@@ -39,7 +39,6 @@ class _AchievementListState extends ConsumerState<AchievementList> {
     final healthBox = objectBox.store.box<HealthDataEntry>();
     final healthRepo = HealthDataRepo(box: healthBox);
     final healthStats = await healthRepo.total();
-    final gameState = ref.read(gameStateProvider);
     final coins = ref.read(coinProvider);
 
     final newProgress = <QuestAction, double>{};
@@ -54,9 +53,11 @@ class _AchievementListState extends ConsumerState<AchievementList> {
           newProgress[achievement.questAction] = coins.totalEarned;
           break;
         case QuestAction.spend:
-          newProgress[achievement.questAction] = gameState.energy.totalSpent;
+          newProgress[achievement.questAction] =
+              ref.read(energyProvider).totalSpent;
           break;
         default:
+          assert(false, 'unhandled quest action ${achievement.questAction}');
           break;
       }
     }
@@ -76,18 +77,25 @@ class _AchievementListState extends ConsumerState<AchievementList> {
     if (!mounted) {
       return;
     }
-    print("claimed, ${achievement.reward}");
 
-    final gameStateNotifier = ref.read(gameStateProvider.notifier);
     final reward = achievement.reward.toDouble();
     // Award the achievement reward
 
-    if (achievement.rewardCurrency == CurrencyType.coin) {
-      final coinsNotifier = ref.read(coinProvider.notifier);
-      coinsNotifier.earn(reward);
-    } else {
-      gameStateNotifier.earnCurrency(achievement.rewardCurrency, reward);
+    switch (achievement.rewardCurrency) {
+      case CurrencyType.coin:
+        final coinsNotifier = ref.read(coinProvider.notifier);
+        coinsNotifier.earn(reward);
+      case CurrencyType.space:
+        final spaceNotifier = ref.read(spaceProvider.notifier);
+        spaceNotifier.earn(reward);
+      case CurrencyType.energy:
+        final energyNotifier = ref.read(energyProvider.notifier);
+        energyNotifier.earn(reward);
+      default:
+        assert(false, 'unhandled currency type ${achievement.rewardCurrency}');
+        return;
     }
+    print("claimed, ${achievement.reward}");
     // Refresh the achievement list to update visibility
     _fetchData();
   }

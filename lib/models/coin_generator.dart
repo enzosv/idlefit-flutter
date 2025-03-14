@@ -1,7 +1,5 @@
 import 'dart:math';
 import 'package:objectbox/objectbox.dart';
-import 'dart:convert';
-import 'package:flutter/services.dart';
 
 @Entity()
 class CoinGenerator {
@@ -21,11 +19,27 @@ class CoinGenerator {
 
   CoinGenerator({
     required this.tier,
+    this.count = 0,
+    this.level = 0,
+    this.isUnlocked = false,
     this.name = '',
     this.baseCost = 0,
     this.baseOutput = 0,
     this.description = '',
   });
+
+  // CoinGenerator copyWith({int? count, int? level, bool? isUnlocked}) {
+  //   return CoinGenerator(
+  //     tier: tier,
+  //     count: count ?? this.count,
+  //     level: level ?? this.level,
+  //     isUnlocked: isUnlocked ?? this.isUnlocked,
+  //     name: name,
+  //     baseCost: baseCost,
+  //     baseOutput: baseOutput,
+  //     description: description,
+  //   );
+  // }
 
   int get maxLevel {
     return 10;
@@ -65,31 +79,5 @@ class CoinGenerator {
       baseOutput: json['output'].toDouble(),
       description: json['description'],
     );
-  }
-}
-
-class CoinGeneratorRepo {
-  final Box<CoinGenerator> box;
-  CoinGeneratorRepo({required this.box});
-
-  Future<List<CoinGenerator>> parseCoinGenerators(String jsonString) async {
-    final String response = await rootBundle.loadString(jsonString);
-    final List<dynamic> data = jsonDecode(response);
-
-    return data.map((item) {
-      CoinGenerator generator = CoinGenerator.fromJson(item);
-      final stored = box.get(generator.tier);
-      if (stored == null) {
-        return generator;
-      }
-      generator.count = stored.count;
-      generator.level = stored.level;
-      generator.isUnlocked = stored.isUnlocked;
-      return generator;
-    }).toList();
-  }
-
-  saveCoinGenerator(CoinGenerator generator) {
-    box.put(generator);
   }
 }

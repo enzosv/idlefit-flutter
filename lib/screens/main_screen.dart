@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
 import 'package:idlefit/providers/coin_provider.dart';
-import 'package:idlefit/services/game_state_notifier.dart';
+import 'package:idlefit/providers/generator_provider.dart';
 import 'package:idlefit/widgets/generator_card.dart';
 import '../widgets/common_widgets.dart';
 
@@ -40,22 +40,21 @@ class MainScreen extends StatelessWidget {
               Expanded(
                 child: Consumer(
                   builder: (context, ref, child) {
-                    final gameState = ref.watch(gameStateProvider);
+                    final coinGenerators = ref.watch(generatorProvider);
                     final coins = ref.watch(coinProvider);
 
                     // Filter affordable generators and sort by price
                     final affordableGenerators =
-                        gameState.coinGenerators
+                        coinGenerators
                             .where((generator) => generator.cost <= coins.max)
                             .toList()
                           ..sort((a, b) => b.tier.compareTo(a.tier));
-
                     return ListView.builder(
                       padding: const EdgeInsets.all(16),
                       itemCount: affordableGenerators.length,
                       itemBuilder: (context, index) {
                         return GeneratorCard(
-                          generatorIndex: gameState.coinGenerators.indexOf(
+                          generatorIndex: coinGenerators.indexOf(
                             affordableGenerators[index],
                           ),
                         );

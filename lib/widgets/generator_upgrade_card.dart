@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/providers/coin_provider.dart';
+import 'package:idlefit/providers/generator_provider.dart';
 import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:idlefit/util.dart';
 import 'common_card.dart';
@@ -15,7 +16,7 @@ class GeneratorUpgradeCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gameState = ref.watch(gameStateProvider);
-    final gameStateNotifier = ref.read(gameStateProvider.notifier);
+    final coinGeneratorNotifier = ref.read(generatorProvider.notifier);
 
     final additionalInfo = <Widget>[
       Row(
@@ -46,17 +47,18 @@ class GeneratorUpgradeCard extends ConsumerWidget {
     }
 
     if (!generator.isUnlocked) {
+      final space = ref.watch(spaceProvider);
       return CommonCard(
         title: generator.name,
         rightText: 'Level: ${generator.level}/${generator.maxLevel}',
         additionalInfo: additionalInfo,
         cost: generator.upgradeUnlockCost,
-        affordable: gameState.space.count >= generator.upgradeUnlockCost,
+        affordable: space.count >= generator.upgradeUnlockCost,
         costIcon: Constants.spaceIcon,
         buttonText: 'Unlock',
         onButtonPressed:
-            gameState.space.count >= generator.upgradeUnlockCost
-                ? () => gameStateNotifier.unlockGenerator(generator)
+            space.count >= generator.upgradeUnlockCost
+                ? () => coinGeneratorNotifier.unlockGenerator(generator)
                 : null,
       );
     }
@@ -74,7 +76,7 @@ class GeneratorUpgradeCard extends ConsumerWidget {
       onButtonPressed:
           (isMaxLevel || coins.count < generator.upgradeCost)
               ? null
-              : () => gameStateNotifier.upgradeGenerator(generator),
+              : () => coinGeneratorNotifier.upgradeGenerator(generator),
     );
   }
 }

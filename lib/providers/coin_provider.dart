@@ -5,7 +5,6 @@ class CurrencyNotifier extends StateNotifier<Currency> {
   CurrencyNotifier(super.state);
 
   void initialize(Currency currency) {
-    print('initializing coin provider with ${currency.count}');
     state = currency;
   }
 
@@ -29,5 +28,27 @@ class CurrencyNotifier extends StateNotifier<Currency> {
 final coinProvider = StateNotifierProvider<CurrencyNotifier, Currency>((ref) {
   return CurrencyNotifier(
     Currency(id: CurrencyType.coin.index, count: 10, baseMax: 100),
+  );
+});
+
+final energyProvider = StateNotifierProvider<CurrencyNotifier, Currency>((ref) {
+  return CurrencyNotifier(
+    Currency(
+      id: CurrencyType.energy.index,
+      count: 0,
+      baseMax: 43200000, //12hrs
+    ),
+  );
+});
+
+final spaceProvider = StateNotifierProvider<CurrencyNotifier, Currency>((ref) {
+  return CurrencyNotifier(
+    Currency(id: CurrencyType.space.index, count: 0, baseMax: 5000),
+  );
+});
+
+final gemProvider = StateNotifierProvider<CurrencyNotifier, Currency>((ref) {
+  return CurrencyNotifier(
+    Currency(id: CurrencyType.gem.index, count: 10, baseMax: 100),
   );
 });

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
+import 'package:idlefit/providers/generator_provider.dart';
 import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:idlefit/widgets/generator_upgrade_card.dart';
 import 'package:idlefit/widgets/shop_item_card.dart';
@@ -27,12 +28,10 @@ class ShopScreen extends StatelessWidget {
             child: Consumer(
               builder: (context, ref, child) {
                 final gameState = ref.watch(gameStateProvider);
-
+                final coinGenerators = ref.watch(generatorProvider);
                 // Filter generators that can be upgraded (count >= 10)
                 final upgradableGenerators =
-                    gameState.coinGenerators
-                        .where((gen) => gen.count >= 10)
-                        .toList()
+                    coinGenerators.where((gen) => gen.count >= 10).toList()
                       ..sort((a, b) => b.tier.compareTo(a.tier));
 
                 return ListView(

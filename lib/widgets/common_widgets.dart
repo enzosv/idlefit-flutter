@@ -11,7 +11,7 @@ class CoinsInfo extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gameState = ref.watch(gameStateProvider);
+    final gameStateNotifier = ref.watch(gameStateProvider.notifier);
     final coins = ref.watch(coinProvider);
 
     return Row(
@@ -28,7 +28,7 @@ class CoinsInfo extends ConsumerWidget {
         const SizedBox(width: 8),
         Flexible(
           child: Text(
-            '${toLettersNotation(gameState.passiveOutput)}/s',
+            '${toLettersNotation(gameStateNotifier.passiveOutput)}/s',
             style: const TextStyle(color: Colors.white70, fontSize: 14),
             overflow: TextOverflow.ellipsis,
           ),
@@ -66,8 +66,7 @@ class EnergyCurrency extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gameState = ref.watch(gameStateProvider);
-
+    final energy = ref.watch(energyProvider);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
@@ -76,7 +75,7 @@ class EnergyCurrency extends ConsumerWidget {
         const SizedBox(width: 4),
         Flexible(
           child: Text(
-            '${durationNotation(gameState.energy.count)}/${durationNotation(gameState.energy.max)}',
+            '${durationNotation(energy.count)}/${durationNotation(energy.max)}',
             style: const TextStyle(color: Colors.white, fontSize: 14),
             overflow: TextOverflow.ellipsis,
           ),
@@ -91,8 +90,7 @@ class SpaceCurrency extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gameState = ref.watch(gameStateProvider);
-
+    final space = ref.watch(spaceProvider);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
@@ -101,7 +99,7 @@ class SpaceCurrency extends ConsumerWidget {
         const SizedBox(width: 4),
         Flexible(
           child: Text(
-            '${toLettersNotation(gameState.space.count)}/${toLettersNotation(gameState.space.max)}',
+            '${toLettersNotation(space.count)}/${toLettersNotation(space.max)}',
             style: const TextStyle(color: Colors.white, fontSize: 14),
             overflow: TextOverflow.ellipsis,
           ),
