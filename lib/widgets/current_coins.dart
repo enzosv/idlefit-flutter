@@ -52,7 +52,7 @@ class _CurrentCoinsState extends State<CurrentCoins>
     return Consumer(
       builder: (context, ref, child) {
         final coins = ref.watch(coinProvider);
-r        return AnimatedBuilder(
+        return AnimatedBuilder(
           animation: _scaleAnimation,
           builder: (context, child) {
             return Transform.scale(
