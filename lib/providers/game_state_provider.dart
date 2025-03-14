@@ -87,8 +87,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     if (state.isPaused) return;
     final now = DateTime.now().millisecondsSinceEpoch;
     final realDif = now - state.lastGenerated;
-    final dif = calculateValidTimeSinceLastGenerate(now, state.lastGenerated);
-    final coinsNotifier = ref.read(coinProvider.notifier);
+    final dif = _calculateValidTimeSinceLastGenerate(now, state.lastGenerated);
 
     // Handle coin generation
     double coinsGenerated = passiveOutput;
@@ -97,6 +96,8 @@ class GameStateNotifier extends StateNotifier<GameState> {
       return;
     }
     coinsGenerated *= (dif / Constants.tickTime);
+
+    final coinsNotifier = ref.read(coinProvider.notifier);
     if (realDif < Constants.inactiveThreshold) {
       // don't use energy
       // earn coins
@@ -212,7 +213,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
   }
 
   /// **Calculate Valid Time Since Last Generate**
-  int calculateValidTimeSinceLastGenerate(int now, int previous) {
+  int _calculateValidTimeSinceLastGenerate(int now, int previous) {
     if (previous <= 0) {
       return Constants.tickTime;
     }
