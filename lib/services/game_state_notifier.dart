@@ -62,7 +62,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
   void setIsPaused(bool isPaused) {
     state = state.copyWith(isPaused: isPaused);
-    // _save();
+    _save();
   }
 
   void _startGenerators() {
@@ -73,7 +73,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
   }
 
   void _save() {
-    print("saving");
     state.storageService.saveGameState(state.toJson());
     state.currencyRepo.saveCurrencies([
       ref.read(coinProvider),
@@ -86,7 +85,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
   void _processGenerators() {
     if (state.isPaused) return;
-    print("running generators");
     final now = DateTime.now().millisecondsSinceEpoch;
     final realDif = now - state.lastGenerated;
     final dif = calculateValidTimeSinceLastGenerate(now, state.lastGenerated);
@@ -169,7 +167,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
   }
 
   void scheduleCoinCapacityNotification() {
-    print("scheduling notif");
     final coins = ref.read(coinProvider);
     if (coins.count >= coins.max) return;
 
