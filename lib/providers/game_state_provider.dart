@@ -226,7 +226,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
       return dif;
     }
     // limit to energy
-    return min(dif, ref.read(energyProvider).count.round());
+    return min(dif, ref.read(energyProvider).count.floor());
   }
 }
 
