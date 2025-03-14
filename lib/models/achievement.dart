@@ -1,6 +1,6 @@
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/daily_quest.dart';
-import 'package:idlefit/util.dart';
+import 'package:idlefit/helpers/util.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()

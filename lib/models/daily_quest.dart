@@ -200,7 +200,7 @@ class DailyQuestRepo {
   ) async {
     final quests = await generateDailyQuests();
     for (final quest in quests) {
-      print('${quest.questAction} ${action} ${quest.questUnit} $unit');
+      print('${quest.questAction} $action ${quest.questUnit} $unit');
 
       if (quest.questAction != action) {
         continue;
@@ -209,7 +209,7 @@ class DailyQuestRepo {
         continue;
       }
       print(
-        'progressing ${quest.questAction} ${action} ${quest.questUnit} $unit',
+        'progressing ${quest.questAction} $action ${quest.questUnit} $unit',
       );
 
       quest.progress += progress;

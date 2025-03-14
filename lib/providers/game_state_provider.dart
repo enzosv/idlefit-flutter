@@ -177,7 +177,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
         ref
             .read(shopItemProvider.notifier)
             .multiplier(ShopItemEffect.offlineCoinMultiplier);
-    ;
     if (effectiveOutput <= 0) return;
 
     final secondsToFill = coinsToFill / effectiveOutput;

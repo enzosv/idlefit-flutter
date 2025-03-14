@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/constants.dart';
+import 'package:idlefit/helpers/constants.dart';
 
 class CardButton extends StatelessWidget {
   final VoidCallback? onPressed;

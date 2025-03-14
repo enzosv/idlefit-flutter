@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/objectbox.g.dart';
-import 'package:idlefit/util.dart';
+import 'package:idlefit/helpers/util.dart';
 import 'achievement.dart';
 
 class AchievementRepo {

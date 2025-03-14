@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/util.dart';
+import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/widgets/card_button.dart';
 
 class CommonCard extends StatelessWidget {
