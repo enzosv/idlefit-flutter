@@ -17,11 +17,9 @@ class HealthService {
     HealthDataType.EXERCISE_TIME,
   ];
 
-  bool _isAuthorized = false;
-
   Future<void> initialize() async {
     try {
-      _isAuthorized = await requestAuthorization();
+      requestAuthorization();
     } catch (e) {
       debugPrint('Error initializing health service: $e');
     }
