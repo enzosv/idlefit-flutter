@@ -1,4 +1,3 @@
-import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/models/currency_repo.dart';
 import 'package:idlefit/models/background_activity.dart';
 import 'package:idlefit/services/storage_service.dart';
@@ -13,7 +12,6 @@ class GameState {
   final BackgroundActivity _backgroundActivity;
   final StorageService storageService;
   final CurrencyRepo _currencyRepo;
-  final DailyQuestRepo _dailyQuestRepo;
 
   GameState({
     required bool isPaused,
@@ -21,13 +19,11 @@ class GameState {
     required int doubleCoinExpiry,
     required this.storageService,
     required CurrencyRepo currencyRepo,
-    required DailyQuestRepo dailyQuestRepo,
     BackgroundActivity? backgroundActivity,
   }) : _isPaused = isPaused,
        _lastGenerated = lastGenerated,
        _doubleCoinExpiry = doubleCoinExpiry,
        _currencyRepo = currencyRepo,
-       _dailyQuestRepo = dailyQuestRepo,
        _backgroundActivity = backgroundActivity ?? BackgroundActivity();
 
   /// **Public Getters (Encapsulation)**
@@ -38,7 +34,6 @@ class GameState {
 
   /// **Repositories (Encapsulation)**
   CurrencyRepo get currencyRepo => _currencyRepo;
-  DailyQuestRepo get dailyQuestRepo => _dailyQuestRepo;
 
   /// **CopyWith (Immutable Updates)**
   GameState copyWith({
@@ -54,7 +49,6 @@ class GameState {
       backgroundActivity: backgroundActivity ?? _backgroundActivity,
       storageService: storageService,
       currencyRepo: _currencyRepo,
-      dailyQuestRepo: _dailyQuestRepo,
     );
   }
 
