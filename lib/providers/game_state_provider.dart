@@ -103,7 +103,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
       // earn coins
       coinsNotifier.earn(coinsGenerated);
       state = state.copyWith(lastGenerated: now);
-      _save();
       return;
     }
     // use energy
@@ -127,7 +126,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
       backgroundActivity: newBackgroundActivity,
       lastGenerated: now,
     );
-    _save();
   }
 
   void convertHealthStats(double steps, calories, exerciseMinutes) {
