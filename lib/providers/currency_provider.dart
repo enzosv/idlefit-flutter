@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/providers/daily_quest_provider.dart';
@@ -13,13 +14,13 @@ class CurrencyNotifier extends StateNotifier<Currency> {
 
   void earn(double amount) {
     state = state.earn(amount);
+    final questUnit = QuestUnit.values.byNameOrNull(state.type.name);
+    if (questUnit == null) {
+      return;
+    }
     ref
         .read(dailyQuestProvider.notifier)
-        .progressTowards(
-          QuestAction.collect,
-          QuestUnit.values.byName(state.type.name),
-          amount,
-        );
+        .progressTowards(QuestAction.collect, questUnit, amount);
   }
 
   void spend(double amount) {
