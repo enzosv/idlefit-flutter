@@ -18,6 +18,11 @@ class DailyQuestNotifier extends StateNotifier<List<DailyQuest>> {
 
   Future<void> initialize() async {
     state = await _generateDailyQuests();
+    for (final quest in state) {
+      print(
+        'quest ${quest.questAction} ${quest.questUnit} ${quest.requirement}',
+      );
+    }
   }
 
   Future<List<DailyQuest>> loadAvailableQuests() async {
@@ -77,8 +82,8 @@ class DailyQuestNotifier extends StateNotifier<List<DailyQuest>> {
 
     final walkQuest =
         DailyQuest()
-          ..action = QuestAction.collect.name
-          ..unit = QuestUnit.space.name
+          ..action = QuestAction.walk.name
+          ..unit = QuestUnit.steps.name
           ..requirement = 7500
           ..reward = 1000
           ..rewardUnit = CurrencyType.space.name
@@ -124,7 +129,7 @@ class DailyQuestNotifier extends StateNotifier<List<DailyQuest>> {
           if (q.id == quest.id) {
             return quest.updateProgress(progress);
           }
-          return quest;
+          return q;
         }).toList();
     box.putAsync(quest);
     return;
@@ -150,7 +155,7 @@ class DailyQuestNotifier extends StateNotifier<List<DailyQuest>> {
           if (q.id == quest.id) {
             return quest.claim();
           }
-          return quest;
+          return q;
         }).toList();
     ref.read(gameStateProvider.notifier).save();
     box.putAsync(quest);
