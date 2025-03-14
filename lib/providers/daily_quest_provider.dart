@@ -139,6 +139,7 @@ class DailyQuestNotifier extends StateNotifier<List<DailyQuest>> {
     if (quest.isClaimed || !quest.isCompleted) {
       return;
     }
+    // TODO: require ad every 10th daily quest, 5th weekly quest, 5th monthly quest
     switch (quest.rewardCurrency) {
       case CurrencyType.coin:
         ref.read(coinProvider.notifier).earn(quest.reward.toDouble());

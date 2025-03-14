@@ -19,6 +19,7 @@ class StatsScreen extends StatelessWidget {
             height: MediaQuery.paddingOf(context).top,
             color: Constants.barColor,
           ),
+          // TODO: do not show until user has tier 9 generator
           const BannerAdWidget(),
           // Stats cards
           Expanded(
