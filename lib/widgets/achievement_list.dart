@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/models/currency.dart';
+import 'package:idlefit/providers/coin_provider.dart';
 import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:idlefit/main.dart'; // Import providers from main.dart
 import '../models/achievement.dart';
@@ -38,6 +40,7 @@ class _AchievementListState extends ConsumerState<AchievementList> {
     final healthRepo = HealthDataRepo(box: healthBox);
     final healthStats = await healthRepo.total();
     final gameState = ref.read(gameStateProvider);
+    final coins = ref.read(coinProvider);
 
     final newProgress = <QuestAction, double>{};
     for (final achievement in newAchievements) {
@@ -48,7 +51,7 @@ class _AchievementListState extends ConsumerState<AchievementList> {
           newProgress[achievement.questAction] = healthStats.steps;
           break;
         case QuestAction.collect:
-          newProgress[achievement.questAction] = gameState.coins.totalEarned;
+          newProgress[achievement.questAction] = coins.totalEarned;
           break;
         case QuestAction.spend:
           newProgress[achievement.questAction] = gameState.energy.totalSpent;
@@ -78,7 +81,13 @@ class _AchievementListState extends ConsumerState<AchievementList> {
     final gameStateNotifier = ref.read(gameStateProvider.notifier);
     final reward = achievement.reward.toDouble();
     // Award the achievement reward
-    gameStateNotifier.earnCurrency(achievement.rewardCurrency, reward);
+
+    if (achievement.rewardCurrency == CurrencyType.coin) {
+      final coinsNotifier = ref.read(coinProvider.notifier);
+      coinsNotifier.earn(reward);
+    } else {
+      gameStateNotifier.earnCurrency(achievement.rewardCurrency, reward);
+    }
     // Refresh the achievement list to update visibility
     _fetchData();
   }

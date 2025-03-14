@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
-import 'package:idlefit/models/currency.dart';
+import 'package:idlefit/providers/coin_provider.dart';
 import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:idlefit/util.dart';
 import 'package:idlefit/widgets/current_coins.dart';
@@ -91,10 +91,10 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
         showProgress = false;
       }); // Hide bar after animation completes
 
-      final gameStateNotifier = ref.read(gameStateProvider.notifier);
       final generator = gameState.coinGenerators[widget.generatorIndex];
       final double output = generator.tier == 1 ? 15 : generator.singleOutput;
-      gameStateNotifier.earnCurrency(CurrencyType.coin, output);
+      final coinsNotifier = ref.read(coinProvider.notifier);
+      coinsNotifier.earn(output);
       _showFloatingText(toLettersNotation(output));
       CurrentCoins.triggerAnimation();
       // Trigger the animation
@@ -184,6 +184,7 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
   @override
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameStateProvider);
+    final coins = ref.watch(coinProvider);
     final gameStateNotifier = ref.read(gameStateProvider.notifier);
     final generator = gameState.coinGenerators[widget.generatorIndex];
     final screenWidth = MediaQuery.of(context).size.width;
@@ -222,11 +223,11 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
           description: generator.description,
           additionalInfo: additionalInfo,
           cost: generator.cost,
-          affordable: gameState.coins.count >= generator.cost,
+          affordable: coins.count >= generator.cost,
           costIcon: Constants.coinIcon,
           buttonText: 'Add Rep',
           onButtonPressed:
-              gameState.coins.count >= generator.cost
+              coins.count >= generator.cost
                   ? () => gameStateNotifier.buyCoinGenerator(generator)
                   : null,
           onTapDown: showProgress || generator.count < 1 ? null : startProgress,

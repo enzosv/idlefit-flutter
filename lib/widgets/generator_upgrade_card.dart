@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
 import 'package:idlefit/models/coin_generator.dart';
+import 'package:idlefit/providers/coin_provider.dart';
 import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:idlefit/util.dart';
 import 'common_card.dart';
@@ -61,17 +62,17 @@ class GeneratorUpgradeCard extends ConsumerWidget {
     }
 
     final isMaxLevel = generator.level >= generator.maxLevel;
-
+    final coins = ref.watch(coinProvider);
     return CommonCard(
       title: generator.name,
       rightText: 'Level: ${generator.level}/${generator.maxLevel}',
       additionalInfo: additionalInfo,
       cost: isMaxLevel ? null : generator.upgradeCost,
-      affordable: gameState.coins.count >= generator.upgradeCost,
+      affordable: coins.count >= generator.upgradeCost,
       costIcon: isMaxLevel ? null : Constants.coinIcon,
       buttonText: isMaxLevel ? 'MAXED' : 'Upgrade',
       onButtonPressed:
-          (isMaxLevel || gameState.coins.count < generator.upgradeCost)
+          (isMaxLevel || coins.count < generator.upgradeCost)
               ? null
               : () => gameStateNotifier.upgradeGenerator(generator),
     );

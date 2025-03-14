@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/providers/coin_provider.dart';
 import 'package:idlefit/services/game_state_notifier.dart';
 import '../constants.dart';
 import '../util.dart';
@@ -35,16 +36,16 @@ class _DynamicStats extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gameState = ref.watch(gameStateProvider);
-
+    final coins = ref.watch(coinProvider);
     return _StatListTile(
       icon: Constants.coinIcon,
       iconColor: Colors.amber,
       title: 'Gains',
-      current: gameState.coins.count,
-      max: gameState.coins.max,
+      current: coins.count,
+      max: coins.max,
       perSecond: gameState.passiveOutput,
-      earned: gameState.coins.totalEarned,
-      spent: gameState.coins.totalSpent,
+      earned: coins.totalEarned,
+      spent: coins.totalSpent,
     );
   }
 }

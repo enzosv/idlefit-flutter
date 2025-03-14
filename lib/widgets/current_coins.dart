@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/services/game_state_notifier.dart';
+import 'package:idlefit/providers/coin_provider.dart';
 import '../util.dart';
 
 class CurrentCoins extends StatefulWidget {
@@ -51,14 +51,14 @@ class _CurrentCoinsState extends State<CurrentCoins>
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, ref, child) {
-        final gameState = ref.watch(gameStateProvider);
+        final coins = ref.watch(coinProvider);
         return AnimatedBuilder(
           animation: _scaleAnimation,
           builder: (context, child) {
             return Transform.scale(
               scale: _scaleAnimation.value,
               child: Text(
-                toLettersNotation(gameState.coins.count),
+                toLettersNotation(coins.count),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,

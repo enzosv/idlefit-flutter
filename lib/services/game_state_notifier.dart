@@ -6,6 +6,7 @@ import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/models/shop_items_repo.dart';
 import 'package:idlefit/models/currency_repo.dart';
+import 'package:idlefit/providers/coin_provider.dart';
 import 'package:idlefit/services/background_activity.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:objectbox/objectbox.dart';
@@ -16,9 +17,10 @@ import 'dart:math';
 import 'notification_service.dart';
 
 class GameStateNotifier extends StateNotifier<GameState> {
+  final Ref ref;
   Timer? _generatorTimer;
 
-  GameStateNotifier(super.state) {
+  GameStateNotifier(this.ref, super.state) {
     _startGenerators();
   }
 
@@ -37,7 +39,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     // Ensure default currencies exist and load them
     state.currencyRepo.ensureDefaultCurrencies();
     final currencies = state.currencyRepo.loadCurrencies();
-    final coins = currencies[CurrencyType.coin]!;
+    ref.read(coinProvider.notifier).initialize(currencies[CurrencyType.coin]!);
     final gems = currencies[CurrencyType.gem]!;
     final energy = currencies[CurrencyType.energy]!;
     final space = currencies[CurrencyType.space]!;
@@ -46,7 +48,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
     final savedState = await storageService.loadGameState();
 
     state = state.copyWith(
-      coins: coins,
       gems: gems,
       energy: energy,
       space: space,
@@ -72,9 +73,10 @@ class GameStateNotifier extends StateNotifier<GameState> {
   }
 
   void _save() {
+    final coins = ref.read(coinProvider);
     state.storageService.saveGameState(state.toJson());
     state.currencyRepo.saveCurrencies([
-      state.coins,
+      coins,
       state.energy,
       state.gems,
       state.space,
@@ -91,6 +93,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
       now,
       state.lastGenerated,
     );
+    final coinsNotifier = ref.read(coinProvider.notifier);
 
     // Handle coin generation
     double coinsGenerated = state.passiveOutput;
@@ -102,27 +105,26 @@ class GameStateNotifier extends StateNotifier<GameState> {
     if (realDif < Constants.inactiveThreshold) {
       // don't use energy
       // earn coins
-      final newCoins = state.coins.earn(coinsGenerated);
-      state = state.copyWith(coins: newCoins, lastGenerated: now);
+      coinsNotifier.earn(coinsGenerated);
+      state = state.copyWith(lastGenerated: now);
       _save();
       return;
     }
     // use energy
     // reduce coins generated offline
     coinsGenerated *= state.offlineCoinMultiplier;
-    final newCoins = state.coins.earn(coinsGenerated);
+    coinsNotifier.earn(coinsGenerated);
 
     // consume energy
     final newEnergy = state.energy.spend(dif.toDouble());
     // track energy spent for popup
     final newBackgroundActivity = state.backgroundActivity.copyWith(
       energySpent: dif.toDouble(),
-      coinsEarned: newCoins.count,
+      coinsEarned: coinsGenerated,
     );
 
     // update state
     state = state.copyWith(
-      coins: newCoins,
       energy: newEnergy,
       backgroundActivity: newBackgroundActivity,
       lastGenerated: now,
@@ -170,8 +172,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
   void earnCurrency(CurrencyType currencyType, double amount) {
     switch (currencyType) {
       case CurrencyType.coin:
-        final newCoins = state.coins.earn(amount);
-        state = state.copyWith(coins: newCoins);
+        assert(false, 'use coinProvider');
       case CurrencyType.space:
         final newSpace = state.space.earn(amount);
         state = state.copyWith(space: newSpace);
@@ -182,6 +183,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
         final newGems = state.gems.earn(amount);
         state = state.copyWith(gems: newGems);
       default:
+        assert(false, 'unhandled currency type ${currencyType.name}');
         return;
     }
     _save();
@@ -193,9 +195,10 @@ class GameStateNotifier extends StateNotifier<GameState> {
   }
 
   void scheduleCoinCapacityNotification() {
-    if (state.coins.count >= state.coins.max) return;
+    final coins = ref.read(coinProvider);
+    if (coins.count >= coins.max) return;
 
-    final coinsToFill = state.coins.max - state.coins.count;
+    final coinsToFill = coins.max - coins.count;
     final effectiveOutput = state.passiveOutput * state.offlineCoinMultiplier;
     if (effectiveOutput <= 0) return;
 
@@ -216,17 +219,15 @@ class GameStateNotifier extends StateNotifier<GameState> {
   }
 
   bool buyCoinGenerator(CoinGenerator generator) {
-    final newCoins = state.coins.spend(generator.cost);
+    final coinsNotifier = ref.read(coinProvider.notifier);
+    coinsNotifier.spend(generator.cost);
 
-    var newState = state.copyWith(coins: newCoins);
+    var newState = state;
 
     if (generator.count == 0) {
       final next = state.coinGenerators[generator.tier].cost;
       final newMax = max(next, (200 * pow(10, generator.tier - 1)).toDouble());
-
-      newState = newState.copyWith(
-        coins: newState.coins.copyWith(baseMax: newMax),
-      );
+      coinsNotifier.setMax(newMax);
 
       if (generator.tier % 10 == 0) {
         newState = newState.copyWith(
@@ -278,11 +279,8 @@ class GameStateNotifier extends StateNotifier<GameState> {
               newState.offlineCoinMultiplier + item.effectValue,
         );
       case ShopItemEffect.coinCapacity:
-        newState = newState.copyWith(
-          coins: newState.coins.copyWith(
-            maxMultiplier: newState.coins.maxMultiplier + item.effectValue,
-          ),
-        );
+        final coinsNotifier = ref.read(coinProvider.notifier);
+        coinsNotifier.updateMaxMultiplier(item.effectValue);
       default:
         break;
     }
@@ -308,12 +306,11 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
   bool upgradeGenerator(CoinGenerator generator) {
     if (generator.count < 10 || !generator.isUnlocked) return false;
-
-    final newCoins = state.coins.spend(generator.upgradeCost);
+    final coinsNotifier = ref.read(coinProvider.notifier);
+    coinsNotifier.spend(generator.upgradeCost);
     generator.level++;
     state.generatorRepo.saveCoinGenerator(generator);
 
-    state = state.copyWith(coins: newCoins);
     _save();
     return true;
   }
@@ -329,14 +326,9 @@ final gameStateProvider = StateNotifierProvider<GameStateNotifier, GameState>((
           .store; // You'll need to properly initialize this
   final storageService = ref.read(storageServiceProvider);
   return GameStateNotifier(
+    ref,
     GameState(
       isPaused: true,
-      coins: Currency(
-        id: CurrencyType.coin.index,
-        count: 0,
-        baseMax: 0,
-        maxMultiplier: 1,
-      ),
       gems: Currency(
         id: CurrencyType.gem.index,
         count: 0,

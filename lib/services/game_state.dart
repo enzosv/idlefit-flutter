@@ -22,7 +22,6 @@ class GameState {
   final double _offlineCoinMultiplier;
 
   // Currencies
-  final Currency _coins;
   final Currency _gems;
   final Currency _energy;
   final Currency _space;
@@ -41,7 +40,6 @@ class GameState {
 
   GameState({
     required bool isPaused,
-    required Currency coins,
     required Currency gems,
     required Currency energy,
     required Currency space,
@@ -57,7 +55,6 @@ class GameState {
     required DailyQuestRepo dailyQuestRepo,
     BackgroundActivity? backgroundActivity,
   }) : _isPaused = isPaused,
-       _coins = coins,
        _gems = gems,
        _energy = energy,
        _space = space,
@@ -74,7 +71,6 @@ class GameState {
 
   /// **Public Getters (Encapsulation)**
   bool get isPaused => _isPaused;
-  Currency get coins => _coins;
   Currency get gems => _gems;
   Currency get energy => _energy;
   Currency get space => _space;
@@ -95,7 +91,6 @@ class GameState {
   /// **CopyWith (Immutable Updates)**
   GameState copyWith({
     bool? isPaused,
-    Currency? coins,
     Currency? gems,
     Currency? energy,
     Currency? space,
@@ -108,7 +103,6 @@ class GameState {
   }) {
     return GameState(
       isPaused: isPaused ?? _isPaused,
-      coins: coins ?? _coins,
       gems: gems ?? _gems,
       energy: energy ?? _energy,
       space: space ?? _space,

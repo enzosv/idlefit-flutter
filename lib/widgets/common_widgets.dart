@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/constants.dart';
+import 'package:idlefit/providers/coin_provider.dart';
 import 'package:idlefit/services/game_state_notifier.dart';
 import 'package:idlefit/widgets/current_coins.dart';
 import '../util.dart';
@@ -11,6 +12,7 @@ class CoinsInfo extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gameState = ref.watch(gameStateProvider);
+    final coins = ref.watch(coinProvider);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -18,7 +20,7 @@ class CoinsInfo extends ConsumerWidget {
       children: [
         Flexible(
           child: Text(
-            '/${toLettersNotation(gameState.coins.max)}',
+            '/${toLettersNotation(coins.max)}',
             style: const TextStyle(color: Colors.white70, fontSize: 14),
             overflow: TextOverflow.ellipsis,
           ),
