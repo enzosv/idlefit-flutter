@@ -96,3 +96,18 @@ void debugPrintWithCaller(String message, {int depth = 2}) {
     debugPrint(message);
   }
 }
+
+extension EnumByNameOrNull<T extends Enum> on Iterable<T> {
+  T? byNameOrNull(String name) {
+    for (var value in this) {
+      if (value.name == name) return value;
+    }
+    return null;
+  }
+}
+
+extension StringExtensions on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${this.substring(1)}";
+  }
+}
