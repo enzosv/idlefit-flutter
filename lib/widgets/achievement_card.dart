@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/achievement.dart';
-import '../models/daily_quest.dart';
 
 class AchievementCard extends StatelessWidget {
   final Achievement achievement;

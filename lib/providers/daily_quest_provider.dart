@@ -7,6 +7,7 @@ import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/objectbox.g.dart';
 import 'package:idlefit/providers/currency_provider.dart';
+import 'package:idlefit/providers/game_state_provider.dart';
 
 class DailyQuestNotifier extends StateNotifier<List<DailyQuest>> {
   final Ref ref;
@@ -119,14 +120,40 @@ class DailyQuestNotifier extends StateNotifier<List<DailyQuest>> {
 
     print('progressing ${quest.questAction} $action ${quest.questUnit} $unit');
     state =
-        state.map((quest) {
-          if (quest.id == quest.id) {
+        state.map((q) {
+          if (q.id == quest.id) {
             return quest.updateProgress(progress);
           }
           return quest;
         }).toList();
     box.putAsync(quest);
     return;
+  }
+
+  void claim(DailyQuest quest) {
+    if (quest.isClaimed || !quest.isCompleted) {
+      return;
+    }
+    switch (quest.rewardCurrency) {
+      case CurrencyType.coin:
+        ref.read(coinProvider.notifier).earn(quest.reward.toDouble());
+      case CurrencyType.space:
+        ref.read(spaceProvider.notifier).earn(quest.reward.toDouble());
+      case CurrencyType.energy:
+        ref.read(energyProvider.notifier).earn(quest.reward.toDouble());
+      default:
+        assert(false, 'unhandled currency type ${quest.rewardCurrency}');
+        return;
+    }
+    state =
+        state.map((q) {
+          if (q.id == quest.id) {
+            return quest.claim();
+          }
+          return quest;
+        }).toList();
+    ref.read(gameStateProvider.notifier).save();
+    box.putAsync(quest);
   }
 
   void updateQuestProgress(DailyQuest quest, double progress) {

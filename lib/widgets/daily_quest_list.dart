@@ -34,13 +34,17 @@ class DailyQuestList extends ConsumerWidget {
   }
 }
 
-class _DailyQuestCard extends StatelessWidget {
+class _DailyQuestCard extends ConsumerWidget {
   final DailyQuest quest;
 
   const _DailyQuestCard({required this.quest});
 
+  void _onClaim(WidgetRef ref) {
+    ref.read(dailyQuestProvider.notifier).claim(quest);
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final progressPercent = (quest.progress / quest.requirement).clamp(
       0.0,
@@ -96,12 +100,18 @@ class _DailyQuestCard extends StatelessWidget {
                 style: theme.textTheme.bodySmall,
               ),
               if (quest.isCompleted)
-                Text(
-                  'Completed',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.primary,
+                if (quest.isClaimed)
+                  Text(
+                    'Completed',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.primary,
+                    ),
+                  )
+                else
+                  ElevatedButton(
+                    onPressed: () => _onClaim(ref),
+                    child: const Text('Claim'),
                   ),
-                ),
             ],
           ),
         ],

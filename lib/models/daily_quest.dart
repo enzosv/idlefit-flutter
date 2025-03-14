@@ -57,6 +57,13 @@ class DailyQuest {
     return copyWith(progress: progress + amount);
   }
 
+  DailyQuest claim() {
+    if (isClaimed || !isCompleted) {
+      return this;
+    }
+    return copyWith(isClaimed: true);
+  }
+
   String get description {
     if (questUnit == QuestUnit.space && questAction == QuestAction.collect) {
       // convert collect space to walk steps
@@ -65,7 +72,7 @@ class DailyQuest {
     return '${questAction.name.capitalize()} ${toLettersNotation(requirement.toDouble())} ${questUnit.name}';
   }
 
-  DailyQuest copyWith({double? progress}) {
+  DailyQuest copyWith({double? progress, bool? isClaimed}) {
     return DailyQuest()
       ..action = action
       ..unit = unit
@@ -74,6 +81,6 @@ class DailyQuest {
       ..reward = reward
       ..progress = progress ?? this.progress
       ..dateAssigned = dateAssigned
-      ..isClaimed = isClaimed;
+      ..isClaimed = isClaimed ?? this.isClaimed;
   }
 }
