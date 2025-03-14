@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:idlefit/constants.dart';
+import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/daily_quest.dart';
@@ -129,11 +129,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     _save();
   }
 
-  void convertHealthStats(
-    double steps,
-    double calories,
-    double exerciseMinutes,
-  ) {
+  void convertHealthStats(double steps, calories, exerciseMinutes) {
     final healthMultiplier = ref
         .read(shopItemProvider.notifier)
         .multiplier(ShopItemEffect.healthMultiplier);
@@ -141,14 +137,16 @@ class GameStateNotifier extends StateNotifier<GameState> {
     final energyGain =
         calories * healthMultiplier * Constants.calorieToEnergyMultiplier;
     final gemGain = exerciseMinutes * healthMultiplier / 2;
+    final spaceGain =
+        steps * healthMultiplier * Constants.stepsToSpaceMultiplier;
 
     final newBackgroundActivity = state.backgroundActivity.copyWith(
       energyEarned: energyGain,
-      spaceEarned: steps,
+      spaceEarned: spaceGain,
     );
     ref.read(energyProvider.notifier).earn(energyGain);
     ref.read(gemProvider.notifier).earn(gemGain);
-    ref.read(spaceProvider.notifier).earn(steps);
+    ref.read(spaceProvider.notifier).earn(spaceGain);
 
     state = state.copyWith(backgroundActivity: newBackgroundActivity);
 
