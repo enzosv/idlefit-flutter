@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/daily_quest.dart';
-import 'package:idlefit/models/game_stats_provider.dart';
+import 'package:idlefit/providers/game_stats_provider.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:objectbox/objectbox.dart';
