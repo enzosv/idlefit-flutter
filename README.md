@@ -33,3 +33,8 @@ An incremental game about incremental games
 2. double coin multiplier expired while offline
   - so only part of the time should be multiplied
   - must consider when timing notification
+
+# Why not
+1. exercise minutes
+  - active minutes not provided by google health connect as of 2025-03-15
+  - iPhone only doesn't measure exercise minutes
