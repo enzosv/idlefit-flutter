@@ -26,3 +26,10 @@ An incremental game about incremental games
   - Unlock ability to convert excess energy to coins
 5. Animations
 6. Art and sound
+
+# What if's
+1. calories burned was synced late
+  - so user misses out on offline fuel
+2. double coin multiplier expired while offline
+  - so only part of the time should be multiplied
+  - must consider when timing notification
