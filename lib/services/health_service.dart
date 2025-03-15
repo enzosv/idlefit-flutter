@@ -62,25 +62,44 @@ class HealthService {
       // print("${entry.type.name} from ${entry.sourceName}: $value");
       grouped[entry.sourceId] = (grouped[entry.sourceId] ?? 0) + value;
     }
-    String? bestSource =
-        grouped.keys.isEmpty
-            ? null
-            : grouped.keys.reduce((a, b) => grouped[a]! > grouped[b]! ? a : b);
+    if (grouped.keys.isEmpty) {
+      return [];
+    }
+    // apple chooses via user priority (https://support.apple.com/en-ca/108779)
+    // we choose by which has the most data
+    String bestSource = grouped.keys.reduce(
+      (a, b) => grouped[a]! > grouped[b]! ? a : b,
+    );
+    print("best source: $bestSource");
 
     // Convert to ObjectBox model
-    return newData
-        .where((e) => e.sourceId == bestSource)
-        .map(
-          (e) => HealthDataEntry(
-            timestamp: e.dateFrom.millisecondsSinceEpoch,
-            duration:
-                e.dateTo.millisecondsSinceEpoch -
-                e.dateFrom.millisecondsSinceEpoch,
-            value: (e.value as NumericHealthValue).numericValue.toDouble(),
-            type: e.type.name,
-          ),
-        )
-        .toList();
+    final entries =
+        newData
+            .where((e) => e.sourceId == bestSource)
+            .map(
+              (e) => HealthDataEntry(
+                timestamp: e.dateFrom.millisecondsSinceEpoch,
+                duration:
+                    e.dateTo.millisecondsSinceEpoch -
+                    e.dateFrom.millisecondsSinceEpoch,
+                value: (e.value as NumericHealthValue).numericValue.toDouble(),
+                type: e.type.name,
+              ),
+            )
+            .toList();
+    double totalSteps = 0;
+    double totalCalories = 0;
+    for (final entry in entries) {
+      switch (entry.type) {
+        case "STEPS":
+          totalSteps += entry.value;
+        case "ACTIVE_ENERGY_BURNED":
+          totalCalories += entry.value;
+      }
+    }
+    print("total steps: $totalSteps");
+    print("total calories: $totalCalories");
+    return entries;
   }
 
   Future<void> syncHealthData(
@@ -127,4 +146,6 @@ class HealthService {
     print("got new health data $steps $calories $exercise");
     gameStateNotifier.convertHealthStats(steps, calories, exercise);
   }
+
+  // TODO: function to sync health data in the background
 }
