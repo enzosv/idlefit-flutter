@@ -4,6 +4,16 @@ import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/models/game_stats.dart';
 import 'package:idlefit/objectbox.g.dart';
 
+const _validActionUnits = {
+  QuestAction.purchase: {QuestUnit.generator},
+  QuestAction.upgrade: {QuestUnit.generator, QuestUnit.shopItem},
+  QuestAction.tap: {QuestUnit.generator},
+  QuestAction.watch: {QuestUnit.ad},
+  QuestAction.burn: {QuestUnit.calories},
+  QuestAction.collect: {QuestUnit.coin, QuestUnit.space, QuestUnit.energy},
+  QuestAction.spend: {QuestUnit.coin, QuestUnit.space, QuestUnit.energy},
+};
+
 class GameStatsNotifier extends StateNotifier<GameStats> {
   final Box<GameStats> box;
   GameStatsNotifier(this.box, super.state);
