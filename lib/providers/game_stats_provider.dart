@@ -31,7 +31,7 @@ class GameStatsNotifier extends StateNotifier<GameStats> {
       totaled
         ..generatorsPurchased += stat.generatorsPurchased
         ..generatorsUpgraded += stat.generatorsUpgraded
-        ..shopItemsPurchased += stat.shopItemsPurchased
+        ..shopItemsUpgraded += stat.shopItemsUpgraded
         ..generatorsTapped += stat.generatorsTapped
         ..adsWatched += stat.adsWatched
         ..caloriesBurned += stat.caloriesBurned
@@ -66,7 +66,7 @@ class GameStatsNotifier extends StateNotifier<GameStats> {
             today.generatorsUpgraded += progress.toInt();
 
       case (QuestAction.upgrade, QuestUnit.shopItem):
-            today.shopItemsPurchased += progress.toInt();
+        today.shopItemsUpgraded += progress.toInt();
 
       case (QuestAction.tap, QuestUnit.generator):
         today.generatorsTapped += progress.toInt();

@@ -6,7 +6,7 @@ class GameStats {
   int dayTimestamp = 0;
   int generatorsPurchased = 0;
   int generatorsUpgraded = 0;
-  int shopItemsPurchased = 0;
+  int shopItemsUpgraded = 0;
   int generatorsTapped = 0;
   int adsWatched = 0;
 
@@ -27,7 +27,7 @@ class GameStats {
     this.dayTimestamp = 0,
     this.generatorsPurchased = 0,
     this.generatorsUpgraded = 0,
-    this.shopItemsPurchased = 0,
+    this.shopItemsUpgraded = 0,
     this.generatorsTapped = 0,
     this.adsWatched = 0,
     this.caloriesBurned = 0,
@@ -43,7 +43,7 @@ class GameStats {
   GameStats copyWith({
     int? generatorsPurchased,
     int? generatorsUpgraded,
-    int? shopItemsPurchased,
+    int? shopItemsUpgraded,
     int? generatorsTapped,
     int? adsWatched,
     double? caloriesBurned,
@@ -59,7 +59,7 @@ class GameStats {
       dayTimestamp: dayTimestamp,
       generatorsPurchased: generatorsPurchased ?? this.generatorsPurchased,
       generatorsUpgraded: generatorsUpgraded ?? this.generatorsUpgraded,
-      shopItemsPurchased: shopItemsPurchased ?? this.shopItemsPurchased,
+      shopItemsUpgraded: shopItemsUpgraded ?? this.shopItemsUpgraded,
       generatorsTapped: generatorsTapped ?? this.generatorsTapped,
       adsWatched: adsWatched ?? this.adsWatched,
       caloriesBurned: caloriesBurned ?? this.caloriesBurned,
