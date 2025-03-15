@@ -20,15 +20,15 @@ class Achievement {
   int reward = 0;
 
   QuestAction get questAction {
-    return QuestAction.values.byName(action);
+    return QuestAction.values.byNameOrNull(action) ?? QuestAction.unknown;
   }
 
   QuestUnit get questUnit {
-    return QuestUnit.values.byName(reqUnit);
+    return QuestUnit.values.byNameOrNull(reqUnit) ?? QuestUnit.unknown;
   }
 
   CurrencyType get rewardCurrency {
-    return CurrencyType.values.byName(rewardUnit);
+    return CurrencyType.values.byNameOrNull(rewardUnit) ?? CurrencyType.unknown;
   }
 
   // Achievement({
