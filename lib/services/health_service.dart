@@ -91,18 +91,9 @@ class HealthService {
     final box = objectBoxService.store.box<HealthDataEntry>();
 
     final repo = HealthDataRepo(box: box);
-    final latestTime = await repo.latestEntryDate();
-
-    final now = DateTime.now();
-
-    // Fetch data from 10 minutes before the last saved time to now
-    // to handle late recordings
-    final startTime =
-        latestTime?.subtract(Duration(minutes: 10)) ??
-        DateTime(now.year, now.month, now.day);
-
-    final entries = await queryHealthEntries(startTime, now);
-    final newEntries = await repo.newFromList(entries, startTime);
+    final syncStart = await repo.syncStart();
+    final entries = await queryHealthEntries(syncStart, DateTime.now());
+    final newEntries = await repo.newFromList(entries, syncStart);
     if (newEntries.isEmpty) {
       return;
     }

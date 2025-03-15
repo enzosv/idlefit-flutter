@@ -24,6 +24,7 @@ class HealthDataRepo {
     List<HealthDataEntry> entries,
     DateTime since,
   ) async {
+    // query for entries that are newer than the since date
     final existing =
         await box
             .query(
@@ -34,6 +35,7 @@ class HealthDataRepo {
             .build()
             .findAsync();
     if (existing.isEmpty) {
+      // everything is new
       return entries;
     }
     final uniqueKeys = existing.map((e) => e.uniqueKey);
@@ -107,5 +109,22 @@ class HealthDataRepo {
       return null;
     }
     return DateTime.fromMillisecondsSinceEpoch(entry.timestamp);
+  }
+
+  Future<DateTime> syncStart() async {
+    final earliest = await earliestEntryDate();
+    final now = DateTime.now();
+    if (earliest == null) {
+      // first time: start midnight today
+      return DateTime(now.year, now.month, now.day);
+    }
+
+    DateTime start = await latestEntryDate() ?? now;
+    start = start.subtract(Duration(hours: 24)); // handle late recordings
+    if (earliest.isBefore(start)) {
+      return start;
+    }
+    // do not fetch before earliest
+    return earliest;
   }
 }
