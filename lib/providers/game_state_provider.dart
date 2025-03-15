@@ -245,6 +245,11 @@ class GameStateNotifier extends StateNotifier<GameState> {
       return dif;
     }
     // limit to energy
+    // if dif > energy
+    // take note of this attempt
+    // when new health data is synced
+    // compare if calorie burn time is within this attempt time
+    // if so, grant user coins based on current passive output and available energy
     return min(dif, ref.read(energyProvider).count.floor());
   }
 }

@@ -23,6 +23,7 @@ class GameStatsNotifier extends StateNotifier<GameStats> {
     QuestUnit unit,
     double progress,
   ) async {
+    // TODO: analytics
     final today = await _getToday();
 
     switch (action) {
@@ -44,7 +45,46 @@ class GameStatsNotifier extends StateNotifier<GameStats> {
         break;
       case QuestAction.tap:
         assert(unit == QuestUnit.generator, "only generators can be tapped");
-        today.manualTaps += progress.toInt();
+        today.generatorsTapped += progress.toInt();
+        break;
+      case QuestAction.watch:
+        assert(unit == QuestUnit.ad, "only ads can be watched");
+        today.adsWatched += progress.toInt();
+        break;
+      case QuestAction.burn:
+        assert(unit == QuestUnit.calories, "only calories can be burned");
+        today.caloriesBurned += progress;
+        break;
+      case QuestAction.collect:
+        switch (unit) {
+          case QuestUnit.coin:
+            today.coinsCollected += progress;
+            break;
+          case QuestUnit.space:
+            today.spaceCollected += progress;
+            break;
+          case QuestUnit.energy:
+            today.energyCollected += progress;
+            break;
+          default:
+            throw UnimplementedError('Unknown unit: $unit');
+        }
+        break;
+      case QuestAction.spend:
+        switch (unit) {
+          case QuestUnit.coin:
+            today.coinsSpent += progress;
+            break;
+          case QuestUnit.space:
+            today.spaceSpent += progress;
+            break;
+          case QuestUnit.energy:
+            today.energySpent += progress;
+            break;
+          default:
+            throw UnimplementedError('Unknown unit: $unit');
+        }
+        break;
       default:
         throw UnimplementedError('Unknown action: $action');
     }
