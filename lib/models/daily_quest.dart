@@ -3,9 +3,29 @@ import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/objectbox.g.dart';
 
 // Define enums for quest properties
-enum QuestAction { unknown, spend, walk, watch, burn, collect }
+enum QuestAction {
+  unknown,
+  spend,
+  walk,
+  watch,
+  burn,
+  collect,
+  purchase,
+  upgrade,
+  tap,
+}
 
-enum QuestUnit { unknown, coin, steps, ad, calories, energy, space }
+enum QuestUnit {
+  unknown,
+  coin,
+  steps,
+  ad,
+  calories,
+  energy,
+  space,
+  generator,
+  shopItem,
+}
 
 @Entity()
 class DailyQuest {
