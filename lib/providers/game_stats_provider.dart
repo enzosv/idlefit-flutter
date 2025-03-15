@@ -53,8 +53,10 @@ class GameStatsNotifier extends StateNotifier<GameStats> {
     QuestUnit unit,
     double progress,
   ) async {
-    // TODO: analytics
-    final today = await _getToday();
+    // Validate action-unit combination
+    if (!_validActionUnits[action]!.contains(unit)) {
+      throw ArgumentError('Invalid action-unit combination: $action-$unit');
+    }
 
     switch (action) {
       case QuestAction.purchase:
