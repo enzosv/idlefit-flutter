@@ -21,6 +21,9 @@ class GameStatsNotifier extends StateNotifier<GameStats> {
   Future<GameStats> _getToday() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+    if (state.dayTimestamp == today) {
+      return state;
+    }
     return box.get(today) ?? (GameStats()..dayTimestamp = today);
   }
 
@@ -53,17 +56,20 @@ class GameStatsNotifier extends StateNotifier<GameStats> {
     QuestUnit unit,
     double progress,
   ) async {
+    // TODO: analytics
+
     // Validate action-unit combination
     if (!_validActionUnits[action]!.contains(unit)) {
       throw ArgumentError('Invalid action-unit combination: $action-$unit');
     }
+    final today = await _getToday();
 
     switch ((action, unit)) {
       case (QuestAction.purchase, QuestUnit.generator):
         today.generatorsPurchased += progress.toInt();
 
       case (QuestAction.upgrade, QuestUnit.generator):
-            today.generatorsUpgraded += progress.toInt();
+        today.generatorsUpgraded += progress.toInt();
 
       case (QuestAction.upgrade, QuestUnit.shopItem):
         today.shopItemsUpgraded += progress.toInt();
@@ -78,22 +84,22 @@ class GameStatsNotifier extends StateNotifier<GameStats> {
         today.caloriesBurned += progress;
 
       case (QuestAction.collect, QuestUnit.coin):
-            today.coinsCollected += progress;
+        today.coinsCollected += progress;
 
       case (QuestAction.collect, QuestUnit.space):
-            today.spaceCollected += progress;
+        today.spaceCollected += progress;
 
       case (QuestAction.collect, QuestUnit.energy):
-            today.energyCollected += progress;
+        today.energyCollected += progress;
 
       case (QuestAction.spend, QuestUnit.coin):
-            today.coinsSpent += progress;
+        today.coinsSpent += progress;
 
       case (QuestAction.spend, QuestUnit.space):
-            today.spaceSpent += progress;
+        today.spaceSpent += progress;
 
       case (QuestAction.spend, QuestUnit.energy):
-            today.energySpent += progress;
+        today.energySpent += progress;
 
       default:
         throw UnimplementedError(
