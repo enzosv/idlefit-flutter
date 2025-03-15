@@ -28,9 +28,13 @@ class GameStatsNotifier extends StateNotifier<GameStats> {
 
     switch (action) {
       case QuestAction.purchase:
+        assert(unit == QuestUnit.generator, "only generators can be purchased");
+        today.generatorsPurchased += progress.toInt();
+        break;
+      case QuestAction.upgrade:
         switch (unit) {
           case QuestUnit.generator:
-            today.generatorsPurchased += progress.toInt();
+            today.generatorsUpgraded += progress.toInt();
             break;
           case QuestUnit.shopItem:
             today.shopItemsPurchased += progress.toInt();
@@ -38,11 +42,6 @@ class GameStatsNotifier extends StateNotifier<GameStats> {
           default:
             throw UnimplementedError('Unknown unit: $unit');
         }
-        break;
-      case QuestAction.upgrade:
-        assert(unit == QuestUnit.generator, "only generators can be upgraded");
-        today.generatorsUpgraded += progress.toInt();
-        break;
       case QuestAction.tap:
         assert(unit == QuestUnit.generator, "only generators can be tapped");
         today.generatorsTapped += progress.toInt();

@@ -9,8 +9,13 @@ class GameStats {
   int shopItemsPurchased = 0;
   int generatorsTapped = 0;
   int adsWatched = 0;
+
+  // alraedy tracked in health service
   double caloriesBurned = 0;
   int stepsWalked = 0;
+
+  // already tracked in currency model
+  // but not split into days
   double coinsCollected = 0;
   double spaceCollected = 0;
   double energyCollected = 0;

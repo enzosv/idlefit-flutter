@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/main.dart';
+import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/models/shop_items.dart';
 import 'package:idlefit/providers/currency_provider.dart';
+import 'package:idlefit/providers/game_stats_provider.dart';
 import 'package:objectbox/objectbox.dart';
 
 class ShopItemNotifier extends StateNotifier<List<ShopItem>> {
@@ -29,6 +31,7 @@ class ShopItemNotifier extends StateNotifier<List<ShopItem>> {
     item.level++;
     switch (item.shopItemEffect) {
       case ShopItemEffect.spaceCapacity:
+        // TODO: new max should be able to afford next level of upgrade
         spaceNotifier.updateMaxMultiplier(item.effectValue);
       case ShopItemEffect.energyCapacity:
         ref.read(energyProvider.notifier).updateMaxMultiplier(item.effectValue);
@@ -45,6 +48,9 @@ class ShopItemNotifier extends StateNotifier<List<ShopItem>> {
     newState[item.id - 1] = item;
     state = newState;
     box.put(item);
+    ref
+        .read(gameStatsProvider.notifier)
+        .progressTowards(QuestAction.upgrade, QuestUnit.shopItem, 1);
     return true;
   }
 

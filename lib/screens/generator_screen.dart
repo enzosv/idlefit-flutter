@@ -21,8 +21,6 @@ class GeneratorsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // Game background using Flame
-        GameWidget(game: FlameBackground()),
         // Game UI overlay
         SafeArea(
           top: false,
@@ -35,6 +33,7 @@ class GeneratorsScreen extends StatelessWidget {
 
               // Currency display
               const CurrencyBar(),
+              // GameWidget(game: FlameBackground()),
 
               // Generators list
               Expanded(
@@ -49,6 +48,7 @@ class GeneratorsScreen extends StatelessWidget {
                             .where((generator) => generator.cost <= coins.max)
                             .toList()
                           ..sort((a, b) => b.tier.compareTo(a.tier));
+                    // TODO: new generator should require scroll up
                     return ListView.builder(
                       padding: const EdgeInsets.all(16),
                       itemCount: affordableGenerators.length,
