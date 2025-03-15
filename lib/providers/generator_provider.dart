@@ -87,6 +87,15 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
     return true;
   }
 
+  double tapGenerator(CoinGenerator generator) {
+    final double output = max(generator.tier * 15, generator.singleOutput);
+    ref.read(coinProvider.notifier).earn(output);
+    ref
+        .read(gameStatsProvider.notifier)
+        .progressTowards(QuestAction.tap, QuestUnit.generator, 1);
+    return output;
+  }
+
   void _updateGenerator(CoinGenerator generator) {
     final newState = List<CoinGenerator>.from(state);
     newState[generator.tier - 1] = generator;

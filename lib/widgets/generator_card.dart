@@ -91,12 +91,11 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
       }); // Hide bar after animation completes
 
       final generator = coinGenerators[widget.generatorIndex];
-      final double output = generator.tier == 1 ? 15 : generator.singleOutput;
-      final coinsNotifier = ref.read(coinProvider.notifier);
-      coinsNotifier.earn(output);
+      final output = ref
+          .read(generatorProvider.notifier)
+          .tapGenerator(generator);
       _showFloatingText(toLettersNotation(output));
       CurrentCoins.triggerAnimation();
-      // Trigger the animation
     });
   }
 
@@ -136,7 +135,7 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.amber.withOpacity(0.2),
+                        color: Colors.amber.withAlpha(50),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: Colors.amber, width: 1),
                       ),
