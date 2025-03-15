@@ -11,11 +11,28 @@ class GameStatsNotifier extends StateNotifier<GameStats> {
   Future<GameStats> _getToday() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
-    final existing = box.get(today);
-    if (existing != null) {
-      return existing;
+  Future<GameStats> get total async {
+    final allStats = await box.getAllAsync();
+    final totaled = GameStats();
+    for (final stat in allStats) {
+      totaled
+        ..generatorsPurchased += stat.generatorsPurchased
+        ..generatorsUpgraded += stat.generatorsUpgraded
+        ..shopItemsPurchased += stat.shopItemsPurchased
+        ..generatorsTapped += stat.generatorsTapped
+        ..adsWatched += stat.adsWatched
+        ..caloriesBurned += stat.caloriesBurned
+        ..coinsCollected += stat.coinsCollected
+        ..spaceCollected += stat.spaceCollected
+        ..energyCollected += stat.energyCollected;
     }
-    return GameStats()..dayTimestamp = today;
+    return totaled;
+  }
+
+  Future<GameStats> statsFor(DateTime date) async {
+    final dayTimestamp =
+        DateTime(date.year, date.month, date.day).millisecondsSinceEpoch;
+    return await box.getAsync(dayTimestamp) ?? GameStats();
   }
 
   Future<void> progressTowards(
