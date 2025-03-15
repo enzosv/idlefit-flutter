@@ -58,67 +58,49 @@ class GameStatsNotifier extends StateNotifier<GameStats> {
       throw ArgumentError('Invalid action-unit combination: $action-$unit');
     }
 
-    switch (action) {
-      case QuestAction.purchase:
-        assert(unit == QuestUnit.generator, "only generators can be purchased");
+    switch ((action, unit)) {
+      case (QuestAction.purchase, QuestUnit.generator):
         today.generatorsPurchased += progress.toInt();
-        break;
-      case QuestAction.upgrade:
-        switch (unit) {
-          case QuestUnit.generator:
+
+      case (QuestAction.upgrade, QuestUnit.generator):
             today.generatorsUpgraded += progress.toInt();
-            break;
-          case QuestUnit.shopItem:
+
+      case (QuestAction.upgrade, QuestUnit.shopItem):
             today.shopItemsPurchased += progress.toInt();
-            break;
-          default:
-            throw UnimplementedError('Unknown unit: $unit');
-        }
-      case QuestAction.tap:
-        assert(unit == QuestUnit.generator, "only generators can be tapped");
+
+      case (QuestAction.tap, QuestUnit.generator):
         today.generatorsTapped += progress.toInt();
-        break;
-      case QuestAction.watch:
-        assert(unit == QuestUnit.ad, "only ads can be watched");
+
+      case (QuestAction.watch, QuestUnit.ad):
         today.adsWatched += progress.toInt();
-        break;
-      case QuestAction.burn:
-        assert(unit == QuestUnit.calories, "only calories can be burned");
+
+      case (QuestAction.burn, QuestUnit.calories):
         today.caloriesBurned += progress;
-        break;
-      case QuestAction.collect:
-        switch (unit) {
-          case QuestUnit.coin:
+
+      case (QuestAction.collect, QuestUnit.coin):
             today.coinsCollected += progress;
-            break;
-          case QuestUnit.space:
+
+      case (QuestAction.collect, QuestUnit.space):
             today.spaceCollected += progress;
-            break;
-          case QuestUnit.energy:
+
+      case (QuestAction.collect, QuestUnit.energy):
             today.energyCollected += progress;
-            break;
-          default:
-            throw UnimplementedError('Unknown unit: $unit');
-        }
-        break;
-      case QuestAction.spend:
-        switch (unit) {
-          case QuestUnit.coin:
+
+      case (QuestAction.spend, QuestUnit.coin):
             today.coinsSpent += progress;
-            break;
-          case QuestUnit.space:
+
+      case (QuestAction.spend, QuestUnit.space):
             today.spaceSpent += progress;
-            break;
-          case QuestUnit.energy:
+
+      case (QuestAction.spend, QuestUnit.energy):
             today.energySpent += progress;
-            break;
-          default:
-            throw UnimplementedError('Unknown unit: $unit');
-        }
-        break;
+
       default:
-        throw UnimplementedError('Unknown action: $action');
+        throw UnimplementedError(
+          'Unhandled action-unit combination: $action-$unit',
+        );
     }
+
     state = today;
     box.putAsync(today);
   }
