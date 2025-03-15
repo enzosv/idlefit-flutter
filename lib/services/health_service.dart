@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:idlefit/models/health_data_entry.dart';
 import 'package:idlefit/models/health_data_repo.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
-import 'package:idlefit/services/object_box.dart';
+import 'package:objectbox/objectbox.dart';
 
 class HealthService {
   final Health health = Health();
+  final Box<HealthDataEntry> box;
+
+  HealthService({required this.box});
 
   // Health data types we want to access
   final List<HealthDataType> types = [
@@ -102,13 +105,7 @@ class HealthService {
     return entries;
   }
 
-  Future<void> syncHealthData(
-    ObjectBox objectBoxService,
-    GameStateNotifier gameStateNotifier,
-  ) async {
-    // final store = await openStore(); // Initialize ObjectBox
-    final box = objectBoxService.store.box<HealthDataEntry>();
-
+  Future<void> syncHealthData(GameStateNotifier gameStateNotifier) async {
     final repo = HealthDataRepo(box: box);
     final syncStart = await repo.syncStart();
     final entries = await queryHealthEntries(syncStart, DateTime.now());
@@ -116,7 +113,7 @@ class HealthService {
     if (newEntries.isEmpty) {
       return;
     }
-
+    // not async. we want to wait for the data to be written to the database
     box.putMany(newEntries);
 
     print("new: ${newEntries.length}, from: ${entries.length}");

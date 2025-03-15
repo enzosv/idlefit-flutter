@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/models/health_data_entry.dart';
 import 'package:idlefit/screens/game_home_screen.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,7 +10,9 @@ import 'services/object_box.dart';
 import 'services/notification_service.dart';
 
 // Create providers for our services
-final healthServiceProvider = Provider<HealthService>((ref) => HealthService());
+final healthServiceProvider = Provider<HealthService>(
+  (ref) => throw UnimplementedError('Initialize in main'),
+);
 final objectBoxProvider = Provider<ObjectBox>(
   (ref) => throw UnimplementedError('Initialize in main'),
 );
@@ -23,8 +26,10 @@ void main() async {
   // Initialize services
   final prefs = await SharedPreferences.getInstance();
   final storageService = StorageService(prefs);
-  final healthService = HealthService();
   final objectBox = await ObjectBox.create();
+  final healthService = HealthService(
+    box: objectBox.store.box<HealthDataEntry>(),
+  );
 
   // Initialize notifications
   await NotificationService.initialize();
