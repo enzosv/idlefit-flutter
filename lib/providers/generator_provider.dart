@@ -34,6 +34,8 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
       // nothing to unlock
       return true;
     }
+
+    // make sure next tier is affordable
     final next = state[generator.tier].cost;
     final newMax = max(
       next * 1.1,
@@ -50,6 +52,11 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
         final energyNotifier = ref.read(energyProvider.notifier);
         energyNotifier.setMax(energy.baseMax + 3600000);
       }
+    }
+    if (generator.tier % 3 == 0) {
+      // add 500 space every 3 tiers
+      final spaceNotifier = ref.read(spaceProvider.notifier);
+      spaceNotifier.addMax(500);
     }
     ref.read(gameStateProvider.notifier).save();
     return true;
