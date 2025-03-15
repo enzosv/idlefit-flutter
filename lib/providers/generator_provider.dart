@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/coin_generator.dart';
+import 'package:idlefit/models/daily_quest.dart';
+import 'package:idlefit/models/game_stats_provider.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:objectbox/objectbox.dart';
@@ -25,6 +27,9 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
     coinsNotifier.spend(generator.cost);
     generator.count++;
     _updateGenerator(generator);
+    ref
+        .read(gameStatsProvider.notifier)
+        .progressTowards(QuestAction.purchase, QuestUnit.generator, 1);
     if (generator.count > 1) {
       // nothing to unlock
       return true;
@@ -62,6 +67,9 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
     coinsNotifier.spend(generator.upgradeCost);
     generator.level++;
     _updateGenerator(generator);
+    ref
+        .read(gameStatsProvider.notifier)
+        .progressTowards(QuestAction.upgrade, QuestUnit.generator, 1);
     ref.read(gameStateProvider.notifier).save();
     return true;
   }
