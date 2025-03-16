@@ -77,7 +77,8 @@ class HealthService {
 
     // Convert to ObjectBox model
     final entries =
-        newData
+        health
+            .removeDuplicates(newData)
             .where((e) => e.sourceId == bestSource)
             .map(
               (e) => HealthDataEntry(
