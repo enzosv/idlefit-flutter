@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:health/health.dart';
 import 'package:flutter/material.dart';
 import 'package:idlefit/providers/daily_health_provider.dart';
-import 'package:idlefit/providers/game_state_provider.dart';
+
 
 class HealthService {
   final Health health = Health();

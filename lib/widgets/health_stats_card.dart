@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/providers/daily_health_provider.dart';
-import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/widgets/card_button.dart';
-import 'package:idlefit/main.dart'; // Import providers from main.dart
+import 'package:idlefit/main.dart';
 
 class HealthStatsCard extends ConsumerStatefulWidget {
   const HealthStatsCard({super.key});
