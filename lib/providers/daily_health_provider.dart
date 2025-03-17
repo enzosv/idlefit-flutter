@@ -37,6 +37,32 @@ class DailyHealthNotifier extends StateNotifier<DailyHealth> {
         (DailyHealth()..dayTimestamp = dayTimestamp);
   }
 
+  Future<DailyHealth> total() async {
+    final entries = await box.getAllAsync();
+    final total = entries.fold(
+      DailyHealth(),
+      (acc, entry) =>
+          acc
+            ..caloriesBurned += entry.caloriesBurned
+            ..steps += entry.steps
+            ..exerciseMinutes += entry.exerciseMinutes,
+    );
+    return total;
+  }
+
+  Future<DateTime> firstDay() async {
+    final first =
+        await box
+            .query()
+            .order(DailyHealth_.dayTimestamp)
+            .build()
+            .findFirstAsync();
+    if (first == null) {
+      return DateTime.now();
+    }
+    return DateTime.fromMillisecondsSinceEpoch(first.dayTimestamp);
+  }
+
   Future<void> reset(int dayTimestamp, DailyHealth newHealth) async {
     final old = await _getAtDay(dayTimestamp);
     final difCalories = newHealth.caloriesBurned - old.caloriesBurned;
