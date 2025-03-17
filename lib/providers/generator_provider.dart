@@ -34,6 +34,10 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
       // nothing to unlock
       return true;
     }
+    if (state.length <= generator.tier) {
+      // no more tiers to unlock
+      return true;
+    }
 
     // make sure next tier is affordable
     final next = state[generator.tier].cost;

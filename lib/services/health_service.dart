@@ -3,6 +3,7 @@ import 'package:health/health.dart';
 import 'package:flutter/material.dart';
 import 'package:idlefit/models/health_data_entry.dart';
 import 'package:idlefit/models/health_data_repo.dart';
+import 'package:idlefit/providers/daily_health_provider.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:objectbox/objectbox.dart';
 
@@ -106,10 +107,27 @@ class HealthService {
     return entries;
   }
 
-  Future<void> syncHealthData(GameStateNotifier gameStateNotifier) async {
+  Future<int> getSteps(DateTime day) async {
+    final startOfDay = DateTime(day.year, day.month, day.day);
+    final endOfDay = startOfDay.add(Duration(seconds: 86399));
+    return await health.getTotalStepsInInterval(startOfDay, endOfDay) ?? 0;
+  }
+
+  Future<void> syncHealthData(
+    GameStateNotifier gameStateNotifier,
+    DailyHealthNotifier dailyHealthNotifier,
+  ) async {
+    // experiment
+    final now = DateTime.now();
+    final steps = await getSteps(now);
+    dailyHealthNotifier.reset(now, DailyHealth()..steps = steps);
+
     final repo = HealthDataRepo(box: box);
     final syncStart = await repo.syncStart();
     final entries = await queryHealthEntries(syncStart, DateTime.now());
+    if (entries.isEmpty) {
+      return;
+    }
     final newEntries = await repo.newFromList(entries, syncStart);
     if (newEntries.isEmpty) {
       return;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idlefit/helpers/constants.dart';
+import 'package:idlefit/providers/daily_health_provider.dart';
 import 'package:idlefit/screens/generator_screen.dart';
 import 'package:idlefit/screens/shop_screen.dart';
 import 'package:idlefit/screens/stats_screen.dart';
@@ -44,8 +45,8 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
     }
     // going to foreground
     final healthService = ref.read(healthServiceProvider);
-
-    await healthService.syncHealthData(gameStateNotifier);
+    final dailyHealthNotifier = ref.read(dailyHealthProvider.notifier);
+    await healthService.syncHealthData(gameStateNotifier, dailyHealthNotifier);
     NotificationService.cancelAllNotifications();
     gameStateNotifier.setIsPaused(false);
 
@@ -76,12 +77,16 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
     // Initialize health data
     final healthService = ref.read(healthServiceProvider);
     final gameStateNotifier = ref.read(gameStateProvider.notifier);
+    final dailyHealthNotifier = ref.read(dailyHealthProvider.notifier);
 
     // Initialize ads
     AdService.initialize();
 
     healthService.initialize().then((_) async {
-      await healthService.syncHealthData(gameStateNotifier);
+      await healthService.syncHealthData(
+        gameStateNotifier,
+        dailyHealthNotifier,
+      );
       gameStateNotifier.setIsPaused(false);
     });
 

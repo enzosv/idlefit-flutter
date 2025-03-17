@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/health_data_entry.dart';
 import 'package:idlefit/models/health_data_repo.dart';
+import 'package:idlefit/providers/daily_health_provider.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/widgets/card_button.dart';
@@ -131,7 +132,13 @@ class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
                     final gameStateNotifier = ref.read(
                       gameStateProvider.notifier,
                     );
-                    await healthService.syncHealthData(gameStateNotifier);
+                    final dailyHealthNotifier = ref.read(
+                      dailyHealthProvider.notifier,
+                    );
+                    await healthService.syncHealthData(
+                      gameStateNotifier,
+                      dailyHealthNotifier,
+                    );
                     setState(
                       () {},
                     ); // Trigger rebuild to refresh last sync time
