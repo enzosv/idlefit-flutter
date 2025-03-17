@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:health/health.dart';
 import 'package:flutter/material.dart';
 import 'package:idlefit/providers/daily_health_provider.dart';
-
+import 'package:idlefit/services/ios_health_service.dart';
 
 class HealthService {
   final Health health = Health();
@@ -82,45 +82,48 @@ class HealthService {
   Future<void> syncDay(
     DateTime day,
     DailyHealthNotifier dailyHealthNotifier,
+    IosHealthService? iosService,
   ) async {
     final startOfDay = DateTime(day.year, day.month, day.day);
     final endOfDay = DateTime(day.year, day.month, day.day, 23, 59, 59, 999);
-    final steps = // https://github.com/cph-cachet/flutter-plugins/issues/1066#issuecomment-2545521041 iOS aggregates but android doesn't
-        await (Platform.isIOS
-            ? health.getTotalStepsInInterval(startOfDay, endOfDay)
-            : _getDailyHealth(startOfDay, endOfDay, HealthDataType.STEPS));
-
-    assert(
-      await health.getTotalStepsInInterval(startOfDay, endOfDay) ==
-          await _getDailyHealth(startOfDay, endOfDay, HealthDataType.STEPS),
-      "steps implementation is different",
-    );
-
-    final calories = await _getDailyHealth(
-      startOfDay,
-      endOfDay,
-      HealthDataType.ACTIVE_ENERGY_BURNED,
-    );
-    final exerciseMinutes = await _getDailyHealth(
-      startOfDay,
-      endOfDay,
-      HealthDataType.EXERCISE_TIME,
-    );
+    if (iosService != null) {
+      final dailyHealth = await iosService.queryHealthForRange(
+        start: startOfDay,
+        end: endOfDay,
+      );
+      dailyHealthNotifier.reset(startOfDay.millisecondsSinceEpoch, dailyHealth);
+      return;
+    }
+    final [steps, calories, exerciseMinutes] =
+        await [
+          _getDailyHealth(startOfDay, endOfDay, HealthDataType.STEPS),
+          _getDailyHealth(
+            startOfDay,
+            endOfDay,
+            HealthDataType.ACTIVE_ENERGY_BURNED,
+          ),
+          _getDailyHealth(startOfDay, endOfDay, HealthDataType.EXERCISE_TIME),
+        ].wait;
 
     dailyHealthNotifier.reset(
       startOfDay.millisecondsSinceEpoch,
       DailyHealth()
-        ..steps = steps?.toInt() ?? 0
+        ..steps = steps.toInt()
         ..caloriesBurned = calories
         ..exerciseMinutes = exerciseMinutes,
     );
   }
 
   Future<void> syncHealthData(DailyHealthNotifier dailyHealthNotifier) async {
+    final iosService = Platform.isIOS ? IosHealthService() : null;
     final now = DateTime.now();
     await [
-      syncDay(now, dailyHealthNotifier),
-      syncDay(now.subtract(const Duration(days: 1)), dailyHealthNotifier),
+      syncDay(now, dailyHealthNotifier, iosService),
+      syncDay(
+        now.subtract(const Duration(days: 1)),
+        dailyHealthNotifier,
+        iosService,
+      ),
     ].wait;
   }
 }
