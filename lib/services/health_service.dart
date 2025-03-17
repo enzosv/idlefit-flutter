@@ -113,14 +113,15 @@ class HealthService {
     return await health.getTotalStepsInInterval(startOfDay, endOfDay) ?? 0;
   }
 
-  Future<double> getCalories(DateTime day) async {
+  Future<double> getHealth(DateTime day, HealthDataType type) async {
     final startOfDay = DateTime(day.year, day.month, day.day);
     final endOfDay = startOfDay.add(Duration(seconds: 86399));
     final data = await health.getHealthDataFromTypes(
       startTime: startOfDay,
       endTime: endOfDay,
-      types: [HealthDataType.ACTIVE_ENERGY_BURNED],
+      types: [type],
     );
+    // TODO: if multiple sources, get the one with the higher value per timerange
     final calories = data.fold(
       0.0,
       (sum, e) => sum + (e.value as NumericHealthValue).numericValue.toDouble(),
@@ -135,12 +136,14 @@ class HealthService {
     // experiment
     final now = DateTime.now();
     final steps = await getSteps(now);
-    final calories = await getCalories(now);
+    final calories = await getHealth(now, HealthDataType.ACTIVE_ENERGY_BURNED);
+    final exerciseMinutes = await getHealth(now, HealthDataType.EXERCISE_TIME);
     dailyHealthNotifier.reset(
       now,
       DailyHealth()
         ..steps = steps
-        ..caloriesBurned = calories,
+        ..caloriesBurned = calories
+        ..exerciseMinutes = exerciseMinutes,
     );
 
     final repo = HealthDataRepo(box: box);
