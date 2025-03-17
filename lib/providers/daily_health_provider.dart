@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/objectbox.g.dart';
+import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()
@@ -15,7 +16,8 @@ class DailyHealth {
 
 class DailyHealthNotifier extends StateNotifier<DailyHealth> {
   final Box<DailyHealth> box;
-  DailyHealthNotifier(this.box, super.state);
+  final Ref ref;
+  DailyHealthNotifier(this.ref, this.box, super.state);
 
   Future<void> initialize() async {
     state = await _getToday();
@@ -35,32 +37,35 @@ class DailyHealthNotifier extends StateNotifier<DailyHealth> {
         (DailyHealth()..dayTimestamp = dayTimestamp);
   }
 
-  // returns the difference betweeen old health and new health
-  Future<DailyHealth> reset(DateTime day, DailyHealth newHealth) async {
-    final dayTimestamp =
-        DateTime(day.year, day.month, day.day).millisecondsSinceEpoch;
+  Future<void> reset(int dayTimestamp, DailyHealth newHealth) async {
     final old = await _getAtDay(dayTimestamp);
-    final dif =
-        DailyHealth()
-          ..caloriesBurned = newHealth.caloriesBurned - old.caloriesBurned
-          ..steps = newHealth.steps - old.steps
-          ..exerciseMinutes = newHealth.exerciseMinutes - old.exerciseMinutes;
+    final difCalories = newHealth.caloriesBurned - old.caloriesBurned;
+    final difSteps = newHealth.steps - old.steps;
+    final difExerciseMinutes = newHealth.exerciseMinutes - old.exerciseMinutes;
 
     old.caloriesBurned = newHealth.caloriesBurned;
     old.exerciseMinutes = newHealth.exerciseMinutes;
     old.steps = newHealth.steps;
 
     box.putAsync(old);
-    if (dayTimestamp == state.dayTimestamp) {
-      state = old;
+    if (dayTimestamp != state.dayTimestamp) {
+      return;
     }
-    return dif;
+    state = old;
+    ref
+        .read(gameStateProvider.notifier)
+        .convertHealthStats(
+          difSteps.toDouble(),
+          difCalories,
+          difExerciseMinutes,
+        );
   }
 }
 
 final dailyHealthProvider =
     StateNotifierProvider<DailyHealthNotifier, DailyHealth>((ref) {
       return DailyHealthNotifier(
+        ref,
         ref.read(objectBoxProvider).store.box<DailyHealth>(),
         DailyHealth(),
       );
