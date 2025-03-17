@@ -110,7 +110,8 @@ class HealthService {
       DailyHealth()
         ..steps = steps.toInt()
         ..caloriesBurned = calories
-        ..exerciseMinutes = exerciseMinutes,
+        ..exerciseMinutes = exerciseMinutes.toInt()
+        ..lastSync = DateTime.now().millisecondsSinceEpoch,
     );
   }
 

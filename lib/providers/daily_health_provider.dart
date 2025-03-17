@@ -11,7 +11,7 @@ class DailyHealth {
 
   int steps = 0;
   double caloriesBurned = 0;
-  double exerciseMinutes = 0;
+  int lastSync = 0;
 }
 
 class DailyHealthNotifier extends StateNotifier<DailyHealth> {
@@ -50,8 +50,8 @@ class DailyHealthNotifier extends StateNotifier<DailyHealth> {
     return total;
   }
 
-  DateTime latestDay() {
-    return DateTime.fromMillisecondsSinceEpoch(state.dayTimestamp);
+  DateTime latestSync() {
+    return DateTime.fromMillisecondsSinceEpoch(state.lastSync);
   }
 
   Future<DateTime> firstDay() async {
@@ -76,7 +76,7 @@ class DailyHealthNotifier extends StateNotifier<DailyHealth> {
     old.caloriesBurned = newHealth.caloriesBurned;
     old.exerciseMinutes = newHealth.exerciseMinutes;
     old.steps = newHealth.steps;
-
+    old.lastSync = newHealth.lastSync;
     box.putAsync(old);
     if (dayTimestamp != state.dayTimestamp) {
       return;

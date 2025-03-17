@@ -24,7 +24,8 @@ class IosHealthService {
     return DailyHealth()
       ..steps = steps.toInt()
       ..caloriesBurned = calories
-      ..exerciseMinutes = exerciseMinutes;
+      ..exerciseMinutes = exerciseMinutes.toInt()
+      ..lastSync = DateTime.now().millisecondsSinceEpoch;
   }
 
   Future<double> _queryStatistics({

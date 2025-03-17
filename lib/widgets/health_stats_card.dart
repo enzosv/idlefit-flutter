@@ -80,7 +80,7 @@ class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
                         final dailyHealthNotifier = ref.read(
                           dailyHealthProvider.notifier,
                         );
-                        final latest = dailyHealthNotifier.latestDay();
+                        final latest = dailyHealthNotifier.latestSync();
                         final earliest = await dailyHealthNotifier.firstDay();
                         return (latest, earliest);
                       }(),
