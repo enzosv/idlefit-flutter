@@ -19,7 +19,6 @@ import 'models/coin_generator.dart';
 import 'models/currency.dart';
 import 'models/daily_quest.dart';
 import 'models/game_stats.dart';
-import 'models/health_data_entry.dart';
 import 'models/shop_items.dart';
 import 'providers/daily_health_provider.dart';
 
@@ -90,46 +89,6 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(5, 2457321709930163773),
             name: 'isUnlocked',
             type: 1,
-            flags: 0)
-      ],
-      relations: <obx_int.ModelRelation>[],
-      backlinks: <obx_int.ModelBacklink>[]),
-  obx_int.ModelEntity(
-      id: const obx_int.IdUid(5, 604859576841525103),
-      name: 'HealthDataEntry',
-      lastPropertyId: const obx_int.IdUid(6, 5977650328934603192),
-      flags: 0,
-      properties: <obx_int.ModelProperty>[
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 4745966459735341277),
-            name: 'id',
-            type: 6,
-            flags: 1),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 81048633074782967),
-            name: 'timestamp',
-            type: 6,
-            flags: 8,
-            indexId: const obx_int.IdUid(2, 6046711262050609894)),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(3, 7708077465627102502),
-            name: 'duration',
-            type: 6,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(4, 4892005414219992245),
-            name: 'recordedAt',
-            type: 6,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(5, 6816389771923756793),
-            name: 'value',
-            type: 8,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(6, 5977650328934603192),
-            name: 'type',
-            type: 9,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -393,7 +352,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
       retiredEntityUids: const [
         2493137042954685248,
         219102169117428336,
-        8235573318783332755
+        8235573318783332755,
+        604859576841525103
       ],
       retiredIndexUids: const [],
       retiredPropertyUids: const [
@@ -433,7 +393,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
         4743794405710996085,
         2032882936729661744,
         3449366289436579614,
-        6172183544316569837
+        6172183544316569837,
+        4745966459735341277,
+        81048633074782967,
+        7708077465627102502,
+        4892005414219992245,
+        6816389771923756793,
+        5977650328934603192
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -527,51 +493,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
 
           return object;
         }),
-    HealthDataEntry: obx_int.EntityDefinition<HealthDataEntry>(
-        model: _entities[2],
-        toOneRelations: (HealthDataEntry object) => [],
-        toManyRelations: (HealthDataEntry object) => {},
-        getId: (HealthDataEntry object) => object.id,
-        setId: (HealthDataEntry object, int id) {
-          object.id = id;
-        },
-        objectToFB: (HealthDataEntry object, fb.Builder fbb) {
-          final typeOffset = fbb.writeString(object.type);
-          fbb.startTable(7);
-          fbb.addInt64(0, object.id);
-          fbb.addInt64(1, object.timestamp);
-          fbb.addInt64(2, object.duration);
-          fbb.addInt64(3, object.recordedAt);
-          fbb.addFloat64(4, object.value);
-          fbb.addOffset(5, typeOffset);
-          fbb.finish(fbb.endTable());
-          return object.id;
-        },
-        objectFromFB: (obx.Store store, ByteData fbData) {
-          final buffer = fb.BufferContext(fbData);
-          final rootOffset = buffer.derefObject(0);
-          final timestampParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
-          final durationParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
-          final valueParam =
-              const fb.Float64Reader().vTableGet(buffer, rootOffset, 12, 0);
-          final typeParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 14, '');
-          final recordedAtParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0);
-          final object = HealthDataEntry(
-              timestamp: timestampParam,
-              duration: durationParam,
-              value: valueParam,
-              type: typeParam,
-              recordedAt: recordedAtParam)
-            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
-
-          return object;
-        }),
     ShopItem: obx_int.EntityDefinition<ShopItem>(
-        model: _entities[3],
+        model: _entities[2],
         toOneRelations: (ShopItem object) => [],
         toManyRelations: (ShopItem object) => {},
         getId: (ShopItem object) => object.id,
@@ -597,7 +520,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           return object;
         }),
     Achievement: obx_int.EntityDefinition<Achievement>(
-        model: _entities[4],
+        model: _entities[3],
         toOneRelations: (Achievement object) => [],
         toManyRelations: (Achievement object) => {},
         getId: (Achievement object) => object.id,
@@ -634,7 +557,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           return object;
         }),
     DailyHealth: obx_int.EntityDefinition<DailyHealth>(
-        model: _entities[5],
+        model: _entities[4],
         toOneRelations: (DailyHealth object) => [],
         toManyRelations: (DailyHealth object) => {},
         getId: (DailyHealth object) => object.dayTimestamp,
@@ -666,7 +589,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           return object;
         }),
     DailyQuest: obx_int.EntityDefinition<DailyQuest>(
-        model: _entities[6],
+        model: _entities[5],
         toOneRelations: (DailyQuest object) => [],
         toManyRelations: (DailyQuest object) => {},
         getId: (DailyQuest object) => object.id,
@@ -716,7 +639,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           return object;
         }),
     GameStats: obx_int.EntityDefinition<GameStats>(
-        model: _entities[7],
+        model: _entities[6],
         toOneRelations: (GameStats object) => [],
         toManyRelations: (GameStats object) => {},
         getId: (GameStats object) => object.dayTimestamp,
@@ -842,180 +765,153 @@ class CoinGenerator_ {
       obx.QueryBooleanProperty<CoinGenerator>(_entities[1].properties[3]);
 }
 
-/// [HealthDataEntry] entity fields to define ObjectBox queries.
-class HealthDataEntry_ {
-  /// See [HealthDataEntry.id].
-  static final id =
-      obx.QueryIntegerProperty<HealthDataEntry>(_entities[2].properties[0]);
-
-  /// See [HealthDataEntry.timestamp].
-  static final timestamp =
-      obx.QueryIntegerProperty<HealthDataEntry>(_entities[2].properties[1]);
-
-  /// See [HealthDataEntry.duration].
-  static final duration =
-      obx.QueryIntegerProperty<HealthDataEntry>(_entities[2].properties[2]);
-
-  /// See [HealthDataEntry.recordedAt].
-  static final recordedAt =
-      obx.QueryIntegerProperty<HealthDataEntry>(_entities[2].properties[3]);
-
-  /// See [HealthDataEntry.value].
-  static final value =
-      obx.QueryDoubleProperty<HealthDataEntry>(_entities[2].properties[4]);
-
-  /// See [HealthDataEntry.type].
-  static final type =
-      obx.QueryStringProperty<HealthDataEntry>(_entities[2].properties[5]);
-}
-
 /// [ShopItem] entity fields to define ObjectBox queries.
 class ShopItem_ {
   /// See [ShopItem.id].
   static final id =
-      obx.QueryIntegerProperty<ShopItem>(_entities[3].properties[0]);
+      obx.QueryIntegerProperty<ShopItem>(_entities[2].properties[0]);
 
   /// See [ShopItem.level].
   static final level =
-      obx.QueryIntegerProperty<ShopItem>(_entities[3].properties[1]);
+      obx.QueryIntegerProperty<ShopItem>(_entities[2].properties[1]);
 }
 
 /// [Achievement] entity fields to define ObjectBox queries.
 class Achievement_ {
   /// See [Achievement.id].
   static final id =
-      obx.QueryIntegerProperty<Achievement>(_entities[4].properties[0]);
+      obx.QueryIntegerProperty<Achievement>(_entities[3].properties[0]);
 
   /// See [Achievement.dateClaimed].
   static final dateClaimed =
-      obx.QueryIntegerProperty<Achievement>(_entities[4].properties[1]);
+      obx.QueryIntegerProperty<Achievement>(_entities[3].properties[1]);
 
   /// See [Achievement.action].
   static final action =
-      obx.QueryStringProperty<Achievement>(_entities[4].properties[2]);
+      obx.QueryStringProperty<Achievement>(_entities[3].properties[2]);
 
   /// See [Achievement.reqUnit].
   static final reqUnit =
-      obx.QueryStringProperty<Achievement>(_entities[4].properties[3]);
+      obx.QueryStringProperty<Achievement>(_entities[3].properties[3]);
 
   /// See [Achievement.requirement].
   static final requirement =
-      obx.QueryIntegerProperty<Achievement>(_entities[4].properties[4]);
+      obx.QueryIntegerProperty<Achievement>(_entities[3].properties[4]);
 }
 
 /// [DailyHealth] entity fields to define ObjectBox queries.
 class DailyHealth_ {
   /// See [DailyHealth.dayTimestamp].
   static final dayTimestamp =
-      obx.QueryIntegerProperty<DailyHealth>(_entities[5].properties[0]);
+      obx.QueryIntegerProperty<DailyHealth>(_entities[4].properties[0]);
 
   /// See [DailyHealth.steps].
   static final steps =
-      obx.QueryIntegerProperty<DailyHealth>(_entities[5].properties[1]);
+      obx.QueryIntegerProperty<DailyHealth>(_entities[4].properties[1]);
 
   /// See [DailyHealth.caloriesBurned].
   static final caloriesBurned =
-      obx.QueryDoubleProperty<DailyHealth>(_entities[5].properties[2]);
+      obx.QueryDoubleProperty<DailyHealth>(_entities[4].properties[2]);
 
   /// See [DailyHealth.exerciseMinutes].
   static final exerciseMinutes =
-      obx.QueryDoubleProperty<DailyHealth>(_entities[5].properties[3]);
+      obx.QueryDoubleProperty<DailyHealth>(_entities[4].properties[3]);
 }
 
 /// [DailyQuest] entity fields to define ObjectBox queries.
 class DailyQuest_ {
   /// See [DailyQuest.id].
   static final id =
-      obx.QueryIntegerProperty<DailyQuest>(_entities[6].properties[0]);
+      obx.QueryIntegerProperty<DailyQuest>(_entities[5].properties[0]);
 
   /// See [DailyQuest.action].
   static final action =
-      obx.QueryStringProperty<DailyQuest>(_entities[6].properties[1]);
+      obx.QueryStringProperty<DailyQuest>(_entities[5].properties[1]);
 
   /// See [DailyQuest.unit].
   static final unit =
-      obx.QueryStringProperty<DailyQuest>(_entities[6].properties[2]);
+      obx.QueryStringProperty<DailyQuest>(_entities[5].properties[2]);
 
   /// See [DailyQuest.rewardUnit].
   static final rewardUnit =
-      obx.QueryStringProperty<DailyQuest>(_entities[6].properties[3]);
+      obx.QueryStringProperty<DailyQuest>(_entities[5].properties[3]);
 
   /// See [DailyQuest.requirement].
   static final requirement =
-      obx.QueryIntegerProperty<DailyQuest>(_entities[6].properties[4]);
+      obx.QueryIntegerProperty<DailyQuest>(_entities[5].properties[4]);
 
   /// See [DailyQuest.reward].
   static final reward =
-      obx.QueryIntegerProperty<DailyQuest>(_entities[6].properties[5]);
+      obx.QueryIntegerProperty<DailyQuest>(_entities[5].properties[5]);
 
   /// See [DailyQuest.progress].
   static final progress =
-      obx.QueryDoubleProperty<DailyQuest>(_entities[6].properties[6]);
+      obx.QueryDoubleProperty<DailyQuest>(_entities[5].properties[6]);
 
   /// See [DailyQuest.dateAssigned].
   static final dateAssigned =
-      obx.QueryIntegerProperty<DailyQuest>(_entities[6].properties[7]);
+      obx.QueryIntegerProperty<DailyQuest>(_entities[5].properties[7]);
 
   /// See [DailyQuest.isClaimed].
   static final isClaimed =
-      obx.QueryBooleanProperty<DailyQuest>(_entities[6].properties[8]);
+      obx.QueryBooleanProperty<DailyQuest>(_entities[5].properties[8]);
 }
 
 /// [GameStats] entity fields to define ObjectBox queries.
 class GameStats_ {
   /// See [GameStats.dayTimestamp].
   static final dayTimestamp =
-      obx.QueryIntegerProperty<GameStats>(_entities[7].properties[0]);
+      obx.QueryIntegerProperty<GameStats>(_entities[6].properties[0]);
 
   /// See [GameStats.generatorsPurchased].
   static final generatorsPurchased =
-      obx.QueryIntegerProperty<GameStats>(_entities[7].properties[1]);
+      obx.QueryIntegerProperty<GameStats>(_entities[6].properties[1]);
 
   /// See [GameStats.generatorsUpgraded].
   static final generatorsUpgraded =
-      obx.QueryIntegerProperty<GameStats>(_entities[7].properties[2]);
+      obx.QueryIntegerProperty<GameStats>(_entities[6].properties[2]);
 
   /// See [GameStats.shopItemsUpgraded].
   static final shopItemsUpgraded =
-      obx.QueryIntegerProperty<GameStats>(_entities[7].properties[3]);
+      obx.QueryIntegerProperty<GameStats>(_entities[6].properties[3]);
 
   /// See [GameStats.generatorsTapped].
   static final generatorsTapped =
-      obx.QueryIntegerProperty<GameStats>(_entities[7].properties[4]);
+      obx.QueryIntegerProperty<GameStats>(_entities[6].properties[4]);
 
   /// See [GameStats.adsWatched].
   static final adsWatched =
-      obx.QueryIntegerProperty<GameStats>(_entities[7].properties[5]);
+      obx.QueryIntegerProperty<GameStats>(_entities[6].properties[5]);
 
   /// See [GameStats.caloriesBurned].
   static final caloriesBurned =
-      obx.QueryDoubleProperty<GameStats>(_entities[7].properties[6]);
+      obx.QueryDoubleProperty<GameStats>(_entities[6].properties[6]);
 
   /// See [GameStats.stepsWalked].
   static final stepsWalked =
-      obx.QueryIntegerProperty<GameStats>(_entities[7].properties[7]);
+      obx.QueryIntegerProperty<GameStats>(_entities[6].properties[7]);
 
   /// See [GameStats.coinsCollected].
   static final coinsCollected =
-      obx.QueryDoubleProperty<GameStats>(_entities[7].properties[8]);
+      obx.QueryDoubleProperty<GameStats>(_entities[6].properties[8]);
 
   /// See [GameStats.spaceCollected].
   static final spaceCollected =
-      obx.QueryDoubleProperty<GameStats>(_entities[7].properties[9]);
+      obx.QueryDoubleProperty<GameStats>(_entities[6].properties[9]);
 
   /// See [GameStats.energyCollected].
   static final energyCollected =
-      obx.QueryDoubleProperty<GameStats>(_entities[7].properties[10]);
+      obx.QueryDoubleProperty<GameStats>(_entities[6].properties[10]);
 
   /// See [GameStats.energySpent].
   static final energySpent =
-      obx.QueryDoubleProperty<GameStats>(_entities[7].properties[11]);
+      obx.QueryDoubleProperty<GameStats>(_entities[6].properties[11]);
 
   /// See [GameStats.coinsSpent].
   static final coinsSpent =
-      obx.QueryDoubleProperty<GameStats>(_entities[7].properties[12]);
+      obx.QueryDoubleProperty<GameStats>(_entities[6].properties[12]);
 
   /// See [GameStats.spaceSpent].
   static final spaceSpent =
-      obx.QueryDoubleProperty<GameStats>(_entities[7].properties[13]);
+      obx.QueryDoubleProperty<GameStats>(_entities[6].properties[13]);
 }
