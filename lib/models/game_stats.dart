@@ -1,4 +1,5 @@
 import 'package:idlefit/objectbox.g.dart';
+import 'package:objectbox/objectbox.dart';
 
 @Entity()
 class GameStats {

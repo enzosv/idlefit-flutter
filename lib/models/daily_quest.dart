@@ -1,6 +1,7 @@
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/objectbox.g.dart';
+import 'package:objectbox/objectbox.dart';
 
 // Define enums for quest properties
 enum QuestAction {
