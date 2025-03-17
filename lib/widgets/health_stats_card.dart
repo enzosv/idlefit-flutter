@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/models/health_data_entry.dart';
-import 'package:idlefit/models/health_data_repo.dart';
 import 'package:idlefit/providers/daily_health_provider.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:idlefit/helpers/util.dart';
@@ -80,14 +78,11 @@ class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
                     ),
                     FutureBuilder<(DateTime?, DateTime?)>(
                       future: () async {
-                        final box =
-                            ref
-                                .read(objectBoxProvider)
-                                .store
-                                .box<HealthDataEntry>();
-                        final repo = HealthDataRepo(box: box);
-                        final latest = await repo.latestEntryDate();
-                        final earliest = await repo.earliestEntryDate();
+                        final dailyHealthNotifier = ref.read(
+                          dailyHealthProvider.notifier,
+                        );
+                        final latest = dailyHealthNotifier.latestDay();
+                        final earliest = await dailyHealthNotifier.firstDay();
                         return (latest, earliest);
                       }(),
                       builder: (context, snapshot) {
