@@ -50,6 +50,10 @@ class DailyHealthNotifier extends StateNotifier<DailyHealth> {
     return total;
   }
 
+  DateTime latestDay() {
+    return DateTime.fromMillisecondsSinceEpoch(state.dayTimestamp);
+  }
+
   Future<DateTime> firstDay() async {
     final first =
         await box
