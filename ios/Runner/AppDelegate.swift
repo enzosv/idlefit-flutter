@@ -1,6 +1,7 @@
 import Flutter
 import UIKit
 import UserNotifications
+import HealthKit
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
@@ -16,6 +17,7 @@ import UserNotifications
     }
     
     GeneratedPluginRegistrant.register(with: self)
+    HealthStatisticsPlugin.register(with: self.registrar(forPlugin: "HealthStatisticsPlugin")!)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
