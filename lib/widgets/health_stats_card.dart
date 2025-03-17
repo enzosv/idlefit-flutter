@@ -42,8 +42,8 @@ class _HealthStatsTile extends StatelessWidget {
 }
 
 class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
-  HealthStats today = HealthStats();
-  HealthStats total = HealthStats();
+  DailyHealth today = DailyHealth();
+  DailyHealth total = DailyHealth();
 
   @override
   void initState() {
@@ -52,13 +52,11 @@ class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
   }
 
   Future<void> _fetchData() async {
-    final healthBox = ref.read(objectBoxProvider).store.box<HealthDataEntry>();
-    final healthRepo = HealthDataRepo(box: healthBox);
-    final (healthToday, healthTotal) =
-        await (healthRepo.today(DateTime.now()), healthRepo.total()).wait;
+    final dailyHealthNotifier = ref.read(dailyHealthProvider.notifier);
+    final totalHealth = await dailyHealthNotifier.total();
     setState(() {
-      today = healthToday;
-      total = healthTotal;
+      today = ref.watch(dailyHealthProvider);
+      total = totalHealth;
     });
   }
 
@@ -151,15 +149,15 @@ class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
             _HealthStatsTile(
               icon: Icons.directions_walk,
               title: "Steps",
-              today: today.steps,
-              total: total.steps,
+              today: today.steps.toDouble(),
+              total: total.steps.toDouble(),
               iconColor: Colors.blue,
             ),
             _HealthStatsTile(
               icon: Icons.local_fire_department,
               title: "Calories Burned",
-              today: today.calories,
-              total: total.calories,
+              today: today.caloriesBurned,
+              total: total.caloriesBurned,
               iconColor: Colors.red,
             ),
           ],

@@ -108,15 +108,11 @@ class HealthService {
     return entries;
   }
 
-  Future<int> getSteps(DateTime day) async {
-    final startOfDay = DateTime(day.year, day.month, day.day);
-    final endOfDay = DateTime(day.year, day.month, day.day, 23, 59, 59, 999);
-    return await health.getTotalStepsInInterval(startOfDay, endOfDay) ?? 0;
-  }
-
-  Future<double> getHealth(DateTime day, HealthDataType type) async {
-    final startOfDay = DateTime(day.year, day.month, day.day);
-    final endOfDay = DateTime(day.year, day.month, day.day, 23, 59, 59, 999);
+  Future<double> _getDailyHealth(
+    DateTime startOfDay,
+    endOfDay,
+    HealthDataType type,
+  ) async {
     final data = await health.getHealthDataFromTypes(
       startTime: startOfDay,
       endTime: endOfDay,
@@ -149,26 +145,48 @@ class HealthService {
     return total;
   }
 
+  Future<void> syncDay(
+    DateTime day,
+    DailyHealthNotifier dailyHealthNotifier,
+  ) async {
+    final startOfDay = DateTime(day.year, day.month, day.day);
+    final endOfDay = DateTime(day.year, day.month, day.day, 23, 59, 59, 999);
+    final steps = // https://github.com/cph-cachet/flutter-plugins/issues/1066#issuecomment-2545521041 iOS aggregates but android doesn't
+        await (Platform.isIOS
+            ? health.getTotalStepsInInterval(startOfDay, endOfDay)
+            : _getDailyHealth(startOfDay, endOfDay, HealthDataType.STEPS));
+
+    final calories = await _getDailyHealth(
+      startOfDay,
+      endOfDay,
+      HealthDataType.ACTIVE_ENERGY_BURNED,
+    );
+    final exerciseMinutes = await _getDailyHealth(
+      startOfDay,
+      endOfDay,
+      HealthDataType.EXERCISE_TIME,
+    );
+
+    dailyHealthNotifier.reset(
+      startOfDay.millisecondsSinceEpoch,
+      DailyHealth()
+        ..steps = steps?.toInt() ?? 0
+        ..caloriesBurned = calories
+        ..exerciseMinutes = exerciseMinutes,
+    );
+  }
+
   Future<void> syncHealthData(
     GameStateNotifier gameStateNotifier,
     DailyHealthNotifier dailyHealthNotifier,
   ) async {
     // experiment
     final now = DateTime.now();
-    final steps =
-        await (Platform.isIOS
-            ? getSteps(now)
-            : getHealth(now, HealthDataType.STEPS));
-
-    final calories = await getHealth(now, HealthDataType.ACTIVE_ENERGY_BURNED);
-    final exerciseMinutes = await getHealth(now, HealthDataType.EXERCISE_TIME);
-    dailyHealthNotifier.reset(
-      now,
-      DailyHealth()
-        ..steps = steps.floor()
-        ..caloriesBurned = calories
-        ..exerciseMinutes = exerciseMinutes,
-    );
+    await [
+      syncDay(now, dailyHealthNotifier),
+      syncDay(now.subtract(const Duration(days: 1)), dailyHealthNotifier),
+    ].wait;
+    return;
 
     final repo = HealthDataRepo(box: box);
     final syncStart = await repo.syncStart();
