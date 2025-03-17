@@ -2,16 +2,13 @@ import 'dart:async';
 import 'dart:io';
 import 'package:health/health.dart';
 import 'package:flutter/material.dart';
-import 'package:idlefit/models/health_data_entry.dart';
 import 'package:idlefit/providers/daily_health_provider.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
-import 'package:objectbox/objectbox.dart';
 
 class HealthService {
   final Health health = Health();
-  final Box<HealthDataEntry> box;
 
-  HealthService({required this.box});
+  HealthService();
 
   // Health data types we want to access
   final List<HealthDataType> types = [
