@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/models/health_data_entry.dart';
 import 'package:idlefit/screens/game_home_screen.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,9 +26,7 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
   final storageService = StorageService(prefs);
   final objectBox = await ObjectBox.create();
-  final healthService = HealthService(
-    box: objectBox.store.box<HealthDataEntry>(),
-  );
+  final healthService = HealthService();
 
   // Initialize notifications
   await NotificationService.initialize();
