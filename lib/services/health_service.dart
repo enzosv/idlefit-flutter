@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:health/health.dart';
 import 'package:flutter/material.dart';
 import 'package:idlefit/models/health_data_entry.dart';
@@ -109,24 +110,43 @@ class HealthService {
 
   Future<int> getSteps(DateTime day) async {
     final startOfDay = DateTime(day.year, day.month, day.day);
-    final endOfDay = startOfDay.add(Duration(seconds: 86399));
+    final endOfDay = DateTime(day.year, day.month, day.day, 23, 59, 59, 999);
     return await health.getTotalStepsInInterval(startOfDay, endOfDay) ?? 0;
   }
 
   Future<double> getHealth(DateTime day, HealthDataType type) async {
     final startOfDay = DateTime(day.year, day.month, day.day);
-    final endOfDay = startOfDay.add(Duration(seconds: 86399));
+    final endOfDay = DateTime(day.year, day.month, day.day, 23, 59, 59, 999);
     final data = await health.getHealthDataFromTypes(
       startTime: startOfDay,
       endTime: endOfDay,
       types: [type],
     );
-    // TODO: if multiple sources, get the one with the higher value per timerange
-    final calories = data.fold(
-      0.0,
-      (sum, e) => sum + (e.value as NumericHealthValue).numericValue.toDouble(),
-    );
-    return calories.toDouble();
+    // Group data by time ranges and sources
+    Map<int, Map<String, double>> timeRangeData = {};
+
+    for (final entry in data) {
+      final timeKey = entry.dateFrom.millisecondsSinceEpoch;
+      timeRangeData[timeKey] ??= {};
+
+      final value = (entry.value as NumericHealthValue).numericValue.toDouble();
+      timeRangeData[timeKey]![entry.sourceId] =
+          (timeRangeData[timeKey]![entry.sourceId] ?? 0) + value;
+    }
+
+    // For each time range, select the best source if there are multiple
+    double total = 0.0;
+    for (final timeRange in timeRangeData.entries) {
+      if (timeRange.value.length == 1) {
+        // Only one source for this time range, use it
+        total += timeRange.value.values.first;
+      } else {
+        // Multiple sources, choose the one with higher value
+        total += timeRange.value.values.reduce((a, b) => a > b ? a : b);
+      }
+    }
+
+    return total;
   }
 
   Future<void> syncHealthData(
@@ -135,13 +155,17 @@ class HealthService {
   ) async {
     // experiment
     final now = DateTime.now();
-    final steps = await getSteps(now);
+    final steps =
+        await (Platform.isIOS
+            ? getSteps(now)
+            : getHealth(now, HealthDataType.STEPS));
+
     final calories = await getHealth(now, HealthDataType.ACTIVE_ENERGY_BURNED);
     final exerciseMinutes = await getHealth(now, HealthDataType.EXERCISE_TIME);
     dailyHealthNotifier.reset(
       now,
       DailyHealth()
-        ..steps = steps
+        ..steps = steps.floor()
         ..caloriesBurned = calories
         ..exerciseMinutes = exerciseMinutes,
     );
