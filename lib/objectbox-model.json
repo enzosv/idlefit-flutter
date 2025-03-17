@@ -126,7 +126,7 @@
     },
     {
       "id": "9:5523549602957263386",
-      "lastPropertyId": "4:6107178178149087951",
+      "lastPropertyId": "5:3783688117025317780",
       "name": "DailyHealth",
       "properties": [
         {
@@ -148,7 +148,12 @@
         {
           "id": "4:6107178178149087951",
           "name": "exerciseMinutes",
-          "type": 8
+          "type": 6
+        },
+        {
+          "id": "5:3783688117025317780",
+          "name": "lastSync",
+          "type": 6
         }
       ],
       "relations": []

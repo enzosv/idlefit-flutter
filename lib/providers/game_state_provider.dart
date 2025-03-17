@@ -139,7 +139,11 @@ class GameStateNotifier extends StateNotifier<GameState> {
     );
   }
 
-  void convertHealthStats(double steps, calories, exerciseMinutes) {
+  Future<void> convertHealthStats(
+    int steps,
+    double calories,
+    int exerciseMinutes,
+  ) async {
     final healthMultiplier = ref
         .read(shopItemProvider.notifier)
         .multiplier(ShopItemEffect.healthMultiplier);
@@ -157,7 +161,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     if (steps > 0) {
       ref
           .read(dailyQuestProvider.notifier)
-          .progressTowards(QuestAction.walk, QuestUnit.steps, steps);
+          .progressTowards(QuestAction.walk, QuestUnit.steps, steps.toDouble());
       ref.read(spaceProvider.notifier).earn(spaceGain);
     }
     if (calories > 0) {

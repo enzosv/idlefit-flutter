@@ -149,7 +149,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(9, 5523549602957263386),
       name: 'DailyHealth',
-      lastPropertyId: const obx_int.IdUid(4, 6107178178149087951),
+      lastPropertyId: const obx_int.IdUid(5, 3783688117025317780),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -170,7 +170,12 @@ final _entities = <obx_int.ModelEntity>[
         obx_int.ModelProperty(
             id: const obx_int.IdUid(4, 6107178178149087951),
             name: 'exerciseMinutes',
-            type: 8,
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 3783688117025317780),
+            name: 'lastSync',
+            type: 6,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -565,11 +570,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
           object.dayTimestamp = id;
         },
         objectToFB: (DailyHealth object, fb.Builder fbb) {
-          fbb.startTable(5);
+          fbb.startTable(6);
           fbb.addInt64(0, object.dayTimestamp);
           fbb.addInt64(1, object.steps);
           fbb.addFloat64(2, object.caloriesBurned);
-          fbb.addFloat64(3, object.exerciseMinutes);
+          fbb.addInt64(3, object.exerciseMinutes);
+          fbb.addInt64(4, object.lastSync);
           fbb.finish(fbb.endTable());
           return object.dayTimestamp;
         },
@@ -584,7 +590,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
             ..caloriesBurned =
                 const fb.Float64Reader().vTableGet(buffer, rootOffset, 8, 0)
             ..exerciseMinutes =
-                const fb.Float64Reader().vTableGet(buffer, rootOffset, 10, 0);
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0)
+            ..lastSync =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0);
 
           return object;
         }),
@@ -815,7 +823,11 @@ class DailyHealth_ {
 
   /// See [DailyHealth.exerciseMinutes].
   static final exerciseMinutes =
-      obx.QueryDoubleProperty<DailyHealth>(_entities[4].properties[3]);
+      obx.QueryIntegerProperty<DailyHealth>(_entities[4].properties[3]);
+
+  /// See [DailyHealth.lastSync].
+  static final lastSync =
+      obx.QueryIntegerProperty<DailyHealth>(_entities[4].properties[4]);
 }
 
 /// [DailyQuest] entity fields to define ObjectBox queries.
