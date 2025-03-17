@@ -57,7 +57,7 @@ PODS:
   - GoogleUtilities/Reachability (7.13.3):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
-  - health (12.0.0):
+  - health (12.1.0):
     - Flutter
   - nanopb (2.30910.0):
     - nanopb/decode (= 2.30910.0)
@@ -123,13 +123,13 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_local_notifications: ad39620c743ea4c15127860f4b5641649a988100
+  flutter_local_notifications: 395056b3175ba4f08480a7c5de30cd36d69827e4
   Google-Mobile-Ads-SDK: 58b4fda3f9758fc1ed210aa5cf7777b5eb55d47e
   google_mobile_ads: c49bca7ce6656c411965e56b4e24893466fef840
   GoogleAppMeasurement: f9de05ee17401e3355f68e8fc8b5064d429f5918
   GoogleUserMessagingPlatform: 0c3a08353e53ce8c2feab7addd0b652cde522450
   GoogleUtilities: ea963c370a38a8069cc5f7ba4ca849a60b6d7d15
-  health: 785a9a388095ea6414755ff081bf46a4a5fb01b2
+  health: a27e55f6f9682483a8bb8fd280084d025b80b478
   nanopb: 438bc412db1928dac798aa6fd75726007be04262
   ObjectBox: 82ecd5139c750d0c152f78cbe0440db3bbe5e4a1
   objectbox_sync_flutter_libs: fa82af74a6ae10113b74a7a541d0951ccdc25fe1
