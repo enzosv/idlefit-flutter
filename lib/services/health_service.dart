@@ -116,11 +116,7 @@ class HealthService {
     );
   }
 
-  Future<void> syncHealthData(
-    GameStateNotifier gameStateNotifier,
-    DailyHealthNotifier dailyHealthNotifier,
-  ) async {
-    // experiment
+  Future<void> syncHealthData(DailyHealthNotifier dailyHealthNotifier) async {
     final now = DateTime.now();
     await [
       syncDay(now, dailyHealthNotifier),

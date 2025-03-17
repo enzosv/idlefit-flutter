@@ -46,7 +46,7 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
     // going to foreground
     final healthService = ref.read(healthServiceProvider);
     final dailyHealthNotifier = ref.read(dailyHealthProvider.notifier);
-    await healthService.syncHealthData(gameStateNotifier, dailyHealthNotifier);
+    await healthService.syncHealthData(dailyHealthNotifier);
     NotificationService.cancelAllNotifications();
     gameStateNotifier.setIsPaused(false);
 
@@ -83,10 +83,7 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
     AdService.initialize();
 
     healthService.initialize().then((_) async {
-      await healthService.syncHealthData(
-        gameStateNotifier,
-        dailyHealthNotifier,
-      );
+      await healthService.syncHealthData(dailyHealthNotifier);
       gameStateNotifier.setIsPaused(false);
     });
 
