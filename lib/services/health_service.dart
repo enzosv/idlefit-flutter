@@ -90,6 +90,12 @@ class HealthService {
             ? health.getTotalStepsInInterval(startOfDay, endOfDay)
             : _getDailyHealth(startOfDay, endOfDay, HealthDataType.STEPS));
 
+    assert(
+      await health.getTotalStepsInInterval(startOfDay, endOfDay) ==
+          await _getDailyHealth(startOfDay, endOfDay, HealthDataType.STEPS),
+      "steps implementation is different",
+    );
+
     final calories = await _getDailyHealth(
       startOfDay,
       endOfDay,
