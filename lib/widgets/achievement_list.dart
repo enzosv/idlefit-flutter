@@ -3,11 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/main.dart'; // Import providers from main.dart
+import 'package:idlefit/providers/daily_health_provider.dart';
 import '../models/achievement.dart';
 import '../models/achievement_repo.dart';
 import '../models/daily_quest.dart';
-import '../models/health_data_repo.dart';
-import '../models/health_data_entry.dart';
 import 'achievement_card.dart';
 
 class AchievementList extends ConsumerStatefulWidget {
@@ -35,9 +34,7 @@ class _AchievementListState extends ConsumerState<AchievementList> {
     final newAchievements = await _achievementRepo.loadNewAchievements();
 
     // Get progress for each achievement type
-    final healthBox = objectBox.store.box<HealthDataEntry>();
-    final healthRepo = HealthDataRepo(box: healthBox);
-    final healthStats = await healthRepo.total();
+    final healthStats = await ref.read(dailyHealthProvider.notifier).total();
     final coins = ref.read(coinProvider);
 
     final newProgress = <QuestAction, double>{};
@@ -46,7 +43,7 @@ class _AchievementListState extends ConsumerState<AchievementList> {
 
       switch (achievement.questAction) {
         case QuestAction.walk:
-          newProgress[achievement.questAction] = healthStats.steps;
+          newProgress[achievement.questAction] = healthStats.steps.toDouble();
           break;
         case QuestAction.collect:
           newProgress[achievement.questAction] = coins.totalEarned;
