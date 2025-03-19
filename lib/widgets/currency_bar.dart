@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/helpers/constants.dart';
+import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:idlefit/widgets/current_coins.dart';
@@ -49,7 +50,7 @@ class CoinsDisplay extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Constants.coinIcon, color: Colors.amber, size: 24),
+            CurrencyType.coin.iconWithSize(24),
             const SizedBox(width: 4),
             CurrentCoins(key: CurrentCoins.globalKey),
           ],
@@ -71,7 +72,7 @@ class EnergyCurrency extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Constants.energyIcon, color: Colors.greenAccent, size: 20),
+        CurrencyType.energy.iconWithSize(20),
         const SizedBox(width: 4),
         Flexible(
           child: Text(
@@ -95,7 +96,7 @@ class SpaceCurrency extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Constants.spaceIcon, color: Colors.blueAccent, size: 20),
+        CurrencyType.space.iconWithSize(20),
         const SizedBox(width: 4),
         Flexible(
           child: Text(

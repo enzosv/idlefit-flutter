@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/helpers/constants.dart';
+import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/generator_provider.dart';
 import 'package:idlefit/helpers/util.dart';
@@ -186,6 +186,8 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
     final coinGeneratorNotifier = ref.read(generatorProvider.notifier);
     final generator = coinGenerators[widget.generatorIndex];
     final screenWidth = MediaQuery.of(context).size.width;
+    final icon = CurrencyType.coin.iconWithSize(16);
+
     final additionalInfo = [
       Row(
         children: [
@@ -193,7 +195,7 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
             'Produces: ${toLettersNotation(generator.singleOutput)} ',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          Icon(Constants.coinIcon, color: Colors.amber, size: 16),
+          icon,
           Text('/s', style: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
@@ -206,7 +208,7 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
               'Output: ${toLettersNotation(generator.output)} ',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-            Icon(Constants.coinIcon, color: Colors.amber, size: 16),
+            icon,
             Text('/s', style: Theme.of(context).textTheme.bodyMedium),
           ],
         ),
@@ -222,7 +224,7 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
           additionalInfo: additionalInfo,
           cost: generator.cost,
           affordable: coins.count >= generator.cost,
-          costIcon: Constants.coinIcon,
+          costIcon: CurrencyType.coin.icon,
           buttonText: 'Add Rep',
           onButtonPressed:
               coins.count >= generator.cost

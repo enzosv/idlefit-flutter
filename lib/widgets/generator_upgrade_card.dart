@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/models/coin_generator.dart';
+import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/generator_provider.dart';
 import 'package:idlefit/helpers/util.dart';
@@ -15,6 +15,7 @@ class GeneratorUpgradeCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final coinGeneratorNotifier = ref.read(generatorProvider.notifier);
+    final icon = CurrencyType.space.iconWithSize(16);
 
     final additionalInfo = <Widget>[
       Row(
@@ -23,7 +24,7 @@ class GeneratorUpgradeCard extends ConsumerWidget {
             'Output: ${toLettersNotation(generator.output)} ',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          Icon(Constants.coinIcon, color: Colors.amber, size: 16),
+          icon,
           Text('/s', style: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
@@ -38,7 +39,7 @@ class GeneratorUpgradeCard extends ConsumerWidget {
               'Next level: ${toLettersNotation(generator.outputAtLevel(generator.level + 1))} ',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-            Icon(Constants.coinIcon, color: Colors.amber, size: 16),
+            icon,
             Text('/s', style: Theme.of(context).textTheme.bodyMedium),
           ],
         ),
@@ -52,7 +53,7 @@ class GeneratorUpgradeCard extends ConsumerWidget {
       additionalInfo: additionalInfo,
       cost: isMaxLevel ? null : generator.upgradeCost,
       affordable: coins.count >= generator.upgradeCost,
-      costIcon: isMaxLevel ? null : Constants.coinIcon,
+      costIcon: isMaxLevel ? null : CurrencyType.space.icon,
       buttonText: isMaxLevel ? 'MAXED' : 'Upgrade',
       onButtonPressed:
           (isMaxLevel || coins.count < generator.upgradeCost)

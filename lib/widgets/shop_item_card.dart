@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/helpers/constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/shop_item_provider.dart';
 import '../models/shop_items.dart';
@@ -29,7 +29,7 @@ class ShopItemCard extends ConsumerWidget {
               ? [Text('Current effect: ${item.currentEffectValue}')]
               : [],
       cost: isMaxLevel ? null : item.currentCost.toDouble(),
-      costIcon: isMaxLevel ? null : Constants.spaceIcon,
+      costIcon: isMaxLevel ? null : CurrencyType.space.icon,
       affordable: space.count >= item.currentCost,
       buttonText: isMaxLevel ? 'MAXED' : 'Upgrade',
       onButtonPressed:

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
-import '../helpers/constants.dart';
 import '../helpers/util.dart';
 
 class GameStatsCard extends StatelessWidget {
@@ -38,8 +38,8 @@ class _DynamicStats extends ConsumerWidget {
     final gameStateNotifier = ref.watch(gameStateProvider.notifier);
     final coins = ref.watch(coinProvider);
     return _StatListTile(
-      icon: Constants.coinIcon,
-      iconColor: Colors.amber,
+      icon: CurrencyType.coin.icon,
+      iconColor: CurrencyType.coin.color,
       title: 'Gains',
       current: coins.count,
       max: coins.max,
@@ -60,8 +60,8 @@ class _StaticStats extends ConsumerWidget {
     return Column(
       children: [
         _StatListTile(
-          icon: Constants.energyIcon,
-          iconColor: Colors.greenAccent,
+          icon: CurrencyType.energy.icon,
+          iconColor: CurrencyType.energy.color,
           title: 'Energy',
           current: energy.count,
           max: energy.max,
@@ -69,8 +69,8 @@ class _StaticStats extends ConsumerWidget {
           spent: energy.totalSpent,
         ),
         _StatListTile(
-          icon: Constants.spaceIcon,
-          iconColor: Colors.blueAccent,
+          icon: CurrencyType.space.icon,
+          iconColor: CurrencyType.space.color,
           title: 'Space',
           current: space.count,
           max: space.max,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/models/background_activity.dart';
+import 'package:idlefit/models/currency.dart';
 import '../helpers/util.dart';
 
 class BackgroundEarningsPopup extends StatelessWidget {
@@ -37,17 +37,17 @@ class BackgroundEarningsPopup extends StatelessWidget {
             if (backgroundActivity.coinsEarned > 0)
               _buildEarningRow(
                 context,
-                icon: Constants.coinIcon,
+                icon: CurrencyType.coin.icon,
                 label: 'Earned',
                 value: toLettersNotation(backgroundActivity.coinsEarned),
-                color: Colors.amber,
+                color: CurrencyType.coin.color,
               ),
 
             if (backgroundActivity.spaceEarned > 0) const SizedBox(height: 16),
             if (backgroundActivity.spaceEarned > 0)
               _buildEarningRow(
                 context,
-                icon: Constants.spaceIcon,
+                icon: CurrencyType.space.icon,
                 label: 'Earned',
                 value: toLettersNotation(backgroundActivity.spaceEarned),
                 color: Colors.blueAccent,
@@ -56,16 +56,16 @@ class BackgroundEarningsPopup extends StatelessWidget {
             if (energyEarned > 0)
               _buildEarningRow(
                 context,
-                icon: Constants.energyIcon,
+                icon: CurrencyType.energy.icon,
                 label: 'Earned',
                 value: durationNotation(energyEarned * msToMins),
-                color: Colors.greenAccent,
+                color: CurrencyType.energy.color,
               ),
             if (energySpent > 0) const SizedBox(height: 16),
             if (energySpent > 0)
               _buildEarningRow(
                 context,
-                icon: Constants.energyIcon,
+                icon: CurrencyType.energy.icon,
                 label: 'Spent',
                 value: durationNotation(energySpent * msToMins),
                 color: Colors.redAccent,

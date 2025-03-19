@@ -1,8 +1,41 @@
 import 'dart:math';
 
+import 'package:flutter/material.dart';
 import 'package:objectbox/objectbox.dart';
 
 enum CurrencyType { unknown, coin, gem, space, energy }
+
+extension CurrencyTypeExtension on CurrencyType {
+  IconData get icon {
+    switch (this) {
+      case CurrencyType.coin:
+        return Icons.speed;
+      case CurrencyType.space:
+        return Icons.space_dashboard_rounded;
+      case CurrencyType.energy:
+        return Icons.bolt_rounded;
+      default:
+        return Icons.question_mark_rounded;
+    }
+  }
+
+  Color get color {
+    switch (this) {
+      case CurrencyType.coin:
+        return Colors.amber;
+      case CurrencyType.space:
+        return Colors.blueAccent;
+      case CurrencyType.energy:
+        return Colors.greenAccent;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Icon iconWithSize(double size) {
+    return Icon(icon, color: color, size: size);
+  }
+}
 
 @Entity()
 class Currency {
