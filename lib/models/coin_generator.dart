@@ -64,7 +64,7 @@ class CoinGenerator {
   }
 
   double get upgradeCost {
-    return baseCost.toDouble() * pow(1.15, 10) * pow(1.15, level);
+    return 1000.0 * (tier * 0.1) * (level + 1);
   }
 
   double get upgradeUnlockCost {

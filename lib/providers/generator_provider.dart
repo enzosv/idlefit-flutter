@@ -67,10 +67,9 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
   }
 
   bool upgradeGenerator(CoinGenerator generator) {
-    final coins = ref.read(coinProvider);
-    if (coins.count < generator.upgradeCost ||
+    final space = ref.read(spaceProvider);
+    if (space.count < generator.upgradeCost ||
         generator.count < 10 ||
-        !generator.isUnlocked ||
         generator.level >= generator.maxLevel) {
       return false;
     }
