@@ -57,10 +57,13 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
         energyNotifier.setMax(energy.baseMax + 3600000);
       }
     }
-    if (generator.tier % 3 == 0) {
-      // add 500 space every 3 tiers
-      final spaceNotifier = ref.read(spaceProvider.notifier);
-      spaceNotifier.addMax(500);
+    if (generator.tier % 2 == 0) {
+      final space = ref.read(spaceProvider);
+      if (space.baseMax < 10000) {
+        // add 500 space every 2 tiers
+        final spaceNotifier = ref.read(spaceProvider.notifier);
+        spaceNotifier.addMax(500);
+      }
     }
     ref.read(gameStateProvider.notifier).save();
     return true;
