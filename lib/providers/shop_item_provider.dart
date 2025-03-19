@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/models/shop_items.dart';
@@ -71,7 +72,9 @@ class ShopItemNotifier extends StateNotifier<List<ShopItem>> {
 
   double multiplier(ShopItemEffect effect) {
     final double start =
-        effect == ShopItemEffect.offlineCoinMultiplier ? 0.2 : 1;
+        effect == ShopItemEffect.offlineCoinMultiplier
+            ? Constants.baseOfflineCoinsMultiplier
+            : 1;
     return state
         .where((item) => item.shopItemEffect == effect)
         .fold(start, (sum, item) => sum + (item.effectValue * item.level));
