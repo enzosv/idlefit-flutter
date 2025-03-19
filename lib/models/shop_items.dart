@@ -1,3 +1,4 @@
+import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:objectbox/objectbox.dart';
 
@@ -54,7 +55,7 @@ class ShopItem {
 
   ShopItemEffect get shopItemEffect {
     _ensureStableEnumValues();
-    return ShopItemEffect.values.byName(effect) ?? ShopItemEffect.unknown;
+    return ShopItemEffect.values.byNameOrNull(effect) ?? ShopItemEffect.unknown;
   }
 
   CurrencyType get costUnit {
