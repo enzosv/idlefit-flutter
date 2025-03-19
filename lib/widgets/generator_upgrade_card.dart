@@ -15,7 +15,7 @@ class GeneratorUpgradeCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final coinGeneratorNotifier = ref.read(generatorProvider.notifier);
-    final icon = CurrencyType.space.iconWithSize(16);
+    final icon = CurrencyType.coin.iconWithSize(16);
 
     final additionalInfo = <Widget>[
       Row(
@@ -46,17 +46,18 @@ class GeneratorUpgradeCard extends ConsumerWidget {
       );
     }
 
-    final coins = ref.watch(coinProvider);
+    final space = ref.watch(spaceProvider);
     return CommonCard(
       title: generator.name,
       rightText: 'Level: ${generator.level}/${generator.maxLevel}',
       additionalInfo: additionalInfo,
       cost: isMaxLevel ? null : generator.upgradeCost,
-      affordable: coins.count >= generator.upgradeCost,
+      affordable: space.count >= generator.upgradeCost,
       costIcon: isMaxLevel ? null : CurrencyType.space.icon,
+      color: CurrencyType.space.color,
       buttonText: isMaxLevel ? 'MAXED' : 'Upgrade',
       onButtonPressed:
-          (isMaxLevel || coins.count < generator.upgradeCost)
+          (isMaxLevel || space.count < generator.upgradeCost)
               ? null
               : () => coinGeneratorNotifier.upgradeGenerator(generator),
     );

@@ -16,6 +16,7 @@ class CommonCard extends StatelessWidget {
   final GestureTapDownCallback? onTapDown;
   final bool affordable;
   final bool disabled;
+  final Color color;
 
   const CommonCard({
     super.key,
@@ -32,11 +33,12 @@ class CommonCard extends StatelessWidget {
     this.onTapDown,
     this.affordable = false,
     this.disabled = true,
+    this.color = Colors.amber,
   });
 
   @override
   Widget build(BuildContext context) {
-    final color = affordable ? Colors.amber : Colors.red;
+    final color = affordable ? this.color : Colors.red;
     return Card(
       margin: margin,
       child: InkWell(

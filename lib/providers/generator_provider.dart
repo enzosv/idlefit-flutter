@@ -76,8 +76,8 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
         generator.level >= generator.maxLevel) {
       return false;
     }
-    final coinsNotifier = ref.read(coinProvider.notifier);
-    coinsNotifier.spend(generator.upgradeCost);
+    final spaceNotifier = ref.read(spaceProvider.notifier);
+    spaceNotifier.spend(generator.upgradeCost);
     generator.level++;
     _updateGenerator(generator);
     ref
