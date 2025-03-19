@@ -10,13 +10,6 @@ class HealthService {
 
   HealthService();
 
-  // Health data types we want to access
-  final List<HealthDataType> types = [
-    HealthDataType.ACTIVE_ENERGY_BURNED,
-    HealthDataType.STEPS,
-    HealthDataType.EXERCISE_TIME,
-  ];
-
   Future<void> initialize() async {
     try {
       requestAuthorization();
@@ -27,6 +20,10 @@ class HealthService {
 
   Future<bool> requestAuthorization() async {
     try {
+      final List<HealthDataType> types = [
+        HealthDataType.ACTIVE_ENERGY_BURNED,
+        HealthDataType.STEPS,
+      ];
       // Get permissions
       bool? hasPermissions = await health.hasPermissions(types);
 
@@ -107,7 +104,7 @@ class HealthService {
             endOfDay,
             HealthDataType.ACTIVE_ENERGY_BURNED,
           ),
-          _getDailyHealth(startOfDay, endOfDay, HealthDataType.EXERCISE_TIME),
+          // _getDailyHealth(startOfDay, endOfDay, HealthDataType.EXERCISE_TIME),
         ].wait;
 
     dailyHealthNotifier.reset(

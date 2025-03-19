@@ -18,7 +18,7 @@ class IosHealthService {
             end: end,
             type: "ACTIVE_ENERGY_BURNED",
           ),
-          _queryStatistics(start: start, end: end, type: "EXERCISE_TIME"),
+          // _queryStatistics(start: start, end: end, type: "EXERCISE_TIME"),
         ].wait;
 
     return DailyHealth()
@@ -33,7 +33,7 @@ class IosHealthService {
     required String type,
   }) async {
     assert(
-      ["ACTIVE_ENERGY_BURNED", "STEPS", "EXERCISE_TIME"].contains(type),
+      ["ACTIVE_ENERGY_BURNED", "STEPS"].contains(type),
       "Unsupported health data type $type",
     );
 

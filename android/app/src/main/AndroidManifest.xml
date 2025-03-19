@@ -18,10 +18,7 @@
 	</queries>
 	<!-- https://pub.dev/packages/health -->
 	<uses-permission android:name="android.permission.health.READ_STEPS" />
-	<uses-permission android:name="android.permission.health.ACTIVITY_RECOGNITION" />
 	<uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" />
-	<uses-permission android:name="android.permission.health.READ_EXERCISE" />
-	<uses-permission android:name="android.permission.health.READ_EXERCISE_ROUTE"/>
 	<application android:label="idlefit" android:name="${applicationName}" android:icon="@mipmap/ic_launcher">
 		<!-- Add AdMob app ID -->
 		<meta-data
