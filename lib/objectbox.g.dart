@@ -84,12 +84,7 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(4, 3181080062182307300),
             name: 'tier',
             type: 6,
-            flags: 129),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(5, 2457321709930163773),
-            name: 'isUnlocked',
-            type: 1,
-            flags: 0)
+            flags: 129)
       ],
       relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[]),
@@ -404,7 +399,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         7708077465627102502,
         4892005414219992245,
         6816389771923756793,
-        5977650328934603192
+        5977650328934603192,
+        2457321709930163773
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -475,7 +471,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fbb.addInt64(1, object.count);
           fbb.addInt64(2, object.level);
           fbb.addInt64(3, object.tier);
-          fbb.addBool(4, object.isUnlocked);
           fbb.finish(fbb.endTable());
           return object.tier;
         },
@@ -488,13 +483,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
           final levelParam =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
-          final isUnlockedParam =
-              const fb.BoolReader().vTableGet(buffer, rootOffset, 12, false);
           final object = CoinGenerator(
-              tier: tierParam,
-              count: countParam,
-              level: levelParam,
-              isUnlocked: isUnlockedParam);
+              tier: tierParam, count: countParam, level: levelParam);
 
           return object;
         }),
@@ -767,10 +757,6 @@ class CoinGenerator_ {
   /// See [CoinGenerator.tier].
   static final tier =
       obx.QueryIntegerProperty<CoinGenerator>(_entities[1].properties[2]);
-
-  /// See [CoinGenerator.isUnlocked].
-  static final isUnlocked =
-      obx.QueryBooleanProperty<CoinGenerator>(_entities[1].properties[3]);
 }
 
 /// [ShopItem] entity fields to define ObjectBox queries.

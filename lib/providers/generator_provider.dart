@@ -84,19 +84,6 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
     return true;
   }
 
-  bool unlockGenerator(CoinGenerator generator) {
-    if (generator.count < 10 || generator.isUnlocked) return false;
-    final space = ref.read(spaceProvider);
-    if (space.count < generator.upgradeUnlockCost) return false;
-
-    final spaceNotifier = ref.read(spaceProvider.notifier);
-    spaceNotifier.spend(generator.upgradeUnlockCost);
-    generator.isUnlocked = true;
-    _updateGenerator(generator);
-    ref.read(gameStateProvider.notifier).save();
-    return true;
-  }
-
   double tapGenerator(CoinGenerator generator) {
     final double output = max(generator.tier * 15, generator.singleOutput);
     ref.read(coinProvider.notifier).earn(output);
@@ -125,7 +112,6 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
       }
       generator.count = stored.count;
       generator.level = stored.level;
-      generator.isUnlocked = stored.isUnlocked;
       return generator;
     }).toList();
   }

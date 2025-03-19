@@ -44,23 +44,6 @@ class GeneratorUpgradeCard extends ConsumerWidget {
       );
     }
 
-    if (!generator.isUnlocked) {
-      final space = ref.watch(spaceProvider);
-      return CommonCard(
-        title: generator.name,
-        rightText: 'Level: ${generator.level}/${generator.maxLevel}',
-        additionalInfo: additionalInfo,
-        cost: generator.upgradeUnlockCost,
-        affordable: space.count >= generator.upgradeUnlockCost,
-        costIcon: Constants.spaceIcon,
-        buttonText: 'Unlock',
-        onButtonPressed:
-            space.count >= generator.upgradeUnlockCost
-                ? () => coinGeneratorNotifier.unlockGenerator(generator)
-                : null,
-      );
-    }
-
     final isMaxLevel = generator.level >= generator.maxLevel;
     final coins = ref.watch(coinProvider);
     return CommonCard(

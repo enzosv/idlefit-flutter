@@ -7,7 +7,6 @@ class CoinGenerator {
   int tier = 0;
   int count = 0;
   int level = 0;
-  bool isUnlocked = false;
   @Transient()
   String name = "";
   @Transient()
@@ -21,7 +20,6 @@ class CoinGenerator {
     required this.tier,
     this.count = 0,
     this.level = 0,
-    this.isUnlocked = false,
     this.name = '',
     this.baseCost = 0,
     this.baseOutput = 0,
