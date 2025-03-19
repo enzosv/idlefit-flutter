@@ -12,7 +12,7 @@ class HealthService {
 
   Future<void> initialize() async {
     try {
-      requestAuthorization();
+      await requestAuthorization();
     } catch (e) {
       debugPrint('Error initializing health service: $e');
     }
