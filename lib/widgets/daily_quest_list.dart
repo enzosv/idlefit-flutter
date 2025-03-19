@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:idlefit/helpers/util.dart';
+import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/providers/daily_quest_provider.dart';
 import '../models/daily_quest.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -72,11 +74,11 @@ class _DailyQuestCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text('Reward:', style: theme.textTheme.bodySmall),
-                  Text(
-                    '${quest.reward} ${quest.rewardCurrency.name}',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.primary,
-                    ),
+                  Row(
+                    children: [
+                      Text(toLettersNotation(quest.reward.toDouble())),
+                      quest.rewardCurrency.iconWithSize(20),
+                    ],
                   ),
                 ],
               ),
