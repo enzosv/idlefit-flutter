@@ -139,18 +139,13 @@ class GameStateNotifier extends StateNotifier<GameState> {
     );
   }
 
-  Future<void> convertHealthStats(
-    int steps,
-    double calories,
-    int exerciseMinutes,
-  ) async {
+  Future<void> convertHealthStats(int steps, double calories) async {
     final healthMultiplier = ref
         .read(shopItemProvider.notifier)
         .multiplier(ShopItemEffect.healthMultiplier);
 
     final energyGain =
         calories * healthMultiplier * Constants.calorieToEnergyMultiplier;
-    final gemGain = exerciseMinutes * healthMultiplier / 2;
     final spaceGain =
         steps * healthMultiplier * Constants.stepsToSpaceMultiplier;
 
@@ -169,9 +164,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
           .read(dailyQuestProvider.notifier)
           .progressTowards(QuestAction.burn, QuestUnit.calories, calories);
       ref.read(energyProvider.notifier).earn(energyGain);
-    }
-    if (gemGain > 0) {
-      ref.read(gemProvider.notifier).earn(gemGain);
     }
 
     state = state.copyWith(backgroundActivity: newBackgroundActivity);

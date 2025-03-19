@@ -11,7 +11,6 @@ class DailyHealth {
 
   int steps = 0;
   double caloriesBurned = 0;
-  int exerciseMinutes = 0;
   int lastSync = 0;
 }
 
@@ -45,8 +44,7 @@ class DailyHealthNotifier extends StateNotifier<DailyHealth> {
       (acc, entry) =>
           acc
             ..caloriesBurned += entry.caloriesBurned
-            ..steps += entry.steps
-            ..exerciseMinutes += entry.exerciseMinutes,
+            ..steps += entry.steps,
     );
     return total;
   }
@@ -72,12 +70,10 @@ class DailyHealthNotifier extends StateNotifier<DailyHealth> {
     final old = await _getAtDay(dayTimestamp);
     final difCalories = newHealth.caloriesBurned - old.caloriesBurned;
     final difSteps = newHealth.steps - old.steps;
-    final difExerciseMinutes = newHealth.exerciseMinutes - old.exerciseMinutes;
-    if (difCalories <= 0 && difSteps <= 0 && difExerciseMinutes <= 0) {
+    if (difCalories <= 0 && difSteps <= 0) {
       return;
     }
     old.caloriesBurned = newHealth.caloriesBurned;
-    old.exerciseMinutes = newHealth.exerciseMinutes;
     old.steps = newHealth.steps;
     old.lastSync = newHealth.lastSync;
     box.putAsync(old);
@@ -88,7 +84,7 @@ class DailyHealthNotifier extends StateNotifier<DailyHealth> {
     // convert newly gained stats to currency
     ref
         .read(gameStateProvider.notifier)
-        .convertHealthStats(difSteps, difCalories, difExerciseMinutes);
+        .convertHealthStats(difSteps, difCalories);
   }
 }
 
