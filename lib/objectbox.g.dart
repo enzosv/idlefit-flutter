@@ -20,6 +20,7 @@ import 'models/currency.dart';
 import 'models/daily_quest.dart';
 import 'models/game_stats.dart';
 import 'models/shop_items.dart';
+import 'providers/daily_currency_provider.dart';
 import 'providers/daily_health_provider.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
@@ -34,11 +35,6 @@ final _entities = <obx_int.ModelEntity>[
         obx_int.ModelProperty(
             id: const obx_int.IdUid(2, 411610756409811407),
             name: 'count',
-            type: 8,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(3, 2153748619588745951),
-            name: 'totalSpent',
             type: 8,
             flags: 0),
         obx_int.ModelProperty(
@@ -302,6 +298,50 @@ final _entities = <obx_int.ModelEntity>[
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(12, 4968479201989030587),
+      name: 'DailyCurrency',
+      lastPropertyId: const obx_int.IdUid(7, 3241915458477813626),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 8038445437539640718),
+            name: 'dayTimestamp',
+            type: 6,
+            flags: 129),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 6621040444297598263),
+            name: 'coinsEarned',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 5845348372971182723),
+            name: 'spaceEarned',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 8147819285923682787),
+            name: 'energyEarned',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 265861408054198287),
+            name: 'coinsSpent',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 775025276072193566),
+            name: 'spaceSpent',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(7, 3241915458477813626),
+            name: 'energySpent',
+            type: 8,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
 ];
 
@@ -340,7 +380,7 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(11, 5789196000044242359),
+      lastEntityId: const obx_int.IdUid(12, 4968479201989030587),
       lastIndexId: const obx_int.IdUid(2, 6046711262050609894),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
@@ -396,7 +436,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         6816389771923756793,
         5977650328934603192,
         2457321709930163773,
-        6107178178149087951
+        6107178178149087951,
+        2153748619588745951
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -421,7 +462,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         objectToFB: (Currency object, fb.Builder fbb) {
           fbb.startTable(10);
           fbb.addFloat64(1, object.count);
-          fbb.addFloat64(2, object.totalSpent);
           fbb.addFloat64(3, object.totalEarned);
           fbb.addInt64(5, object.id);
           fbb.addFloat64(7, object.baseMax);
@@ -436,8 +476,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0);
           final countParam =
               const fb.Float64Reader().vTableGet(buffer, rootOffset, 6, 0);
-          final totalSpentParam =
-              const fb.Float64Reader().vTableGet(buffer, rootOffset, 8, 0);
           final totalEarnedParam =
               const fb.Float64Reader().vTableGet(buffer, rootOffset, 10, 0);
           final baseMaxParam =
@@ -447,7 +485,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final object = Currency(
               id: idParam,
               count: countParam,
-              totalSpent: totalSpentParam,
               totalEarned: totalEarnedParam,
               baseMax: baseMaxParam,
               maxMultiplier: maxMultiplierParam);
@@ -704,6 +741,48 @@ obx_int.ModelDefinition getObjectBoxModel() {
               spaceSpent: spaceSpentParam);
 
           return object;
+        }),
+    DailyCurrency: obx_int.EntityDefinition<DailyCurrency>(
+        model: _entities[7],
+        toOneRelations: (DailyCurrency object) => [],
+        toManyRelations: (DailyCurrency object) => {},
+        getId: (DailyCurrency object) => object.dayTimestamp,
+        setId: (DailyCurrency object, int id) {
+          object.dayTimestamp = id;
+        },
+        objectToFB: (DailyCurrency object, fb.Builder fbb) {
+          fbb.startTable(8);
+          fbb.addInt64(0, object.dayTimestamp);
+          fbb.addFloat64(1, object.coinsEarned);
+          fbb.addFloat64(2, object.spaceEarned);
+          fbb.addFloat64(3, object.energyEarned);
+          fbb.addFloat64(4, object.coinsSpent);
+          fbb.addFloat64(5, object.spaceSpent);
+          fbb.addFloat64(6, object.energySpent);
+          fbb.finish(fbb.endTable());
+          return object.dayTimestamp;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+
+          final object = DailyCurrency()
+            ..dayTimestamp =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
+            ..coinsEarned =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 6, 0)
+            ..spaceEarned =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 8, 0)
+            ..energyEarned =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 10, 0)
+            ..coinsSpent =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 12, 0)
+            ..spaceSpent =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 14, 0)
+            ..energySpent =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 16, 0);
+
+          return object;
         })
   };
 
@@ -716,25 +795,21 @@ class Currency_ {
   static final count =
       obx.QueryDoubleProperty<Currency>(_entities[0].properties[0]);
 
-  /// See [Currency.totalSpent].
-  static final totalSpent =
-      obx.QueryDoubleProperty<Currency>(_entities[0].properties[1]);
-
   /// See [Currency.totalEarned].
   static final totalEarned =
-      obx.QueryDoubleProperty<Currency>(_entities[0].properties[2]);
+      obx.QueryDoubleProperty<Currency>(_entities[0].properties[1]);
 
   /// See [Currency.id].
   static final id =
-      obx.QueryIntegerProperty<Currency>(_entities[0].properties[3]);
+      obx.QueryIntegerProperty<Currency>(_entities[0].properties[2]);
 
   /// See [Currency.baseMax].
   static final baseMax =
-      obx.QueryDoubleProperty<Currency>(_entities[0].properties[4]);
+      obx.QueryDoubleProperty<Currency>(_entities[0].properties[3]);
 
   /// See [Currency.maxMultiplier].
   static final maxMultiplier =
-      obx.QueryDoubleProperty<Currency>(_entities[0].properties[5]);
+      obx.QueryDoubleProperty<Currency>(_entities[0].properties[4]);
 }
 
 /// [CoinGenerator] entity fields to define ObjectBox queries.
@@ -901,4 +976,35 @@ class GameStats_ {
   /// See [GameStats.spaceSpent].
   static final spaceSpent =
       obx.QueryDoubleProperty<GameStats>(_entities[6].properties[13]);
+}
+
+/// [DailyCurrency] entity fields to define ObjectBox queries.
+class DailyCurrency_ {
+  /// See [DailyCurrency.dayTimestamp].
+  static final dayTimestamp =
+      obx.QueryIntegerProperty<DailyCurrency>(_entities[7].properties[0]);
+
+  /// See [DailyCurrency.coinsEarned].
+  static final coinsEarned =
+      obx.QueryDoubleProperty<DailyCurrency>(_entities[7].properties[1]);
+
+  /// See [DailyCurrency.spaceEarned].
+  static final spaceEarned =
+      obx.QueryDoubleProperty<DailyCurrency>(_entities[7].properties[2]);
+
+  /// See [DailyCurrency.energyEarned].
+  static final energyEarned =
+      obx.QueryDoubleProperty<DailyCurrency>(_entities[7].properties[3]);
+
+  /// See [DailyCurrency.coinsSpent].
+  static final coinsSpent =
+      obx.QueryDoubleProperty<DailyCurrency>(_entities[7].properties[4]);
+
+  /// See [DailyCurrency.spaceSpent].
+  static final spaceSpent =
+      obx.QueryDoubleProperty<DailyCurrency>(_entities[7].properties[5]);
+
+  /// See [DailyCurrency.energySpent].
+  static final energySpent =
+      obx.QueryDoubleProperty<DailyCurrency>(_entities[7].properties[6]);
 }

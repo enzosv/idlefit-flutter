@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/daily_quest.dart';
-import 'package:idlefit/providers/daily_quest_provider.dart';
+import 'package:idlefit/providers/daily_currency_provider.dart';
 
 class CurrencyNotifier extends StateNotifier<Currency> {
   final Ref ref;
@@ -19,19 +19,15 @@ class CurrencyNotifier extends StateNotifier<Currency> {
       return;
     }
     ref
-        .read(dailyQuestProvider.notifier)
-        .progressTowards(QuestAction.collect, questUnit, amount);
+        .read(dailyCurrencyProvider.notifier)
+        .updateToday(state.type, amount, true);
   }
 
   void spend(double amount) {
     state = state.spend(amount);
     ref
-        .read(dailyQuestProvider.notifier)
-        .progressTowards(
-          QuestAction.spend,
-          QuestUnit.values.byName(state.type.name),
-          amount,
-        );
+        .read(dailyCurrencyProvider.notifier)
+        .updateToday(state.type, amount, false);
   }
 
   void setMax(double max) {

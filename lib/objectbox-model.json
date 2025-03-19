@@ -14,11 +14,6 @@
           "type": 8
         },
         {
-          "id": "3:2153748619588745951",
-          "name": "totalSpent",
-          "type": 8
-        },
-        {
           "id": "4:4769501277755131512",
           "name": "totalEarned",
           "type": 8
@@ -280,9 +275,53 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "12:4968479201989030587",
+      "lastPropertyId": "7:3241915458477813626",
+      "name": "DailyCurrency",
+      "properties": [
+        {
+          "id": "1:8038445437539640718",
+          "name": "dayTimestamp",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:6621040444297598263",
+          "name": "coinsEarned",
+          "type": 8
+        },
+        {
+          "id": "3:5845348372971182723",
+          "name": "spaceEarned",
+          "type": 8
+        },
+        {
+          "id": "4:8147819285923682787",
+          "name": "energyEarned",
+          "type": 8
+        },
+        {
+          "id": "5:265861408054198287",
+          "name": "coinsSpent",
+          "type": 8
+        },
+        {
+          "id": "6:775025276072193566",
+          "name": "spaceSpent",
+          "type": 8
+        },
+        {
+          "id": "7:3241915458477813626",
+          "name": "energySpent",
+          "type": 8
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "11:5789196000044242359",
+  "lastEntityId": "12:4968479201989030587",
   "lastIndexId": "2:6046711262050609894",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
@@ -340,7 +379,8 @@
     6816389771923756793,
     5977650328934603192,
     2457321709930163773,
-    6107178178149087951
+    6107178178149087951,
+    2153748619588745951
   ],
   "retiredRelationUids": [],
   "version": 1
