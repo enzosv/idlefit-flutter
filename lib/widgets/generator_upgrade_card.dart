@@ -28,8 +28,9 @@ class GeneratorUpgradeCard extends ConsumerWidget {
         ],
       ),
     ];
+    final isMaxLevel = generator.level >= generator.maxLevel;
 
-    if (generator.level < generator.maxLevel) {
+    if (!isMaxLevel) {
       additionalInfo.add(
         Row(
           children: [
@@ -44,7 +45,6 @@ class GeneratorUpgradeCard extends ConsumerWidget {
       );
     }
 
-    final isMaxLevel = generator.level >= generator.maxLevel;
     final coins = ref.watch(coinProvider);
     return CommonCard(
       title: generator.name,
