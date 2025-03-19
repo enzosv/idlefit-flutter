@@ -43,15 +43,17 @@ class Currency {
   final int id;
 
   final double count;
-  final double totalSpent;
   final double totalEarned;
   final double baseMax;
   final double maxMultiplier;
 
+  double get totalSpent {
+    return totalEarned - count;
+  }
+
   Currency({
     required this.id,
     this.count = 0,
-    this.totalSpent = 0,
     this.totalEarned = 0,
     this.baseMax = 100,
     this.maxMultiplier = 1,
@@ -67,7 +69,6 @@ class Currency {
     return Currency(
       id: id,
       count: count ?? this.count,
-      totalSpent: totalSpent ?? this.totalSpent,
       totalEarned: totalEarned ?? this.totalEarned,
       baseMax: baseMax ?? this.baseMax,
       maxMultiplier: maxMultiplier ?? this.maxMultiplier,
