@@ -52,31 +52,36 @@ class HealthService {
       endTime: endOfDay,
       types: [type],
     );
-    // Group data by time ranges and sources
-    Map<int, Map<String, double>> timeRangeData = {};
-
-    for (final entry in data) {
-      final timeKey = entry.dateFrom.millisecondsSinceEpoch;
-      timeRangeData[timeKey] ??= {};
-
+    final total = data.fold(0.0, (sum, entry) {
       final value = (entry.value as NumericHealthValue).numericValue.toDouble();
-      timeRangeData[timeKey]![entry.sourceId] =
-          (timeRangeData[timeKey]![entry.sourceId] ?? 0) + value;
-    }
-
-    // For each time range, select the best source if there are multiple
-    double total = 0.0;
-    for (final timeRange in timeRangeData.entries) {
-      if (timeRange.value.length == 1) {
-        // Only one source for this time range, use it
-        total += timeRange.value.values.first;
-      } else {
-        // Multiple sources, choose the one with higher value
-        total += timeRange.value.values.reduce((a, b) => a > b ? a : b);
-      }
-    }
-
+      return sum + value;
+    });
     return total;
+    // Group data by time ranges and sources
+    // Map<int, Map<String, double>> timeRangeData = {};
+
+    // for (final entry in data) {
+    //   final timeKey = entry.dateFrom.millisecondsSinceEpoch;
+    //   timeRangeData[timeKey] ??= {};
+
+    //   final value = (entry.value as NumericHealthValue).numericValue.toDouble();
+    //   timeRangeData[timeKey]![entry.sourceId] =
+    //       (timeRangeData[timeKey]![entry.sourceId] ?? 0) + value;
+    // }
+
+    // // For each time range, select the best source if there are multiple
+    // double total = 0.0;
+    // for (final timeRange in timeRangeData.entries) {
+    //   if (timeRange.value.length == 1) {
+    //     // Only one source for this time range, use it
+    //     total += timeRange.value.values.first;
+    //   } else {
+    //     // Multiple sources, choose the one with higher value
+    //     total += timeRange.value.values.reduce((a, b) => a > b ? a : b);
+    //   }
+    // }
+
+    // return total;
   }
 
   Future<void> syncDay(
