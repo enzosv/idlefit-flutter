@@ -5,6 +5,7 @@ import 'package:idlefit/widgets/health_stats_card.dart';
 import 'package:idlefit/widgets/game_stats_card.dart';
 import 'package:idlefit/widgets/banner_ad_widget.dart';
 import 'package:idlefit/widgets/daily_quest_list.dart';
+import 'package:idlefit/widgets/quest_list.dart';
 
 class StatsScreen extends StatelessWidget {
   const StatsScreen({super.key});
@@ -36,7 +37,8 @@ class StatsScreen extends StatelessWidget {
                 const DailyQuestList(),
                 const SizedBox(height: 16),
                 // Achievement list
-                const AchievementList(),
+                // const AchievementList(),
+                const QuestList(),
               ],
             ),
           ),
