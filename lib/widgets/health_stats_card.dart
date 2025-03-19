@@ -102,7 +102,7 @@ class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Lastest data: ${formatRelativeTime(latest)}',
+                              'Last synced: ${formatRelativeTime(latest)}',
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             if (earliest != null)
