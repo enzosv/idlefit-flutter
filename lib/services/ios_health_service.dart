@@ -10,7 +10,7 @@ class IosHealthService {
     required DateTime start,
     required DateTime end,
   }) async {
-    final [steps, calories, exerciseMinutes] =
+    final [steps, calories] =
         await [
           _queryStatistics(start: start, end: end, type: "STEPS"),
           _queryStatistics(
@@ -18,7 +18,6 @@ class IosHealthService {
             end: end,
             type: "ACTIVE_ENERGY_BURNED",
           ),
-          // _queryStatistics(start: start, end: end, type: "EXERCISE_TIME"),
         ].wait;
 
     return DailyHealth()
