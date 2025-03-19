@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idlefit/helpers/util.dart';
+import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/widgets/card_button.dart';
 
 class CommonCard extends StatelessWidget {
@@ -8,7 +9,6 @@ class CommonCard extends StatelessWidget {
   final String? description;
   final List<Widget> additionalInfo;
   final double? cost;
-  final IconData? costIcon;
   final String buttonText;
   final VoidCallback? onButtonPressed;
   final Widget? progressIndicator;
@@ -16,7 +16,7 @@ class CommonCard extends StatelessWidget {
   final GestureTapDownCallback? onTapDown;
   final bool affordable;
   final bool disabled;
-  final Color color;
+  final CurrencyType? costCurrency;
 
   const CommonCard({
     super.key,
@@ -25,7 +25,7 @@ class CommonCard extends StatelessWidget {
     this.description,
     this.additionalInfo = const [],
     this.cost,
-    this.costIcon,
+    this.costCurrency,
     required this.buttonText,
     this.onButtonPressed,
     this.progressIndicator,
@@ -33,12 +33,11 @@ class CommonCard extends StatelessWidget {
     this.onTapDown,
     this.affordable = false,
     this.disabled = true,
-    this.color = Colors.amber,
   });
 
   @override
   Widget build(BuildContext context) {
-    final color = affordable ? this.color : Colors.red;
+    final color = affordable ? costCurrency?.color : Colors.red;
     return Card(
       margin: margin,
       child: InkWell(
@@ -74,9 +73,9 @@ class CommonCard extends StatelessWidget {
                             color: color,
                           ),
                         ),
-                        if (costIcon != null) ...[
+                        if (costCurrency != null) ...[
                           const SizedBox(width: 4),
-                          Icon(costIcon!, color: color, size: 20),
+                          Icon(costCurrency!.icon, color: color, size: 20),
                         ],
                       ],
                     ),

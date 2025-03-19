@@ -29,7 +29,7 @@ class ShopItemCard extends ConsumerWidget {
               ? [Text('Current effect: ${item.currentEffectValue}')]
               : [],
       cost: isMaxLevel ? null : item.currentCost.toDouble(),
-      costIcon: isMaxLevel ? null : CurrencyType.space.icon,
+      costCurrency: isMaxLevel ? null : CurrencyType.space,
       affordable: space.count >= item.currentCost,
       buttonText: isMaxLevel ? 'MAXED' : 'Upgrade',
       onButtonPressed:

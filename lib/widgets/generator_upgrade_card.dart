@@ -53,8 +53,7 @@ class GeneratorUpgradeCard extends ConsumerWidget {
       additionalInfo: additionalInfo,
       cost: isMaxLevel ? null : generator.upgradeCost,
       affordable: space.count >= generator.upgradeCost,
-      costIcon: isMaxLevel ? null : CurrencyType.space.icon,
-      color: CurrencyType.space.color,
+      costCurrency: isMaxLevel ? null : CurrencyType.space,
       buttonText: isMaxLevel ? 'MAXED' : 'Upgrade',
       onButtonPressed:
           (isMaxLevel || space.count < generator.upgradeCost)

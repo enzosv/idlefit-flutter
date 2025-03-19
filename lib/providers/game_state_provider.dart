@@ -95,6 +95,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     // not saving generators and shopitems. only changes on buy anyway
   }
 
+  // main run loop
   void _processGenerators() {
     if (state.isPaused) return;
     final now = DateTime.now().millisecondsSinceEpoch;
