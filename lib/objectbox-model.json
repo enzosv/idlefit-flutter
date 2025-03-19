@@ -319,9 +319,63 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "13:2350846937776369818",
+      "lastPropertyId": "9:4062908151799617486",
+      "name": "Quest",
+      "properties": [
+        {
+          "id": "1:8896872525305970670",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1588350365785122035",
+          "name": "dayTimestamp",
+          "type": 6
+        },
+        {
+          "id": "3:4282291348858888894",
+          "name": "action",
+          "type": 9
+        },
+        {
+          "id": "4:6250565454144484206",
+          "name": "unit",
+          "type": 9
+        },
+        {
+          "id": "5:3497061908798785311",
+          "name": "rewardUnit",
+          "type": 9
+        },
+        {
+          "id": "6:1074688234730917148",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "7:842234281523857787",
+          "name": "requirement",
+          "type": 8
+        },
+        {
+          "id": "8:821905277989780379",
+          "name": "reward",
+          "type": 8
+        },
+        {
+          "id": "9:4062908151799617486",
+          "name": "dateClaimed",
+          "type": 6
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "12:4968479201989030587",
+  "lastEntityId": "13:2350846937776369818",
   "lastIndexId": "2:6046711262050609894",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
