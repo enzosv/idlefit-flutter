@@ -6,6 +6,13 @@ import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/widgets/quest_card.dart';
 
+// cache quests to be used on widget rebuild
+final _questsProvider = FutureProvider.family
+    .autoDispose<List<Quest>, QuestType>((ref, questType) async {
+      final repository = ref.read(questRepositoryProvider);
+      return repository.getQuests(questType);
+    });
+
 class QuestList extends ConsumerWidget {
   final QuestType questType;
   const QuestList({super.key, required this.questType});
@@ -23,10 +30,14 @@ class QuestList extends ConsumerWidget {
           ref.read(questStatsRepositoryProvider),
           currencyProvider,
         );
+    // Invalidate the quests cache to refresh the list
+    ref.invalidate(_questsProvider(questType));
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final questsAsync = ref.watch(_questsProvider(questType));
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -38,16 +49,11 @@ class QuestList extends ConsumerWidget {
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const Divider(),
-            FutureBuilder<List<Quest>>(
-              future: ref.read(questRepositoryProvider).getQuests(questType),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.data == null || snapshot.data!.isEmpty) {
+            questsAsync.when(
+              data: (quests) {
+                if (quests.isEmpty) {
                   return const Center(child: Text('No quests available'));
                 }
-                final quests = snapshot.data!;
                 return Column(
                   children:
                       quests.map((quest) {
@@ -58,6 +64,9 @@ class QuestList extends ConsumerWidget {
                       }).toList(),
                 );
               },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error:
+                  (_, __) => const Center(child: Text('Failed to load quests')),
             ),
           ],
         ),
