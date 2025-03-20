@@ -64,6 +64,12 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
         // do not show popup if energy spent is less than 1 minute
         return;
       }
+      // dismiss existing dialogs
+      Navigator.of(
+        context,
+        rootNavigator: true,
+      ).popUntil((route) => route.isFirst);
+
       showDialog(
         context: context,
         builder:
