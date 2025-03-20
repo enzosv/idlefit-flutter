@@ -97,6 +97,11 @@ void debugPrintWithCaller(String message, {int depth = 2}) {
   }
 }
 
+int get todayTimestamp {
+  final now = DateTime.now();
+  return DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+}
+
 extension EnumByNameOrNull<T extends Enum> on Iterable<T> {
   T? byNameOrNull(String name) {
     for (var value in this) {
@@ -108,6 +113,6 @@ extension EnumByNameOrNull<T extends Enum> on Iterable<T> {
 
 extension StringExtensions on String {
   String capitalize() {
-    return "${this[0].toUpperCase()}${this.substring(1)}";
+    return "${this[0].toUpperCase()}${substring(1)}";
   }
 }
