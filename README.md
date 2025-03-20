@@ -21,7 +21,7 @@
 
 # TODO
 
-1. track more stats
+1. ✅ ~~track more stats~~  
 2. Weekly, monthly quests
 3. Defer ads to when user is more engaged
 4. in app purchases
@@ -33,6 +33,17 @@
 5. Animations
 6. Art and sound
 7. Adjust balance
+8. Reset button 
+- Sell all generators
+- Reset coins to 10
+- Gain unique currency
+9. Unique currency
+- increase health conversion?
+- increase offline production
+- decrease tap delay
+- load historic health data
+- can be converted to coins/space/energy?
+- temporary generation boost
 
 # What if's
 
