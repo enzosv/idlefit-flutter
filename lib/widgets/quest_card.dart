@@ -28,23 +28,21 @@ class QuestCard extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            quest.description,
-                            style: theme.textTheme.titleMedium,
-                          ),
-                          if (quest.questUnit.currencyType != null)
-                            quest.questUnit.currencyType!.iconWithSize(20),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                    ],
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          quest.description,
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        if (quest.questUnit.currencyType != null)
+                          quest.questUnit.currencyType!.iconWithSize(20),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                  ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -55,7 +53,7 @@ class QuestCard extends ConsumerWidget {
                         Text(
                           quest.rewardText,
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                            // fontWeight: FontWeight.bold,
                             color: quest.rewardCurrency.color,
                           ),
                         ),
