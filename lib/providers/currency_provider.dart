@@ -12,8 +12,8 @@ class CurrencyNotifier extends StateNotifier<Currency> {
     state = currency;
   }
 
-  void earn(double amount) {
-    state = state.earn(amount);
+  void earn(double amount, {bool allowExcess = false}) {
+    state = state.earn(amount, allowExcess);
     ref
         .read(questStatsRepositoryProvider)
         .progressTowards(

@@ -313,11 +313,10 @@ class QuestRepository {
     if (quest.dateClaimed != null || !(await quest.isCompleted(repository))) {
       return;
     }
-    print("claiming quest: ${quest.id}");
-    currencyNotifier.earn(quest.reward.toDouble());
+
+    currencyNotifier.earn(quest.reward.toDouble(), allowExcess: true);
     quest.dateClaimed = DateTime.now().millisecondsSinceEpoch;
     box.put(quest);
-    print("quest claimed: ${quest.id}");
 
     // create next achievement
     if (quest.questType == QuestType.achievement) {
