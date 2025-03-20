@@ -2,8 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/daily_quest.dart';
-import 'package:idlefit/providers/daily_currency_provider.dart';
-import 'package:idlefit/providers/game_stats_provider.dart';
+import 'package:idlefit/models/quest_stats.dart';
 
 class CurrencyNotifier extends StateNotifier<Currency> {
   final Ref ref;
@@ -15,26 +14,26 @@ class CurrencyNotifier extends StateNotifier<Currency> {
 
   void earn(double amount) {
     state = state.earn(amount);
-    final questUnit = QuestUnit.values.byNameOrNull(state.type.name);
-    if (questUnit == null) {
-      return;
-    }
     ref
-        .read(gameStatsProvider.notifier)
-        .progressTowards(QuestAction.collect, state.type.questUnit!, amount);
-    ref
-        .read(dailyCurrencyProvider.notifier)
-        .updateToday(state.type, amount, true);
+        .read(questStatsRepositoryProvider)
+        .progressTowards(
+          QuestAction.collect,
+          state.type.questUnit!,
+          todayTimestamp,
+          amount,
+        );
   }
 
   void spend(double amount) {
     state = state.spend(amount);
     ref
-        .read(gameStatsProvider.notifier)
-        .progressTowards(QuestAction.spend, state.type.questUnit!, amount);
-    ref
-        .read(dailyCurrencyProvider.notifier)
-        .updateToday(state.type, amount, false);
+        .read(questStatsRepositoryProvider)
+        .progressTowards(
+          QuestAction.spend,
+          state.type.questUnit!,
+          todayTimestamp,
+          amount,
+        );
   }
 
   void setMax(double max) {

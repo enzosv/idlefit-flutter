@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/models/daily_quest.dart';
+import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/providers/daily_quest_provider.dart';
 import 'package:idlefit/services/ad_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,8 +73,13 @@ class _DoubleCoinsCardState extends ConsumerState<DoubleCoinsCard> {
                   .millisecondsSinceEpoch,
             );
         ref
-            .read(dailyQuestProvider.notifier)
-            .progressTowards(QuestAction.watch, QuestUnit.ad, 1);
+            .read(questStatsRepositoryProvider)
+            .progressTowards(
+              QuestAction.watch,
+              QuestUnit.ad,
+              todayTimestamp,
+              1,
+            );
         _startTimer();
       },
       onAdDismissed: () {

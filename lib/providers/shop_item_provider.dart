@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/helpers/constants.dart';
+import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/daily_quest.dart';
+import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/models/shop_items.dart';
 import 'package:idlefit/providers/currency_provider.dart';
-import 'package:idlefit/providers/game_stats_provider.dart';
 import 'package:objectbox/objectbox.dart';
 
 class ShopItemNotifier extends StateNotifier<List<ShopItem>> {
@@ -48,10 +49,15 @@ class ShopItemNotifier extends StateNotifier<List<ShopItem>> {
     final newState = List<ShopItem>.from(state);
     newState[item.id - 1] = item;
     state = newState;
-    box.put(item);
+    box.putAsync(item);
     ref
-        .read(gameStatsProvider.notifier)
-        .progressTowards(QuestAction.upgrade, QuestUnit.shopItem, 1);
+        .read(questStatsRepositoryProvider)
+        .progressTowards(
+          QuestAction.upgrade,
+          QuestUnit.shopItem,
+          todayTimestamp,
+          1,
+        );
     return true;
   }
 

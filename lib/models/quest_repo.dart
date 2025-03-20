@@ -1,9 +1,11 @@
 import 'dart:math';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/helpers/util.dart';
+import 'package:idlefit/main.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/daily_quest.dart';
-import 'package:idlefit/models/game_stats.dart';
+import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/objectbox.g.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:objectbox/objectbox.dart';
@@ -53,23 +55,15 @@ class Quest {
     return QuestType.values.byNameOrNull(type) ?? QuestType.unknown;
   }
 
-  double progress(GameStats stats) {
-    switch ((questAction, questUnit)) {
-      case (QuestAction.purchase, QuestUnit.generator):
-        return stats.generatorsPurchased.toDouble();
-      case (QuestAction.spend, QuestUnit.coin):
-        return stats.coinsSpent.toDouble();
-      case (QuestAction.walk, QuestUnit.steps):
-        return stats.stepsWalked.toDouble();
-      case (QuestAction.watch, QuestUnit.ad):
-        return stats.adsWatched.toDouble();
-      default:
-        return 0;
+  Future<double> progress(QuestStatsRepository repository) async {
+    if (questType == QuestType.achivement) {
+      return repository.getTotalProgress(questAction, questUnit);
     }
+    return repository.getProgress(questAction, questUnit, dayTimestamp);
   }
 
-  bool isCompleted(GameStats stats) {
-    return progress(stats) >= requirement;
+  Future<bool> isCompleted(QuestStatsRepository repository) async {
+    return (await progress(repository)) >= requirement;
   }
 
   String get description {
@@ -219,10 +213,10 @@ class QuestRepository {
 
   Future<void> claimQuest(
     Quest quest,
-    GameStats stats,
+    QuestStatsRepository repository,
     CurrencyNotifier currencyNotifier,
   ) async {
-    if (quest.dateClaimed != null || !quest.isCompleted(stats)) {
+    if (quest.dateClaimed != null || !(await quest.isCompleted(repository))) {
       return;
     }
     currencyNotifier.earn(quest.reward.toDouble());
@@ -238,10 +232,10 @@ class QuestRepository {
 //   QuestNotifier(this.stats, this.repository, super.state);
 // }
 
-// final questRepositoryProvider = Provider<QuestRepository>((ref) {
-//   final box = ref.read(objectBoxProvider).store.box<Quest>();
-//   return QuestRepository(box);
-// });
+final questRepositoryProvider = Provider<QuestRepository>((ref) {
+  final box = ref.read(objectBoxProvider).store.box<Quest>();
+  return QuestRepository(box);
+});
 
 // final questProvider = StateNotifierProvider<QuestNotifier, Quest>((ref) {
 //   final repository = ref.read(questRepositoryProvider);

@@ -3,10 +3,11 @@ import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/daily_quest.dart';
-import 'package:idlefit/providers/game_stats_provider.dart';
+import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:objectbox/objectbox.dart';
@@ -28,8 +29,13 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
     generator.count++;
     _updateGenerator(generator);
     ref
-        .read(gameStatsProvider.notifier)
-        .progressTowards(QuestAction.purchase, QuestUnit.generator, 1);
+        .read(questStatsRepositoryProvider)
+        .progressTowards(
+          QuestAction.purchase,
+          QuestUnit.generator,
+          todayTimestamp,
+          1,
+        );
     if (generator.count > 1) {
       // nothing to unlock
       return true;
@@ -81,8 +87,13 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
     generator.level++;
     _updateGenerator(generator);
     ref
-        .read(gameStatsProvider.notifier)
-        .progressTowards(QuestAction.upgrade, QuestUnit.generator, 1);
+        .read(questStatsRepositoryProvider)
+        .progressTowards(
+          QuestAction.upgrade,
+          QuestUnit.generator,
+          todayTimestamp,
+          1,
+        );
     ref.read(gameStateProvider.notifier).save();
     return true;
   }
@@ -91,8 +102,13 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
     final double output = max(generator.tier * 15, generator.singleOutput);
     ref.read(coinProvider.notifier).earn(output);
     ref
-        .read(gameStatsProvider.notifier)
-        .progressTowards(QuestAction.tap, QuestUnit.generator, 1);
+        .read(questStatsRepositoryProvider)
+        .progressTowards(
+          QuestAction.tap,
+          QuestUnit.generator,
+          todayTimestamp,
+          1,
+        );
     return output;
   }
 
