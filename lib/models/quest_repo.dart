@@ -5,11 +5,40 @@ import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/currency.dart';
-import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/objectbox.g.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:objectbox/objectbox.dart';
+
+enum QuestAction {
+  unknown,
+  spend,
+  walk,
+  watch,
+  burn,
+  collect,
+  purchase,
+  upgrade,
+  tap,
+}
+
+enum QuestUnit {
+  unknown,
+  coin,
+  steps,
+  ad,
+  calories,
+  energy,
+  space,
+  generator,
+  shopItem,
+}
+
+extension QuestUnitExtension on QuestUnit {
+  CurrencyType? get currencyType {
+    return CurrencyType.values.byNameOrNull(name);
+  }
+}
 
 enum QuestType { unknown, daily, weekly, monthly, achievement }
 

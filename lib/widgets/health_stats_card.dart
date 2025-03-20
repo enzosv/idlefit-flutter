@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/models/daily_quest.dart';
+import 'package:idlefit/models/quest_repo.dart';
 import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/providers/game_state_provider.dart';

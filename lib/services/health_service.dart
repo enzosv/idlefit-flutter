@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:health/health.dart';
 import 'package:flutter/material.dart';
-import 'package:idlefit/models/daily_quest.dart';
+import 'package:idlefit/models/quest_repo.dart';
 import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:idlefit/services/ios_health_service.dart';

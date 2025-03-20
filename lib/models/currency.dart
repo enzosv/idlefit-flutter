@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:idlefit/models/daily_quest.dart';
+import 'package:idlefit/models/quest_repo.dart';
 import 'package:objectbox/objectbox.dart';
 
 enum CurrencyType { unknown, coin, gem, space, energy }

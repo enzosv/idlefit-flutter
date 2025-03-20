@@ -4,10 +4,9 @@ import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/currency_repo.dart';
-import 'package:idlefit/models/daily_quest.dart';
+import 'package:idlefit/models/quest_repo.dart';
 import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/providers/currency_provider.dart';
-import 'package:idlefit/providers/daily_quest_provider.dart';
 import 'package:idlefit/providers/generator_provider.dart';
 import 'package:idlefit/providers/shop_item_provider.dart';
 import 'package:idlefit/models/background_activity.dart';
@@ -47,7 +46,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
       ref
           .read(coinProvider.notifier)
           .initialize(currencies[CurrencyType.coin]!);
-      ref.read(dailyQuestProvider.notifier).initialize();
 
       // Load data from repositories
       await ref.read(generatorProvider.notifier).initialize();

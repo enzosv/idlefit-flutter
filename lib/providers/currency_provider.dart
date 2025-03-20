@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/models/currency.dart';
-import 'package:idlefit/models/daily_quest.dart';
+import 'package:idlefit/models/quest_repo.dart';
 import 'package:idlefit/models/quest_stats.dart';
 
 class CurrencyNotifier extends StateNotifier<Currency> {
