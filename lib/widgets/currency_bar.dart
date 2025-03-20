@@ -41,9 +41,37 @@ class CoinsDisplay extends ConsumerWidget {
                     ),
                   ],
                 ),
-                Text(
-                  '${toLettersNotation(gameStateNotifier.passiveOutput)}/s',
-                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                Row(
+                  children: [
+                    Text(
+                      '${toLettersNotation(gameStateNotifier.passiveOutput)}/s ',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: () {},
+                      label: Text(""),
+                      icon: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          const Icon(Icons.play_circle),
+                          Text("Boost"),
+                        ],
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: Constants.primaryColor,
+                        foregroundColor: Colors.white,
+                        iconSize: 12,
+                        padding: const EdgeInsets.only(left: 4),
+                        visualDensity: VisualDensity.compact,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        minimumSize: const Size(0, 0),
+                        side: BorderSide(color: CurrencyType.coin.color),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -95,21 +123,28 @@ class CurrencyBar extends StatelessWidget {
       key: currencyBarKey,
       padding: const EdgeInsets.only(left: 20, right: 20, bottom: 12),
       decoration: BoxDecoration(color: Constants.barColor),
-      child: Row(
+      child: Flex(
+        direction: Axis.horizontal,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         // crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          IconButton(
-            iconSize: 32,
-            onPressed: () {},
-            icon: const Icon(Icons.menu),
+          Expanded(
+            flex: 1,
+            child: IconButton(
+              iconSize: 32,
+              onPressed: () {},
+              icon: const Icon(Icons.menu),
+            ),
           ),
-          CoinsDisplay(),
-          Column(
-            children: [
-              CurrencyWidget(currencyType: CurrencyType.energy),
-              CurrencyWidget(currencyType: CurrencyType.space),
-            ],
+          Expanded(flex: 3, child: CoinsDisplay()),
+          Expanded(
+            flex: 2,
+            child: Column(
+              children: [
+                CurrencyWidget(currencyType: CurrencyType.energy),
+                CurrencyWidget(currencyType: CurrencyType.space),
+              ],
+            ),
           ),
         ],
       ),
