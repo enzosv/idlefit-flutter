@@ -23,15 +23,19 @@ class QuestList extends ConsumerWidget {
             ? ref.read(coinProvider.notifier)
             : ref.read(spaceProvider.notifier);
 
-    ref
-        .read(questRepositoryProvider)
-        .claimQuest(
-          quest,
-          ref.read(questStatsRepositoryProvider),
-          currencyProvider,
-        );
-    // Invalidate the quests cache to refresh the list
-    ref.invalidate(_questsProvider(questType));
+    Future(
+      () => ref
+          .read(questRepositoryProvider)
+          .claimQuest(
+            quest,
+            ref.read(questStatsRepositoryProvider),
+            currencyProvider,
+          ),
+    ).then((_) {
+      // Invalidate both quests and stats to force refresh
+      ref.invalidate(_questsProvider(questType));
+      ref.invalidate(questStatsRepositoryProvider);
+    });
   }
 
   @override
