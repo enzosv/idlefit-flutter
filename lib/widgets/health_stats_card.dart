@@ -24,7 +24,7 @@ final _healthTileStatsProvider = FutureProvider.family
       params,
     ) async {
       final (action, unit) = params;
-      final repository = ref.read(questStatsRepositoryProvider);
+      final repository = ref.watch(questStatsRepositoryProvider);
       final [today, total] =
           await [
             repository.getProgress(action, unit, todayTimestamp),
@@ -50,7 +50,7 @@ class _HealthStatsTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final statsAsync = ref.read(_healthTileStatsProvider((action, unit)));
+    final statsAsync = ref.watch(_healthTileStatsProvider((action, unit)));
 
     return statsAsync.when(
       data: (data) {
@@ -66,15 +66,15 @@ class _HealthStatsTile extends ConsumerWidget {
           () => ListTile(
             leading: Icon(icon, color: iconColor),
             title: Text(title),
-            subtitle: const Center(child: CircularProgressIndicator()),
-            trailing: const Center(child: CircularProgressIndicator()),
+            subtitle: const Text('Today: loading...'),
+            trailing: const SizedBox.shrink(),
           ),
       error:
           (_, __) => ListTile(
             leading: Icon(icon, color: iconColor),
             title: Text(title),
-            subtitle: const Text('Error loading stats'),
-            trailing: const Text(''),
+            subtitle: const Text('Error loading'),
+            trailing: const SizedBox.shrink(),
           ),
     );
   }
@@ -97,7 +97,7 @@ class HealthStatsCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final healthStats = ref.read(_healthStatsProvider);
+    final healthStats = ref.watch(_healthStatsProvider);
 
     return Card(
       child: Padding(
