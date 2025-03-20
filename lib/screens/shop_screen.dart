@@ -44,7 +44,7 @@ class ShopScreen extends StatelessWidget {
                     if (upgradableGenerators.isNotEmpty) ...[
                       const SizedBox(height: 24),
                       Text(
-                        'Generator Upgrades',
+                        'Add Weight',
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                       const SizedBox(height: 16),
