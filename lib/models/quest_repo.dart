@@ -67,7 +67,21 @@ class Quest {
   }
 
   String get description {
-    return '${questAction.name.capitalize()} ${toLettersNotation(requirement.toDouble())} ${questUnit.name}';
+    final valueText =
+        questUnit == QuestUnit.energy
+            ? durationNotation(requirement.toDouble())
+            : toLettersNotation(requirement.toDouble());
+    if (questUnit.currencyType == null) {
+      return '${questAction.name.capitalize()} $valueText ${questUnit.name}';
+    }
+    return '${questAction.name.capitalize()} $valueText';
+  }
+
+  String get rewardText {
+    if (rewardCurrency == CurrencyType.energy) {
+      return durationNotation(reward.toDouble());
+    }
+    return toLettersNotation(reward.toDouble());
   }
 }
 

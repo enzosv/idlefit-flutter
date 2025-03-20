@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/models/currency.dart';
+import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/models/quest_repo.dart';
 import 'package:idlefit/models/quest_stats.dart';
 
@@ -54,9 +54,15 @@ class _QuestCardState extends ConsumerState<QuestCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.quest.description,
-                      style: theme.textTheme.titleMedium,
+                    Row(
+                      children: [
+                        Text(
+                          widget.quest.description,
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        if (widget.quest.questUnit.currencyType != null)
+                          widget.quest.questUnit.currencyType!.iconWithSize(20),
+                      ],
                     ),
                     const SizedBox(height: 4),
                   ],
@@ -66,13 +72,17 @@ class _QuestCardState extends ConsumerState<QuestCard> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text('Reward:', style: theme.textTheme.bodySmall),
-                  Text(
-                    toLettersNotation(widget.quest.reward),
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.primary,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        widget.quest.rewardText,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                      widget.quest.rewardCurrency.iconWithSize(20),
+                    ],
                   ),
-                  widget.quest.rewardCurrency.iconWithSize(20),
                 ],
               ),
             ],

@@ -28,6 +28,12 @@ enum QuestUnit {
   shopItem,
 }
 
+extension QuestUnitExtension on QuestUnit {
+  CurrencyType? get currencyType {
+    return CurrencyType.values.byNameOrNull(name);
+  }
+}
+
 @Entity()
 class DailyQuest {
   @Id()
