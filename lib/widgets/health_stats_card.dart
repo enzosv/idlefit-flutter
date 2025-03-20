@@ -7,22 +7,40 @@ import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:idlefit/widgets/card_button.dart';
 import 'package:idlefit/main.dart';
 
-class HealthStatsCard extends ConsumerStatefulWidget {
-  const HealthStatsCard({super.key});
+// Provider for health stats data
+final _healthStatsProvider = FutureProvider.autoDispose<(DateTime?, DateTime?)>(
+  (ref) async {
+    final repository = ref.read(questStatsRepositoryProvider);
+    final earliest = await repository.firstHealthDay();
+    final latest = await repository.lastHealthDay();
+    return (latest, earliest);
+  },
+);
 
-  @override
-  ConsumerState<HealthStatsCard> createState() => _HealthStatsCardState();
-}
+// Provider for health tile stats
+final _healthTileStatsProvider = FutureProvider.family
+    .autoDispose<(double, double), (QuestAction, QuestUnit)>((
+      ref,
+      params,
+    ) async {
+      final (action, unit) = params;
+      final repository = ref.read(questStatsRepositoryProvider);
+      final [today, total] =
+          await [
+            repository.getProgress(action, unit, todayTimestamp),
+            repository.getTotalProgress(action, unit),
+          ].wait;
+      return (today, total);
+    });
 
-class _HealthStatsTile extends StatelessWidget {
+class _HealthStatsTile extends ConsumerWidget {
   final QuestAction action;
   final QuestUnit unit;
   final IconData icon;
   final String title;
   final Color? iconColor;
-  final QuestStatsRepository questStatsRepository;
+
   const _HealthStatsTile({
-    required this.questStatsRepository,
     required this.action,
     required this.unit,
     required this.icon,
@@ -31,26 +49,12 @@ class _HealthStatsTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<(double, double)>(
-      future: () async {
-        final [today, total] =
-            await [
-              questStatsRepository.getProgress(action, unit, todayTimestamp),
-              questStatsRepository.getTotalProgress(action, unit),
-            ].wait;
-        return (today, total);
-      }(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return ListTile(
-            leading: Icon(icon, color: iconColor),
-            title: Text(title),
-            subtitle: Text('Today: 0'),
-            trailing: Text('Total: 0'),
-          );
-        }
-        final (today, total) = snapshot.data!;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final statsAsync = ref.read(_healthTileStatsProvider((action, unit)));
+
+    return statsAsync.when(
+      data: (data) {
+        final (today, total) = data;
         return ListTile(
           leading: Icon(icon, color: iconColor),
           title: Text(title),
@@ -58,21 +62,43 @@ class _HealthStatsTile extends StatelessWidget {
           trailing: Text('Total: ${toLettersNotation(total)}'),
         );
       },
+      loading:
+          () => ListTile(
+            leading: Icon(icon, color: iconColor),
+            title: Text(title),
+            subtitle: const Center(child: CircularProgressIndicator()),
+            trailing: const Center(child: CircularProgressIndicator()),
+          ),
+      error:
+          (_, __) => ListTile(
+            leading: Icon(icon, color: iconColor),
+            title: Text(title),
+            subtitle: const Text('Error loading stats'),
+            trailing: const Text(''),
+          ),
     );
   }
 }
 
-class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
-  late QuestStatsRepository _questStatsRepository;
+class HealthStatsCard extends ConsumerWidget {
+  const HealthStatsCard({super.key});
 
-  @override
-  void initState() {
-    super.initState();
-    _questStatsRepository = ref.read(questStatsRepositoryProvider);
+  Future<void> _syncHealthData(WidgetRef ref) async {
+    await ref
+        .read(healthServiceProvider)
+        .syncHealthData(
+          ref.read(gameStateProvider.notifier),
+          ref.read(questStatsRepositoryProvider),
+        );
+    // Invalidate both providers to refresh all data
+    ref.invalidate(_healthStatsProvider);
+    ref.invalidate(_healthTileStatsProvider);
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final healthStats = ref.read(_healthStatsProvider);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -89,22 +115,9 @@ class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
                       'Health Activity',
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
-                    FutureBuilder<(DateTime?, DateTime?)>(
-                      future: () async {
-                        final earliest =
-                            await _questStatsRepository.firstHealthDay();
-                        final latest =
-                            await _questStatsRepository.lastHealthDay();
-                        return (latest, earliest);
-                      }(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return Text(
-                            'Last sync: Never',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          );
-                        }
-                        final (latest, earliest) = snapshot.data!;
+                    healthStats.when(
+                      data: (data) {
+                        final (latest, earliest) = data;
                         if (latest == null) {
                           return Text(
                             'Last sync: Never',
@@ -126,37 +139,27 @@ class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
                           ],
                         );
                       },
+                      loading: () => const Text('Loading...'),
+                      error: (_, __) => const Text('Error loading health data'),
                     ),
                   ],
                 ),
                 CardButton(
                   icon: Icons.sync,
                   text: 'Sync',
-                  onPressed: () async {
-                    await ref
-                        .read(healthServiceProvider)
-                        .syncHealthData(
-                          ref.read(gameStateProvider.notifier),
-                          _questStatsRepository,
-                        );
-                    setState(
-                      () {},
-                    ); // Trigger rebuild to refresh last sync time
-                  },
+                  onPressed: () => _syncHealthData(ref),
                 ),
               ],
             ),
             const Divider(),
-            _HealthStatsTile(
-              questStatsRepository: _questStatsRepository,
+            const _HealthStatsTile(
               action: QuestAction.walk,
               unit: QuestUnit.steps,
               icon: Icons.directions_walk,
               title: "Steps",
               iconColor: Colors.blue,
             ),
-            _HealthStatsTile(
-              questStatsRepository: _questStatsRepository,
+            const _HealthStatsTile(
               action: QuestAction.burn,
               unit: QuestUnit.calories,
               icon: Icons.local_fire_department,
