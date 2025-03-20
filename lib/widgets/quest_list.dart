@@ -7,7 +7,8 @@ import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/widgets/quest_card.dart';
 
 class QuestList extends ConsumerStatefulWidget {
-  const QuestList({super.key});
+  final QuestType questType;
+  const QuestList({super.key, required this.questType});
 
   @override
   ConsumerState<QuestList> createState() => _QuestListState();
@@ -20,15 +21,7 @@ class _QuestListState extends ConsumerState<QuestList> {
   @override
   void initState() {
     super.initState();
-    _fetchData();
-  }
-
-  Future<void> _fetchData() async {
     _questRepo = ref.read(questRepositoryProvider);
-    final achievements = await _questRepo.getAchievements();
-    setState(() {
-      quests = achievements;
-    });
   }
 
   void onClaim(Quest quest) {
@@ -37,6 +30,7 @@ class _QuestListState extends ConsumerState<QuestList> {
         quest.rewardCurrency == CurrencyType.coin
             ? ref.read(coinProvider.notifier)
             : ref.read(spaceProvider.notifier);
+    print("attempting to claim quest: ${quest.id}");
     _questRepo.claimQuest(
       quest,
       ref.read(questStatsRepositoryProvider),
@@ -53,13 +47,38 @@ class _QuestListState extends ConsumerState<QuestList> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Achievements',
+              widget.questType.displayName,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const Divider(),
-            ...quests.map((quest) {
-              return QuestCard(quest: quest, onClaim: () => onClaim(quest));
-            }),
+            FutureBuilder<List<Quest>>(
+              future: () async {
+                final List<Quest> quests = switch (widget.questType) {
+                  QuestType.achievement => await _questRepo.getAchievements(),
+                  QuestType.daily => await _questRepo.getTodayDailyQuests(),
+                  _ => [],
+                };
+                return quests;
+              }(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.data == null) {
+                  return const Center(child: Text('No quests found'));
+                }
+                final quests = snapshot.data!;
+                return Column(
+                  children:
+                      quests.map((quest) {
+                        return QuestCard(
+                          quest: quest,
+                          onClaim: () => onClaim(quest),
+                        );
+                      }).toList(), // Convert Iterable to List
+                );
+              },
+            ),
           ],
         ),
       ),

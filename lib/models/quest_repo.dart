@@ -10,7 +10,24 @@ import 'package:idlefit/objectbox.g.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:objectbox/objectbox.dart';
 
-enum QuestType { unknown, daily, weekly, monthly, achivement }
+enum QuestType { unknown, daily, weekly, monthly, achievement }
+
+extension QuestTypeX on QuestType {
+  String get displayName {
+    switch (this) {
+      case QuestType.unknown:
+        return 'Unknown';
+      case QuestType.daily:
+        return 'Daily Quests';
+      case QuestType.weekly:
+        return 'Weekly Quests';
+      case QuestType.monthly:
+        return 'Monthly Quests';
+      case QuestType.achievement:
+        return 'Achievements';
+    }
+  }
+}
 
 @Entity()
 class Quest {
@@ -56,7 +73,7 @@ class Quest {
   }
 
   Future<double> progress(QuestStatsRepository repository) async {
-    if (questType == QuestType.achivement) {
+    if (questType == QuestType.achievement) {
       return repository.getTotalProgress(questAction, questUnit);
     }
     return repository.getProgress(questAction, questUnit, dayTimestamp);
@@ -99,11 +116,24 @@ class QuestRepository {
         .toList();
   }
 
+  Future<List<Quest>> getDailyQuests() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+    return box
+        .query(
+          Quest_.type
+              .equals(QuestType.daily.name)
+              .and(Quest_.dayTimestamp.equals(today)),
+        )
+        .build()
+        .find();
+  }
+
   Future<int> _countAchievements(QuestAction action, QuestUnit unit) async {
     return box
         .query(
           Quest_.type
-              .equals(QuestType.achivement.name)
+              .equals(QuestType.achievement.name)
               .and(Quest_.dateClaimed.greaterThan(0))
               .and(Quest_.action.equals(action.name))
               .and(Quest_.unit.equals(unit.name)),
@@ -138,11 +168,11 @@ class QuestRepository {
         const rewards = [1000, 2000, 3000, 4000, 5000, 6000];
         requirement = requirements[level].toDouble();
         reward = rewards[level].toDouble();
-      // TODO: achivement for number of generators purchased
-      // TODO: achivement for number of generator upgrades purchased
-      // TODO: achivement for number of generator upgrades unlocked
-      // TODO: achivement for number of shop items purchased
-      // TODO: achivement for number of manual taps
+      // TODO: achievement for number of generators purchased
+      // TODO: achievement for number of generator upgrades purchased
+      // TODO: achievement for number of generator upgrades unlocked
+      // TODO: achievement for number of shop items purchased
+      // TODO: achievement for number of manual taps
 
       default:
         return null;
@@ -152,7 +182,7 @@ class QuestRepository {
       action: action.name,
       unit: unit.name,
       rewardUnit: rewardUnit.name,
-      type: QuestType.achivement.name,
+      type: QuestType.achievement.name,
       dayTimestamp: 0,
       requirement: requirement,
       reward: reward,
@@ -164,7 +194,7 @@ class QuestRepository {
         await box
             .query(
               Quest_.type
-                  .equals(QuestType.achivement.name)
+                  .equals(QuestType.achievement.name)
                   .and(Quest_.action.equals(QuestAction.spend.name))
                   .and(Quest_.unit.equals(QuestUnit.coin.name))
                   .and(Quest_.dateClaimed.greaterThan(0)),
@@ -207,7 +237,7 @@ class QuestRepository {
     ];
   }
 
-  Future<List<Quest>> getTodayDailyQuests(int maxCoins) async {
+  Future<List<Quest>> getTodayDailyQuests() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
     final dailyQuests =
