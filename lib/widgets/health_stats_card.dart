@@ -56,7 +56,7 @@ class _HealthStatsTile extends ConsumerWidget {
       data: (data) {
         final (today, total) = data;
         return ListTile(
-          leading: Icon(icon, color: iconColor),
+          leading: Icon(icon, color: iconColor, size: 32),
           title: Text(title),
           subtitle: Text('Today: ${toLettersNotation(today)}'),
           trailing: Text('Total: ${toLettersNotation(total)}'),

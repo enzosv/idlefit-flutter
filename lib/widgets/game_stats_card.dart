@@ -38,9 +38,7 @@ class _DynamicStats extends ConsumerWidget {
     final gameStateNotifier = ref.watch(gameStateProvider.notifier);
     final coins = ref.watch(coinProvider);
     return _StatListTile(
-      icon: CurrencyType.coin.icon,
-      iconColor: CurrencyType.coin.color,
-      title: 'Gains',
+      currencyType: CurrencyType.coin,
       current: coins.count,
       max: coins.max,
       perSecond: gameStateNotifier.passiveOutput,
@@ -60,18 +58,14 @@ class _StaticStats extends ConsumerWidget {
     return Column(
       children: [
         _StatListTile(
-          icon: CurrencyType.energy.icon,
-          iconColor: CurrencyType.energy.color,
-          title: 'Energy',
+          currencyType: CurrencyType.energy,
           current: energy.count,
           max: energy.max,
           earned: energy.totalEarned,
           spent: energy.totalSpent,
         ),
         _StatListTile(
-          icon: CurrencyType.space.icon,
-          iconColor: CurrencyType.space.color,
-          title: 'Space',
+          currencyType: CurrencyType.space,
           current: space.count,
           max: space.max,
           earned: space.totalEarned,
@@ -84,9 +78,7 @@ class _StaticStats extends ConsumerWidget {
 
 class _StatListTile extends StatelessWidget {
   const _StatListTile({
-    required this.icon,
-    required this.iconColor,
-    required this.title,
+    required this.currencyType,
     required this.current,
     required this.max,
     this.perSecond,
@@ -94,9 +86,7 @@ class _StatListTile extends StatelessWidget {
     required this.spent,
   });
 
-  final IconData icon;
-  final Color iconColor;
-  final String title;
+  final CurrencyType currencyType;
   final double current;
   final double max;
   final double? perSecond;
@@ -104,23 +94,21 @@ class _StatListTile extends StatelessWidget {
   final double spent;
 
   String _formatted(double value) {
-    return title == "Energy"
+    return currencyType == CurrencyType.energy
         ? durationNotation(value)
         : toLettersNotation(value);
   }
 
   @override
   Widget build(BuildContext context) {
-    String titleText = title;
-    if (perSecond != null) {
-      titleText = '$title • ${toLettersNotation(perSecond!)}/s';
-    }
+    String titleText = '${_formatted(current)}/${_formatted(max)}';
     return ListTile(
-      leading: Icon(icon, color: iconColor),
+      leading: currencyType.iconWithSize(32),
       title: Text(titleText),
-      subtitle: Row(
-        children: [Text('${_formatted(current)}/${_formatted(max)}')],
-      ),
+      subtitle:
+          perSecond == null
+              ? null
+              : Row(children: [Text('${toLettersNotation(perSecond!)}/s')]),
       trailing: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
