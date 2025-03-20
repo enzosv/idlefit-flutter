@@ -44,13 +44,14 @@ class QuestCard extends ConsumerWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('Reward:', style: theme.textTheme.bodySmall),
+                  Text('Reward:'),
                   Row(
                     children: [
                       Text(
                         quest.rewardText,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.colorScheme.primary,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: quest.rewardCurrency.color,
                         ),
                       ),
                       quest.rewardCurrency.iconWithSize(20),
@@ -77,6 +78,7 @@ class QuestCard extends ConsumerWidget {
                     child: LinearProgressIndicator(
                       value: snapshot.hasData ? progressPercent : null,
                       minHeight: 8,
+                      color: quest.rewardCurrency.color,
                       backgroundColor:
                           theme.colorScheme.surfaceContainerHighest,
                     ),
@@ -92,12 +94,7 @@ class QuestCard extends ConsumerWidget {
                         style: theme.textTheme.bodySmall,
                       ),
                       if (quest.dateClaimed != null)
-                        Text(
-                          'Claimed',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.primary,
-                          ),
-                        )
+                        Text('Claimed', style: theme.textTheme.bodySmall)
                       else if (snapshot.hasData &&
                           progress >= quest.requirement)
                         ElevatedButton(
