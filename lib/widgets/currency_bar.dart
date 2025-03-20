@@ -7,104 +7,79 @@ import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:idlefit/widgets/current_coins.dart';
 import '../helpers/util.dart';
 
-class CoinsInfo extends ConsumerWidget {
-  const CoinsInfo({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final gameStateNotifier = ref.watch(gameStateProvider.notifier);
-    final coins = ref.watch(coinProvider);
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Flexible(
-          child: Text(
-            '/${toLettersNotation(coins.max)}',
-            style: const TextStyle(color: Colors.white70, fontSize: 14),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Flexible(
-          child: Text(
-            '${toLettersNotation(gameStateNotifier.passiveOutput)}/s',
-            style: const TextStyle(color: Colors.white70, fontSize: 14),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class CoinsDisplay extends StatelessWidget {
+class CoinsDisplay extends ConsumerWidget {
   const CoinsDisplay({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final coins = ref.watch(coinProvider);
+    final gameStateNotifier = ref.watch(gameStateProvider.notifier);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CurrencyType.coin.iconWithSize(24),
-            const SizedBox(width: 4),
-            CurrentCoins(key: CurrentCoins.globalKey),
+            CurrencyType.coin.iconWithSize(32),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              // mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CurrentCoins(
+                      key: CurrentCoins.globalKey,
+                      currentCoins: toLettersNotation(coins.count),
+                    ),
+                    Text(
+                      '/${toLettersNotation(coins.max)}',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  '${toLettersNotation(gameStateNotifier.passiveOutput)}/s',
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+              ],
+            ),
           ],
         ),
-        const SizedBox(height: 4),
-        const CoinsInfo(),
       ],
     );
   }
 }
 
-class EnergyCurrency extends ConsumerWidget {
-  const EnergyCurrency({super.key});
+class CurrencyWidget extends ConsumerWidget {
+  final CurrencyType currencyType;
+  const CurrencyWidget({super.key, required this.currencyType});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final energy = ref.watch(energyProvider);
+    final provider =
+        currencyType == CurrencyType.space
+            ? ref.watch(spaceProvider)
+            : ref.watch(energyProvider);
+    final count =
+        currencyType == CurrencyType.space
+            ? toLettersNotation(provider.count)
+            : durationNotation(provider.count);
+    final max =
+        currencyType == CurrencyType.space
+            ? toLettersNotation(provider.max)
+            : durationNotation(provider.max);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        CurrencyType.energy.iconWithSize(20),
+        currencyType.iconWithSize(20),
         const SizedBox(width: 4),
-        Flexible(
-          child: Text(
-            '${durationNotation(energy.count)}/${durationNotation(energy.max)}',
-            style: const TextStyle(color: Colors.white, fontSize: 14),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class SpaceCurrency extends ConsumerWidget {
-  const SpaceCurrency({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final space = ref.watch(spaceProvider);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CurrencyType.space.iconWithSize(20),
-        const SizedBox(width: 4),
-        Flexible(
-          child: Text(
-            '${toLettersNotation(space.count)}/${toLettersNotation(space.max)}',
-            style: const TextStyle(color: Colors.white, fontSize: 14),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
+        Text(count, style: const TextStyle(fontWeight: FontWeight.bold)),
+        Text('/$max'),
       ],
     );
   }
@@ -118,15 +93,24 @@ class CurrencyBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: currencyBarKey,
-      padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 12),
       decoration: BoxDecoration(color: Constants.barColor),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        // crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Expanded(flex: 3, child: EnergyCurrency()),
-          const Expanded(flex: 4, child: CoinsDisplay()),
-          const Expanded(flex: 3, child: SpaceCurrency()),
+          IconButton(
+            iconSize: 32,
+            onPressed: () {},
+            icon: const Icon(Icons.menu),
+          ),
+          CoinsDisplay(),
+          Column(
+            children: [
+              CurrencyWidget(currencyType: CurrencyType.energy),
+              CurrencyWidget(currencyType: CurrencyType.space),
+            ],
+          ),
         ],
       ),
     );

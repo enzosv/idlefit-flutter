@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/providers/currency_provider.dart';
-import '../helpers/util.dart';
 
 class CurrentCoins extends StatefulWidget {
   static final globalKey = GlobalKey<_CurrentCoinsState>();
+  // final Currency coins;
+  final String currentCoins;
 
-  const CurrentCoins({super.key});
+  const CurrentCoins({super.key, required this.currentCoins});
 
   static void triggerAnimation() {
     globalKey.currentState?._triggerAnimation();
@@ -49,24 +48,19 @@ class _CurrentCoinsState extends State<CurrentCoins>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, child) {
-        final coins = ref.watch(coinProvider);
-        return AnimatedBuilder(
-          animation: _scaleAnimation,
-          builder: (context, child) {
-            return Transform.scale(
-              scale: _scaleAnimation.value,
-              child: Text(
-                toLettersNotation(coins.count),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            );
-          },
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: Text(
+            widget.currentCoins,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         );
       },
     );
