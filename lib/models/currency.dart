@@ -1,11 +1,25 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:idlefit/models/daily_quest.dart';
 import 'package:objectbox/objectbox.dart';
 
 enum CurrencyType { unknown, coin, gem, space, energy }
 
 extension CurrencyTypeExtension on CurrencyType {
+  QuestUnit? get questUnit {
+    switch (this) {
+      case CurrencyType.coin:
+        return QuestUnit.coin;
+      case CurrencyType.space:
+        return QuestUnit.space;
+      case CurrencyType.energy:
+        return QuestUnit.energy;
+      default:
+        return null;
+    }
+  }
+
   IconData get icon {
     switch (this) {
       case CurrencyType.coin:
