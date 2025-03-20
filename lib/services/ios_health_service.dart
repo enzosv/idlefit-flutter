@@ -1,12 +1,11 @@
 import 'package:flutter/services.dart';
-import 'package:idlefit/providers/daily_health_provider.dart';
 
 class IosHealthService {
   static const MethodChannel _channel = MethodChannel(
     'com.idlefit/health_statistics',
   );
 
-  Future<DailyHealth> queryHealthForRange({
+  Future<(double, double)> queryHealthForRange({
     required DateTime start,
     required DateTime end,
   }) async {
@@ -19,11 +18,7 @@ class IosHealthService {
             type: "ACTIVE_ENERGY_BURNED",
           ),
         ].wait;
-
-    return DailyHealth()
-      ..steps = steps.toInt()
-      ..caloriesBurned = calories
-      ..lastSync = DateTime.now().millisecondsSinceEpoch;
+    return (steps, calories);
   }
 
   Future<double> _queryStatistics({

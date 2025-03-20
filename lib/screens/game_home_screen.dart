@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idlefit/helpers/constants.dart';
-import 'package:idlefit/providers/daily_health_provider.dart';
+import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/screens/generator_screen.dart';
 import 'package:idlefit/screens/shop_screen.dart';
 import 'package:idlefit/screens/stats_screen.dart';
@@ -44,9 +44,12 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
       return;
     }
     // going to foreground
-    final healthService = ref.read(healthServiceProvider);
-    final dailyHealthNotifier = ref.read(dailyHealthProvider.notifier);
-    await healthService.syncHealthData(dailyHealthNotifier);
+    await ref
+        .read(healthServiceProvider)
+        .syncHealthData(
+          ref.read(gameStateProvider.notifier),
+          ref.read(questStatsRepositoryProvider),
+        );
     NotificationService.cancelAllNotifications();
     gameStateNotifier.setIsPaused(false);
 
@@ -77,13 +80,15 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
     // Initialize health data
     final healthService = ref.read(healthServiceProvider);
     final gameStateNotifier = ref.read(gameStateProvider.notifier);
-    final dailyHealthNotifier = ref.read(dailyHealthProvider.notifier);
-
+    final questStatsRepository = ref.read(questStatsRepositoryProvider);
     // Initialize ads
     AdService.initialize();
 
     healthService.initialize().then((_) async {
-      await healthService.syncHealthData(dailyHealthNotifier);
+      await healthService.syncHealthData(
+        gameStateNotifier,
+        questStatsRepository,
+      );
       gameStateNotifier.setIsPaused(false);
     });
 

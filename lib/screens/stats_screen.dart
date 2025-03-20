@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:idlefit/helpers/constants.dart';
-import 'package:idlefit/widgets/achievement_list.dart';
 import 'package:idlefit/widgets/health_stats_card.dart';
 import 'package:idlefit/widgets/game_stats_card.dart';
 import 'package:idlefit/widgets/banner_ad_widget.dart';
@@ -37,7 +36,6 @@ class StatsScreen extends StatelessWidget {
                 const DailyQuestList(),
                 const SizedBox(height: 16),
                 // Achievement list
-                // const AchievementList(),
                 const QuestList(),
               ],
             ),

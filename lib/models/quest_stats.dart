@@ -47,6 +47,50 @@ class QuestStatsRepository {
     return newStats;
   }
 
+  /// Returns the difference in progress
+  /// For health stats
+  Future<double> setProgress(
+    QuestAction action,
+    QuestUnit unit,
+    int dayTimestamp,
+    double value,
+  ) async {
+    final stats = await _getOrCreateQuestStats(action, unit, dayTimestamp);
+    final oldValue = stats.value;
+    if (value == oldValue) {
+      return 0;
+    }
+    stats.value = value;
+    box.putAsync(stats);
+    return value - oldValue;
+  }
+
+  Future<DateTime?> firstHealthDay() async {
+    final firstStep =
+        await box
+            .query(QuestStats_.unit.equals(QuestUnit.steps.index))
+            .order(QuestStats_.dayTimestamp)
+            .build()
+            .findFirstAsync();
+    final firstDay = firstStep?.dayTimestamp;
+    return firstDay != null
+        ? DateTime.fromMillisecondsSinceEpoch(firstDay)
+        : null;
+  }
+
+  Future<DateTime?> lastHealthDay() async {
+    final lastStep =
+        await box
+            .query(QuestStats_.unit.equals(QuestUnit.steps.index))
+            .order(QuestStats_.dayTimestamp, flags: Order.descending)
+            .build()
+            .findFirstAsync();
+    final lastDay = lastStep?.dayTimestamp;
+    return lastDay != null
+        ? DateTime.fromMillisecondsSinceEpoch(lastDay)
+        : null;
+  }
+
   Future<void> progressTowards(
     QuestAction action,
     QuestUnit unit,

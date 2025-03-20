@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'package:health/health.dart';
 import 'package:flutter/material.dart';
-import 'package:idlefit/providers/daily_health_provider.dart';
+import 'package:idlefit/models/daily_quest.dart';
+import 'package:idlefit/models/quest_stats.dart';
+import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:idlefit/services/ios_health_service.dart';
 
 class HealthService {
@@ -41,7 +43,7 @@ class HealthService {
 
   Future<double> _getDailyHealth(
     DateTime startOfDay,
-    endOfDay,
+    DateTime endOfDay,
     HealthDataType type,
   ) async {
     final data = await health.getHealthDataFromTypes(
@@ -83,47 +85,60 @@ class HealthService {
 
   Future<void> syncDay(
     DateTime day,
-    DailyHealthNotifier dailyHealthNotifier,
+    GameStateNotifier gameStateNotifier,
+    QuestStatsRepository questStatsRepository,
     IosHealthService? iosService,
   ) async {
     final startOfDay = DateTime(day.year, day.month, day.day);
     final endOfDay = DateTime(day.year, day.month, day.day, 23, 59, 59, 999);
+    final dayTimestamp = startOfDay.millisecondsSinceEpoch;
+
+    double steps = 0;
+    double calories = 0;
     if (iosService != null) {
-      final dailyHealth = await iosService.queryHealthForRange(
+      (steps, calories) = await iosService.queryHealthForRange(
         start: startOfDay,
         end: endOfDay,
       );
-      dailyHealthNotifier.reset(startOfDay.millisecondsSinceEpoch, dailyHealth);
-      return;
+    } else {
+      [steps, calories] =
+          await [
+            _getDailyHealth(startOfDay, endOfDay, HealthDataType.STEPS),
+            _getDailyHealth(
+              startOfDay,
+              endOfDay,
+              HealthDataType.ACTIVE_ENERGY_BURNED,
+            ),
+          ].wait;
     }
-    final [steps, calories, exerciseMinutes] =
-        await [
-          _getDailyHealth(startOfDay, endOfDay, HealthDataType.STEPS),
-          _getDailyHealth(
-            startOfDay,
-            endOfDay,
-            HealthDataType.ACTIVE_ENERGY_BURNED,
-          ),
-          // _getDailyHealth(startOfDay, endOfDay, HealthDataType.EXERCISE_TIME),
-        ].wait;
 
-    dailyHealthNotifier.reset(
-      startOfDay.millisecondsSinceEpoch,
-      DailyHealth()
-        ..steps = steps.toInt()
-        ..caloriesBurned = calories
-        ..lastSync = DateTime.now().millisecondsSinceEpoch,
+    final stepsDif = await questStatsRepository.setProgress(
+      QuestAction.walk,
+      QuestUnit.steps,
+      dayTimestamp,
+      steps,
     );
+    final caloriesDif = await questStatsRepository.setProgress(
+      QuestAction.burn,
+      QuestUnit.calories,
+      dayTimestamp,
+      calories,
+    );
+    gameStateNotifier.convertHealthStats(stepsDif.toInt(), caloriesDif);
   }
 
-  Future<void> syncHealthData(DailyHealthNotifier dailyHealthNotifier) async {
+  Future<void> syncHealthData(
+    GameStateNotifier gameStateNotifier,
+    QuestStatsRepository questStatsRepository,
+  ) async {
     final iosService = Platform.isIOS ? IosHealthService() : null;
     final now = DateTime.now();
     await [
-      syncDay(now, dailyHealthNotifier, iosService),
+      syncDay(now, gameStateNotifier, questStatsRepository, iosService),
       syncDay(
         now.subtract(const Duration(days: 1)),
-        dailyHealthNotifier,
+        gameStateNotifier,
+        questStatsRepository,
         iosService,
       ),
     ].wait;

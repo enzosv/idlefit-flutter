@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/providers/daily_health_provider.dart';
+import 'package:idlefit/models/daily_quest.dart';
+import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/helpers/util.dart';
+import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:idlefit/widgets/card_button.dart';
 import 'package:idlefit/main.dart';
 
@@ -13,48 +15,60 @@ class HealthStatsCard extends ConsumerStatefulWidget {
 }
 
 class _HealthStatsTile extends StatelessWidget {
+  final QuestAction action;
+  final QuestUnit unit;
   final IconData icon;
   final String title;
-  final double today;
-  final double total;
   final Color? iconColor;
-
+  final QuestStatsRepository questStatsRepository;
   const _HealthStatsTile({
+    required this.questStatsRepository,
+    required this.action,
+    required this.unit,
     required this.icon,
     required this.title,
-    required this.today,
-    required this.total,
     this.iconColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(icon, color: iconColor),
-      title: Text(title),
-      subtitle: Text('Today: ${toLettersNotation(today)}'),
-      trailing: Text('Total: ${toLettersNotation(total)}'),
+    return FutureBuilder<(double, double)>(
+      future: () async {
+        final [today, total] =
+            await [
+              questStatsRepository.getProgress(action, unit, todayTimestamp),
+              questStatsRepository.getTotalProgress(action, unit),
+            ].wait;
+        return (today, total);
+      }(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return ListTile(
+            leading: Icon(icon, color: iconColor),
+            title: Text(title),
+            subtitle: Text('Today: 0'),
+            trailing: Text('Total: 0'),
+          );
+        }
+        final (today, total) = snapshot.data!;
+        return ListTile(
+          leading: Icon(icon, color: iconColor),
+          title: Text(title),
+          subtitle: Text('Today: ${toLettersNotation(today)}'),
+          trailing: Text('Total: ${toLettersNotation(total)}'),
+        );
+      },
     );
   }
 }
 
 class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
-  DailyHealth today = DailyHealth();
-  DailyHealth total = DailyHealth();
+  late QuestStatsRepository _questStatsRepository;
 
   @override
   void initState() {
     super.initState();
-    _fetchData();
-  }
-
-  Future<void> _fetchData() async {
-    final dailyHealthNotifier = ref.read(dailyHealthProvider.notifier);
-    final totalHealth = await dailyHealthNotifier.total();
-    setState(() {
-      today = ref.watch(dailyHealthProvider);
-      total = totalHealth;
-    });
+    _questStatsRepository = ref.read(questStatsRepositoryProvider);
   }
 
   @override
@@ -77,11 +91,10 @@ class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
                     ),
                     FutureBuilder<(DateTime?, DateTime?)>(
                       future: () async {
-                        final dailyHealthNotifier = ref.read(
-                          dailyHealthProvider.notifier,
-                        );
-                        final latest = dailyHealthNotifier.latestSync();
-                        final earliest = await dailyHealthNotifier.firstDay();
+                        final earliest =
+                            await _questStatsRepository.firstHealthDay();
+                        final latest =
+                            await _questStatsRepository.lastHealthDay();
                         return (latest, earliest);
                       }(),
                       builder: (context, snapshot) {
@@ -120,32 +133,34 @@ class _HealthStatsCardState extends ConsumerState<HealthStatsCard> {
                   icon: Icons.sync,
                   text: 'Sync',
                   onPressed: () async {
-                    final healthService = ref.read(healthServiceProvider);
-                    final dailyHealthNotifier = ref.read(
-                      dailyHealthProvider.notifier,
-                    );
-                    await healthService.syncHealthData(dailyHealthNotifier);
+                    await ref
+                        .read(healthServiceProvider)
+                        .syncHealthData(
+                          ref.read(gameStateProvider.notifier),
+                          _questStatsRepository,
+                        );
                     setState(
                       () {},
                     ); // Trigger rebuild to refresh last sync time
-                    await _fetchData(); // Refresh displayed data
                   },
                 ),
               ],
             ),
             const Divider(),
             _HealthStatsTile(
+              questStatsRepository: _questStatsRepository,
+              action: QuestAction.walk,
+              unit: QuestUnit.steps,
               icon: Icons.directions_walk,
               title: "Steps",
-              today: today.steps.toDouble(),
-              total: total.steps.toDouble(),
               iconColor: Colors.blue,
             ),
             _HealthStatsTile(
+              questStatsRepository: _questStatsRepository,
+              action: QuestAction.burn,
+              unit: QuestUnit.calories,
               icon: Icons.local_fire_department,
               title: "Calories Burned",
-              today: today.caloriesBurned,
-              total: total.caloriesBurned,
               iconColor: Colors.red,
             ),
           ],
