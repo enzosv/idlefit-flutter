@@ -44,6 +44,12 @@
 - load historic health data
 - can be converted to coins/space/energy?
 - temporary generation boost
+10. Accounts and sync
+11. Leaderboards (weekly?)
+- serverwide and friends
+- step leader
+- calorie leader
+- coin leader
 
 # What if's
 
@@ -61,4 +67,4 @@
 1. exercise minutes
 
 - active minutes not provided by google health connect as of 2025-03-15
-- iPhone only doesn't measure exercise minutes
+- iPhone on its own doesn't measure exercise minutes
