@@ -29,6 +29,9 @@ class _QuestCardState extends ConsumerState<QuestCard> {
       ref.read(questStatsRepositoryProvider),
     );
     setState(() {
+      if (!mounted) {
+        return;
+      }
       this.progress = progress;
     });
   }
