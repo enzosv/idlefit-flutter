@@ -5,45 +5,15 @@ import 'package:idlefit/models/daily_quest.dart';
 import 'package:idlefit/models/quest_repo.dart';
 import 'package:idlefit/models/quest_stats.dart';
 
-class QuestCard extends ConsumerStatefulWidget {
+class QuestCard extends ConsumerWidget {
   final Quest quest;
   final VoidCallback onClaim;
 
-  @override
-  ConsumerState<QuestCard> createState() => _QuestCardState();
-
   const QuestCard({super.key, required this.quest, required this.onClaim});
-}
-
-class _QuestCardState extends ConsumerState<QuestCard> {
-  double progress = 0.0;
 
   @override
-  void initState() {
-    super.initState();
-    _fetchData();
-  }
-
-  Future<void> _fetchData() async {
-    final progress = await widget.quest.progress(
-      ref.read(questStatsRepositoryProvider),
-    );
-    setState(() {
-      if (!mounted) {
-        return;
-      }
-      this.progress = progress;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-
-    final progressPercent = (progress / widget.quest.requirement).clamp(
-      0.0,
-      1.0,
-    );
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -60,11 +30,11 @@ class _QuestCardState extends ConsumerState<QuestCard> {
                     Row(
                       children: [
                         Text(
-                          widget.quest.description,
+                          quest.description,
                           style: theme.textTheme.titleMedium,
                         ),
-                        if (widget.quest.questUnit.currencyType != null)
-                          widget.quest.questUnit.currencyType!.iconWithSize(20),
+                        if (quest.questUnit.currencyType != null)
+                          quest.questUnit.currencyType!.iconWithSize(20),
                       ],
                     ),
                     const SizedBox(height: 4),
@@ -78,12 +48,12 @@ class _QuestCardState extends ConsumerState<QuestCard> {
                   Row(
                     children: [
                       Text(
-                        widget.quest.rewardText,
+                        quest.rewardText,
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: theme.colorScheme.primary,
                         ),
                       ),
-                      widget.quest.rewardCurrency.iconWithSize(20),
+                      quest.rewardCurrency.iconWithSize(20),
                     ],
                   ),
                 ],
@@ -91,42 +61,57 @@ class _QuestCardState extends ConsumerState<QuestCard> {
             ],
           ),
           const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: progressPercent,
-              minHeight: 8,
-              backgroundColor: theme.colorScheme.surfaceContainerHighest,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${(progressPercent * 100).toInt()}%',
-                style: theme.textTheme.bodySmall,
-              ),
-              if (widget.quest.dateClaimed != null)
-                Text(
-                  'Completed ${_formatDate(DateTime.fromMillisecondsSinceEpoch(widget.quest.dateClaimed!))}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.primary,
+          FutureBuilder<double>(
+            future: quest.progress(ref.read(questStatsRepositoryProvider)),
+            builder: (context, snapshot) {
+              final progress = snapshot.data ?? 0.0;
+              final progressPercent = (progress / quest.requirement).clamp(
+                0.0,
+                1.0,
+              );
+
+              return Column(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: snapshot.hasData ? progressPercent : null,
+                      minHeight: 8,
+                      backgroundColor:
+                          theme.colorScheme.surfaceContainerHighest,
+                    ),
                   ),
-                )
-              else if (progress >= widget.quest.requirement)
-                ElevatedButton(
-                  onPressed: widget.onClaim,
-                  child: const Text('Claim'),
-                ),
-            ],
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        snapshot.hasData
+                            ? '${(progressPercent * 100).toInt()}%'
+                            : 'Loading...',
+                        style: theme.textTheme.bodySmall,
+                      ),
+                      if (quest.dateClaimed != null)
+                        Text(
+                          'Claimed',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.primary,
+                          ),
+                        )
+                      else if (snapshot.hasData &&
+                          progress >= quest.requirement)
+                        ElevatedButton(
+                          onPressed: onClaim,
+                          child: const Text('Claim'),
+                        ),
+                    ],
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
   }
 }
