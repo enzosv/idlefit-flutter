@@ -14,7 +14,6 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_sync_flutter_libs/objectbox_sync_flutter_libs.dart';
 
-import 'models/achievement.dart';
 import 'models/coin_generator.dart';
 import 'models/currency.dart';
 import 'models/daily_quest.dart';
@@ -98,40 +97,6 @@ final _entities = <obx_int.ModelEntity>[
         obx_int.ModelProperty(
             id: const obx_int.IdUid(8, 2249982543274755836),
             name: 'level',
-            type: 6,
-            flags: 0)
-      ],
-      relations: <obx_int.ModelRelation>[],
-      backlinks: <obx_int.ModelBacklink>[]),
-  obx_int.ModelEntity(
-      id: const obx_int.IdUid(7, 2119159745219438621),
-      name: 'Achievement',
-      lastPropertyId: const obx_int.IdUid(13, 5316489849535110872),
-      flags: 0,
-      properties: <obx_int.ModelProperty>[
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 37781412133150881),
-            name: 'id',
-            type: 6,
-            flags: 1),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(10, 2084831577797524984),
-            name: 'dateClaimed',
-            type: 6,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(11, 6913876187873743667),
-            name: 'action',
-            type: 9,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(12, 759831562113825008),
-            name: 'reqUnit',
-            type: 9,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(13, 5316489849535110872),
-            name: 'requirement',
             type: 6,
             flags: 0)
       ],
@@ -372,7 +337,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         7990607732704873599,
         9167584311080985965,
         5789196000044242359,
-        5523549602957263386
+        5523549602957263386,
+        2119159745219438621
       ],
       retiredIndexUids: const [],
       retiredPropertyUids: const [
@@ -446,7 +412,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         8642844963959802391,
         1793398252997816722,
         60503497721018850,
-        3783688117025317780
+        3783688117025317780,
+        37781412133150881,
+        2084831577797524984,
+        6913876187873743667,
+        759831562113825008,
+        5316489849535110872
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -556,45 +527,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
 
           return object;
         }),
-    Achievement: obx_int.EntityDefinition<Achievement>(
-        model: _entities[3],
-        toOneRelations: (Achievement object) => [],
-        toManyRelations: (Achievement object) => {},
-        getId: (Achievement object) => object.id,
-        setId: (Achievement object, int id) {
-          object.id = id;
-        },
-        objectToFB: (Achievement object, fb.Builder fbb) {
-          final actionOffset = fbb.writeString(object.action);
-          final reqUnitOffset = fbb.writeString(object.reqUnit);
-          fbb.startTable(14);
-          fbb.addInt64(0, object.id);
-          fbb.addInt64(9, object.dateClaimed);
-          fbb.addOffset(10, actionOffset);
-          fbb.addOffset(11, reqUnitOffset);
-          fbb.addInt64(12, object.requirement);
-          fbb.finish(fbb.endTable());
-          return object.id;
-        },
-        objectFromFB: (obx.Store store, ByteData fbData) {
-          final buffer = fb.BufferContext(fbData);
-          final rootOffset = buffer.derefObject(0);
-
-          final object = Achievement()
-            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
-            ..dateClaimed =
-                const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 22)
-            ..action = const fb.StringReader(asciiOptimization: true)
-                .vTableGet(buffer, rootOffset, 24, '')
-            ..reqUnit = const fb.StringReader(asciiOptimization: true)
-                .vTableGet(buffer, rootOffset, 26, '')
-            ..requirement =
-                const fb.Int64Reader().vTableGet(buffer, rootOffset, 28, 0);
-
-          return object;
-        }),
     DailyQuest: obx_int.EntityDefinition<DailyQuest>(
-        model: _entities[4],
+        model: _entities[3],
         toOneRelations: (DailyQuest object) => [],
         toManyRelations: (DailyQuest object) => {},
         getId: (DailyQuest object) => object.id,
@@ -644,7 +578,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           return object;
         }),
     DailyCurrency: obx_int.EntityDefinition<DailyCurrency>(
-        model: _entities[5],
+        model: _entities[4],
         toOneRelations: (DailyCurrency object) => [],
         toManyRelations: (DailyCurrency object) => {},
         getId: (DailyCurrency object) => object.dayTimestamp,
@@ -686,7 +620,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           return object;
         }),
     Quest: obx_int.EntityDefinition<Quest>(
-        model: _entities[6],
+        model: _entities[5],
         toOneRelations: (Quest object) => [],
         toManyRelations: (Quest object) => {},
         getId: (Quest object) => object.id,
@@ -744,7 +678,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           return object;
         }),
     QuestStats: obx_int.EntityDefinition<QuestStats>(
-        model: _entities[7],
+        model: _entities[6],
         toOneRelations: (QuestStats object) => [],
         toManyRelations: (QuestStats object) => {},
         getId: (QuestStats object) => object.id,
@@ -832,156 +766,133 @@ class ShopItem_ {
       obx.QueryIntegerProperty<ShopItem>(_entities[2].properties[1]);
 }
 
-/// [Achievement] entity fields to define ObjectBox queries.
-class Achievement_ {
-  /// See [Achievement.id].
-  static final id =
-      obx.QueryIntegerProperty<Achievement>(_entities[3].properties[0]);
-
-  /// See [Achievement.dateClaimed].
-  static final dateClaimed =
-      obx.QueryIntegerProperty<Achievement>(_entities[3].properties[1]);
-
-  /// See [Achievement.action].
-  static final action =
-      obx.QueryStringProperty<Achievement>(_entities[3].properties[2]);
-
-  /// See [Achievement.reqUnit].
-  static final reqUnit =
-      obx.QueryStringProperty<Achievement>(_entities[3].properties[3]);
-
-  /// See [Achievement.requirement].
-  static final requirement =
-      obx.QueryIntegerProperty<Achievement>(_entities[3].properties[4]);
-}
-
 /// [DailyQuest] entity fields to define ObjectBox queries.
 class DailyQuest_ {
   /// See [DailyQuest.id].
   static final id =
-      obx.QueryIntegerProperty<DailyQuest>(_entities[4].properties[0]);
+      obx.QueryIntegerProperty<DailyQuest>(_entities[3].properties[0]);
 
   /// See [DailyQuest.action].
   static final action =
-      obx.QueryStringProperty<DailyQuest>(_entities[4].properties[1]);
+      obx.QueryStringProperty<DailyQuest>(_entities[3].properties[1]);
 
   /// See [DailyQuest.unit].
   static final unit =
-      obx.QueryStringProperty<DailyQuest>(_entities[4].properties[2]);
+      obx.QueryStringProperty<DailyQuest>(_entities[3].properties[2]);
 
   /// See [DailyQuest.rewardUnit].
   static final rewardUnit =
-      obx.QueryStringProperty<DailyQuest>(_entities[4].properties[3]);
+      obx.QueryStringProperty<DailyQuest>(_entities[3].properties[3]);
 
   /// See [DailyQuest.requirement].
   static final requirement =
-      obx.QueryIntegerProperty<DailyQuest>(_entities[4].properties[4]);
+      obx.QueryIntegerProperty<DailyQuest>(_entities[3].properties[4]);
 
   /// See [DailyQuest.reward].
   static final reward =
-      obx.QueryIntegerProperty<DailyQuest>(_entities[4].properties[5]);
+      obx.QueryIntegerProperty<DailyQuest>(_entities[3].properties[5]);
 
   /// See [DailyQuest.progress].
   static final progress =
-      obx.QueryDoubleProperty<DailyQuest>(_entities[4].properties[6]);
+      obx.QueryDoubleProperty<DailyQuest>(_entities[3].properties[6]);
 
   /// See [DailyQuest.dateAssigned].
   static final dateAssigned =
-      obx.QueryIntegerProperty<DailyQuest>(_entities[4].properties[7]);
+      obx.QueryIntegerProperty<DailyQuest>(_entities[3].properties[7]);
 
   /// See [DailyQuest.isClaimed].
   static final isClaimed =
-      obx.QueryBooleanProperty<DailyQuest>(_entities[4].properties[8]);
+      obx.QueryBooleanProperty<DailyQuest>(_entities[3].properties[8]);
 }
 
 /// [DailyCurrency] entity fields to define ObjectBox queries.
 class DailyCurrency_ {
   /// See [DailyCurrency.dayTimestamp].
   static final dayTimestamp =
-      obx.QueryIntegerProperty<DailyCurrency>(_entities[5].properties[0]);
+      obx.QueryIntegerProperty<DailyCurrency>(_entities[4].properties[0]);
 
   /// See [DailyCurrency.coinsEarned].
   static final coinsEarned =
-      obx.QueryDoubleProperty<DailyCurrency>(_entities[5].properties[1]);
+      obx.QueryDoubleProperty<DailyCurrency>(_entities[4].properties[1]);
 
   /// See [DailyCurrency.spaceEarned].
   static final spaceEarned =
-      obx.QueryDoubleProperty<DailyCurrency>(_entities[5].properties[2]);
+      obx.QueryDoubleProperty<DailyCurrency>(_entities[4].properties[2]);
 
   /// See [DailyCurrency.energyEarned].
   static final energyEarned =
-      obx.QueryDoubleProperty<DailyCurrency>(_entities[5].properties[3]);
+      obx.QueryDoubleProperty<DailyCurrency>(_entities[4].properties[3]);
 
   /// See [DailyCurrency.coinsSpent].
   static final coinsSpent =
-      obx.QueryDoubleProperty<DailyCurrency>(_entities[5].properties[4]);
+      obx.QueryDoubleProperty<DailyCurrency>(_entities[4].properties[4]);
 
   /// See [DailyCurrency.spaceSpent].
   static final spaceSpent =
-      obx.QueryDoubleProperty<DailyCurrency>(_entities[5].properties[5]);
+      obx.QueryDoubleProperty<DailyCurrency>(_entities[4].properties[5]);
 
   /// See [DailyCurrency.energySpent].
   static final energySpent =
-      obx.QueryDoubleProperty<DailyCurrency>(_entities[5].properties[6]);
+      obx.QueryDoubleProperty<DailyCurrency>(_entities[4].properties[6]);
 }
 
 /// [Quest] entity fields to define ObjectBox queries.
 class Quest_ {
   /// See [Quest.id].
-  static final id = obx.QueryIntegerProperty<Quest>(_entities[6].properties[0]);
+  static final id = obx.QueryIntegerProperty<Quest>(_entities[5].properties[0]);
 
   /// See [Quest.dayTimestamp].
   static final dayTimestamp =
-      obx.QueryIntegerProperty<Quest>(_entities[6].properties[1]);
+      obx.QueryIntegerProperty<Quest>(_entities[5].properties[1]);
 
   /// See [Quest.action].
   static final action =
-      obx.QueryStringProperty<Quest>(_entities[6].properties[2]);
+      obx.QueryStringProperty<Quest>(_entities[5].properties[2]);
 
   /// See [Quest.unit].
   static final unit =
-      obx.QueryStringProperty<Quest>(_entities[6].properties[3]);
+      obx.QueryStringProperty<Quest>(_entities[5].properties[3]);
 
   /// See [Quest.rewardUnit].
   static final rewardUnit =
-      obx.QueryStringProperty<Quest>(_entities[6].properties[4]);
+      obx.QueryStringProperty<Quest>(_entities[5].properties[4]);
 
   /// See [Quest.type].
   static final type =
-      obx.QueryStringProperty<Quest>(_entities[6].properties[5]);
+      obx.QueryStringProperty<Quest>(_entities[5].properties[5]);
 
   /// See [Quest.requirement].
   static final requirement =
-      obx.QueryDoubleProperty<Quest>(_entities[6].properties[6]);
+      obx.QueryDoubleProperty<Quest>(_entities[5].properties[6]);
 
   /// See [Quest.reward].
   static final reward =
-      obx.QueryDoubleProperty<Quest>(_entities[6].properties[7]);
+      obx.QueryDoubleProperty<Quest>(_entities[5].properties[7]);
 
   /// See [Quest.dateClaimed].
   static final dateClaimed =
-      obx.QueryIntegerProperty<Quest>(_entities[6].properties[8]);
+      obx.QueryIntegerProperty<Quest>(_entities[5].properties[8]);
 }
 
 /// [QuestStats] entity fields to define ObjectBox queries.
 class QuestStats_ {
   /// See [QuestStats.id].
   static final id =
-      obx.QueryIntegerProperty<QuestStats>(_entities[7].properties[0]);
+      obx.QueryIntegerProperty<QuestStats>(_entities[6].properties[0]);
 
   /// See [QuestStats.dayTimestamp].
   static final dayTimestamp =
-      obx.QueryIntegerProperty<QuestStats>(_entities[7].properties[1]);
+      obx.QueryIntegerProperty<QuestStats>(_entities[6].properties[1]);
 
   /// See [QuestStats.action].
   static final action =
-      obx.QueryIntegerProperty<QuestStats>(_entities[7].properties[2]);
+      obx.QueryIntegerProperty<QuestStats>(_entities[6].properties[2]);
 
   /// See [QuestStats.unit].
   static final unit =
-      obx.QueryIntegerProperty<QuestStats>(_entities[7].properties[3]);
+      obx.QueryIntegerProperty<QuestStats>(_entities[6].properties[3]);
 
   /// See [QuestStats.value].
   static final value =
-      obx.QueryDoubleProperty<QuestStats>(_entities[7].properties[4]);
+      obx.QueryDoubleProperty<QuestStats>(_entities[6].properties[4]);
 }
