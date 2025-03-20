@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
-import 'package:idlefit/models/game_stats.dart';
 import 'package:idlefit/models/quest_repo.dart';
+import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/providers/currency_provider.dart';
-import 'package:idlefit/main.dart'; // Import providers from main.dart
-import 'package:idlefit/providers/game_stats_provider.dart';
 import 'package:idlefit/widgets/quest_card.dart';
 
 class QuestList extends ConsumerStatefulWidget {
@@ -18,7 +16,6 @@ class QuestList extends ConsumerStatefulWidget {
 class _QuestListState extends ConsumerState<QuestList> {
   List<Quest> quests = [];
   late QuestRepository _questRepo;
-  late GameStats _gameStats;
 
   @override
   void initState() {
@@ -27,14 +24,24 @@ class _QuestListState extends ConsumerState<QuestList> {
   }
 
   Future<void> _fetchData() async {
-    final objectBox = ref.read(objectBoxProvider);
-    final questBox = objectBox.store.box<Quest>();
-    _questRepo = QuestRepository(questBox);
+    _questRepo = ref.read(questRepositoryProvider);
     final achievements = await _questRepo.getAchievements();
-    _gameStats = await ref.read(gameStatsProvider);
     setState(() {
       quests = achievements;
     });
+  }
+
+  void onClaim(Quest quest) {
+    // assuming only coins and spaces are rewarded
+    final currencyProvider =
+        quest.rewardCurrency == CurrencyType.coin
+            ? ref.read(coinProvider.notifier)
+            : ref.read(spaceProvider.notifier);
+    _questRepo.claimQuest(
+      quest,
+      ref.read(questStatsRepositoryProvider),
+      currencyProvider,
+    );
   }
 
   @override
@@ -45,23 +52,13 @@ class _QuestListState extends ConsumerState<QuestList> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Quests', style: Theme.of(context).textTheme.headlineSmall),
+            Text(
+              'Achievements',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
             const Divider(),
             ...quests.map((quest) {
-              final currencyProvider =
-                  quest.rewardCurrency == CurrencyType.coin
-                      ? ref.read(coinProvider.notifier)
-                      : ref.read(spaceProvider.notifier);
-              return QuestCard(
-                quest: quest,
-                progress: quest.progress(_gameStats),
-                onClaim:
-                    () => _questRepo.claimQuest(
-                      quest,
-                      _gameStats,
-                      currencyProvider,
-                    ),
-              );
+              return QuestCard(quest: quest, onClaim: () => onClaim(quest));
             }),
           ],
         ),

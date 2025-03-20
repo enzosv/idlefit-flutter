@@ -1,25 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/quest_repo.dart';
-import '../models/achievement.dart';
+import 'package:idlefit/models/quest_stats.dart';
 
-class QuestCard extends StatelessWidget {
+class QuestCard extends ConsumerStatefulWidget {
   final Quest quest;
-  final double progress;
   final VoidCallback onClaim;
 
-  const QuestCard({
-    super.key,
-    required this.quest,
-    required this.progress,
-    required this.onClaim,
-  });
+  @override
+  ConsumerState<QuestCard> createState() => _QuestCardState();
+
+  const QuestCard({super.key, required this.quest, required this.onClaim});
+}
+
+class _QuestCardState extends ConsumerState<QuestCard> {
+  double progress = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    final progress = await widget.quest.progress(
+      ref.read(questStatsRepositoryProvider),
+    );
+    setState(() {
+      this.progress = progress;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final progressPercent = (progress / quest.requirement).clamp(0.0, 1.0);
+
+    final progressPercent = (progress / widget.quest.requirement).clamp(
+      0.0,
+      1.0,
+    );
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -33,7 +54,10 @@ class QuestCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(quest.description, style: theme.textTheme.titleMedium),
+                    Text(
+                      widget.quest.description,
+                      style: theme.textTheme.titleMedium,
+                    ),
                     const SizedBox(height: 4),
                   ],
                 ),
@@ -43,12 +67,12 @@ class QuestCard extends StatelessWidget {
                 children: [
                   Text('Reward:', style: theme.textTheme.bodySmall),
                   Text(
-                    toLettersNotation(quest.reward),
+                    toLettersNotation(widget.quest.reward),
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.colorScheme.primary,
                     ),
                   ),
-                  quest.rewardCurrency.iconWithSize(20),
+                  widget.quest.rewardCurrency.iconWithSize(20),
                 ],
               ),
             ],
@@ -70,15 +94,18 @@ class QuestCard extends StatelessWidget {
                 '${(progressPercent * 100).toInt()}%',
                 style: theme.textTheme.bodySmall,
               ),
-              if (quest.dateClaimed != null)
+              if (widget.quest.dateClaimed != null)
                 Text(
-                  'Completed ${_formatDate(DateTime.fromMillisecondsSinceEpoch(quest.dateClaimed!))}',
+                  'Completed ${_formatDate(DateTime.fromMillisecondsSinceEpoch(widget.quest.dateClaimed!))}',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.primary,
                   ),
                 )
-              else if (progress >= quest.requirement)
-                ElevatedButton(onPressed: onClaim, child: const Text('Claim')),
+              else if (progress >= widget.quest.requirement)
+                ElevatedButton(
+                  onPressed: widget.onClaim,
+                  child: const Text('Claim'),
+                ),
             ],
           ),
         ],
