@@ -36,10 +36,10 @@ class Quest {
 
   int dayTimestamp = 0;
 
-  String action = '';
-  String unit = '';
-  String rewardUnit = '';
-  String type = '';
+  int action = 0;
+  int unit = 0;
+  int rewardUnit = 0;
+  int type = 0;
 
   double requirement = 0;
   double reward = 0;
@@ -57,19 +57,19 @@ class Quest {
   });
 
   QuestAction get questAction {
-    return QuestAction.values.byNameOrNull(action) ?? QuestAction.unknown;
+    return QuestAction.values[action];
   }
 
   QuestUnit get questUnit {
-    return QuestUnit.values.byNameOrNull(unit) ?? QuestUnit.unknown;
+    return QuestUnit.values[unit];
   }
 
   CurrencyType get rewardCurrency {
-    return CurrencyType.values.byNameOrNull(rewardUnit) ?? CurrencyType.unknown;
+    return CurrencyType.values[rewardUnit];
   }
 
   QuestType get questType {
-    return QuestType.values.byNameOrNull(type) ?? QuestType.unknown;
+    return QuestType.values[type];
   }
 
   Future<double> progress(QuestStatsRepository repository) async {
@@ -106,7 +106,19 @@ class QuestRepository {
   final Box<Quest> box;
 
   QuestRepository(this.box);
-  Future<List<Quest>> getAchievements() async {
+
+  Future<List<Quest>> getQuests(QuestType type) async {
+    switch (type) {
+      case QuestType.achievement:
+        return await _getAchievements();
+      case QuestType.daily:
+        return await _getDailyQuests();
+      default:
+        return [];
+    }
+  }
+
+  Future<List<Quest>> _getAchievements() async {
     return (await [
           _generateAchievement(QuestAction.spend, QuestUnit.coin),
           _generateAchievement(QuestAction.walk, QuestUnit.steps),
@@ -116,27 +128,14 @@ class QuestRepository {
         .toList();
   }
 
-  Future<List<Quest>> getDailyQuests() async {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
-    return box
-        .query(
-          Quest_.type
-              .equals(QuestType.daily.name)
-              .and(Quest_.dayTimestamp.equals(today)),
-        )
-        .build()
-        .find();
-  }
-
   Future<int> _countAchievements(QuestAction action, QuestUnit unit) async {
     return box
         .query(
           Quest_.type
-              .equals(QuestType.achievement.name)
+              .equals(QuestType.achievement.index)
               .and(Quest_.dateClaimed.greaterThan(0))
-              .and(Quest_.action.equals(action.name))
-              .and(Quest_.unit.equals(unit.name)),
+              .and(Quest_.action.equals(action.index))
+              .and(Quest_.unit.equals(unit.index)),
         )
         .build()
         .count();
@@ -179,10 +178,10 @@ class QuestRepository {
     }
 
     return Quest(
-      action: action.name,
-      unit: unit.name,
-      rewardUnit: rewardUnit.name,
-      type: QuestType.achievement.name,
+      action: action.index,
+      unit: unit.index,
+      rewardUnit: rewardUnit.index,
+      type: QuestType.achievement.index,
       dayTimestamp: 0,
       requirement: requirement,
       reward: reward,
@@ -194,9 +193,9 @@ class QuestRepository {
         await box
             .query(
               Quest_.type
-                  .equals(QuestType.achievement.name)
-                  .and(Quest_.action.equals(QuestAction.spend.name))
-                  .and(Quest_.unit.equals(QuestUnit.coin.name))
+                  .equals(QuestType.achievement.index)
+                  .and(Quest_.action.equals(QuestAction.spend.index))
+                  .and(Quest_.unit.equals(QuestUnit.coin.index))
                   .and(Quest_.dateClaimed.greaterThan(0)),
             )
             .order(Quest_.dateClaimed, flags: Order.descending)
@@ -206,45 +205,49 @@ class QuestRepository {
     final coinReward = coinRequirement * 0.1;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
-    return [
+    final quests = [
       Quest(
-        action: QuestAction.watch.name,
-        unit: QuestUnit.ad.name,
-        rewardUnit: CurrencyType.space.name,
-        type: QuestType.daily.name,
+        action: QuestAction.watch.index,
+        unit: QuestUnit.ad.index,
+        rewardUnit: CurrencyType.space.index,
+        type: QuestType.daily.index,
         dayTimestamp: today,
         requirement: 1,
         reward: 1000,
       ),
       Quest(
-        action: QuestAction.spend.name,
-        unit: QuestUnit.coin.name,
-        rewardUnit: CurrencyType.coin.name,
-        type: QuestType.daily.name,
+        action: QuestAction.spend.index,
+        unit: QuestUnit.coin.index,
+        rewardUnit: CurrencyType.coin.index,
+        type: QuestType.daily.index,
         dayTimestamp: today,
         requirement: coinRequirement,
         reward: coinReward,
       ),
       Quest(
-        action: QuestAction.walk.name,
-        unit: QuestUnit.steps.name,
-        rewardUnit: CurrencyType.space.name,
-        type: QuestType.daily.name,
+        action: QuestAction.walk.index,
+        unit: QuestUnit.steps.index,
+        rewardUnit: CurrencyType.space.index,
+        type: QuestType.daily.index,
         dayTimestamp: today,
         requirement: 7500,
         reward: 1000,
       ),
     ];
+    box.putMany(quests);
+    return quests;
   }
 
-  Future<List<Quest>> getTodayDailyQuests() async {
+  /// returns daily quests for today
+  /// generates them if they dont exist
+  Future<List<Quest>> _getDailyQuests() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
     final dailyQuests =
         box
             .query(
               Quest_.type
-                  .equals(QuestType.daily.name)
+                  .equals(QuestType.daily.index)
                   .and(Quest_.dayTimestamp.equals(today)),
             )
             .build()
@@ -263,9 +266,11 @@ class QuestRepository {
     if (quest.dateClaimed != null || !(await quest.isCompleted(repository))) {
       return;
     }
+    print("claiming quest: ${quest.id}");
     currencyNotifier.earn(quest.reward.toDouble());
     quest.dateClaimed = DateTime.now().millisecondsSinceEpoch;
-    box.putAsync(quest);
+    box.put(quest);
+    print("quest claimed: ${quest.id}");
   }
 }
 

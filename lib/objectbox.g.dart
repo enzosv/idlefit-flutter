@@ -219,22 +219,22 @@ final _entities = <obx_int.ModelEntity>[
         obx_int.ModelProperty(
             id: const obx_int.IdUid(3, 4282291348858888894),
             name: 'action',
-            type: 9,
+            type: 6,
             flags: 0),
         obx_int.ModelProperty(
             id: const obx_int.IdUid(4, 6250565454144484206),
             name: 'unit',
-            type: 9,
+            type: 6,
             flags: 0),
         obx_int.ModelProperty(
             id: const obx_int.IdUid(5, 3497061908798785311),
             name: 'rewardUnit',
-            type: 9,
+            type: 6,
             flags: 0),
         obx_int.ModelProperty(
             id: const obx_int.IdUid(6, 1074688234730917148),
             name: 'type',
-            type: 9,
+            type: 6,
             flags: 0),
         obx_int.ModelProperty(
             id: const obx_int.IdUid(7, 842234281523857787),
@@ -628,17 +628,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
           object.id = id;
         },
         objectToFB: (Quest object, fb.Builder fbb) {
-          final actionOffset = fbb.writeString(object.action);
-          final unitOffset = fbb.writeString(object.unit);
-          final rewardUnitOffset = fbb.writeString(object.rewardUnit);
-          final typeOffset = fbb.writeString(object.type);
           fbb.startTable(10);
           fbb.addInt64(0, object.id);
           fbb.addInt64(1, object.dayTimestamp);
-          fbb.addOffset(2, actionOffset);
-          fbb.addOffset(3, unitOffset);
-          fbb.addOffset(4, rewardUnitOffset);
-          fbb.addOffset(5, typeOffset);
+          fbb.addInt64(2, object.action);
+          fbb.addInt64(3, object.unit);
+          fbb.addInt64(4, object.rewardUnit);
+          fbb.addInt64(5, object.type);
           fbb.addFloat64(6, object.requirement);
           fbb.addFloat64(7, object.reward);
           fbb.addInt64(8, object.dateClaimed);
@@ -648,14 +644,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
         objectFromFB: (obx.Store store, ByteData fbData) {
           final buffer = fb.BufferContext(fbData);
           final rootOffset = buffer.derefObject(0);
-          final actionParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 8, '');
-          final unitParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 10, '');
-          final rewardUnitParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 12, '');
-          final typeParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 14, '');
+          final actionParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
+          final unitParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0);
+          final rewardUnitParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0);
+          final typeParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0);
           final dayTimestampParam =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
           final requirementParam =
@@ -847,19 +843,19 @@ class Quest_ {
 
   /// See [Quest.action].
   static final action =
-      obx.QueryStringProperty<Quest>(_entities[5].properties[2]);
+      obx.QueryIntegerProperty<Quest>(_entities[5].properties[2]);
 
   /// See [Quest.unit].
   static final unit =
-      obx.QueryStringProperty<Quest>(_entities[5].properties[3]);
+      obx.QueryIntegerProperty<Quest>(_entities[5].properties[3]);
 
   /// See [Quest.rewardUnit].
   static final rewardUnit =
-      obx.QueryStringProperty<Quest>(_entities[5].properties[4]);
+      obx.QueryIntegerProperty<Quest>(_entities[5].properties[4]);
 
   /// See [Quest.type].
   static final type =
-      obx.QueryStringProperty<Quest>(_entities[5].properties[5]);
+      obx.QueryIntegerProperty<Quest>(_entities[5].properties[5]);
 
   /// See [Quest.requirement].
   static final requirement =

@@ -30,12 +30,12 @@ class _QuestListState extends ConsumerState<QuestList> {
         quest.rewardCurrency == CurrencyType.coin
             ? ref.read(coinProvider.notifier)
             : ref.read(spaceProvider.notifier);
-    print("attempting to claim quest: ${quest.id}");
     _questRepo.claimQuest(
       quest,
       ref.read(questStatsRepositoryProvider),
       currencyProvider,
     );
+    setState(() {});
   }
 
   @override
@@ -53,11 +53,9 @@ class _QuestListState extends ConsumerState<QuestList> {
             const Divider(),
             FutureBuilder<List<Quest>>(
               future: () async {
-                final List<Quest> quests = switch (widget.questType) {
-                  QuestType.achievement => await _questRepo.getAchievements(),
-                  QuestType.daily => await _questRepo.getTodayDailyQuests(),
-                  _ => [],
-                };
+                final List<Quest> quests = await _questRepo.getQuests(
+                  widget.questType,
+                );
                 return quests;
               }(),
               builder: (context, snapshot) {
