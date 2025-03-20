@@ -119,6 +119,18 @@ class QuestRepository {
   }
 
   Future<List<Quest>> _getAchievements() async {
+    final quests =
+        box
+            .query(
+              Quest_.type
+                  .equals(QuestType.achievement.index)
+                  .and(Quest_.dateClaimed.isNull()),
+            )
+            .build()
+            .find();
+    if (quests.isNotEmpty) {
+      return quests;
+    }
     return (await [
           _generateAchievement(QuestAction.spend, QuestUnit.coin),
           _generateAchievement(QuestAction.walk, QuestUnit.steps),
@@ -177,7 +189,7 @@ class QuestRepository {
         return null;
     }
 
-    return Quest(
+    final quest = Quest(
       action: action.index,
       unit: unit.index,
       rewardUnit: rewardUnit.index,
@@ -186,6 +198,8 @@ class QuestRepository {
       requirement: requirement,
       reward: reward,
     );
+    box.put(quest);
+    return quest;
   }
 
   Future<List<Quest>> _generateTodayDailyQuests() async {
@@ -271,6 +285,11 @@ class QuestRepository {
     quest.dateClaimed = DateTime.now().millisecondsSinceEpoch;
     box.put(quest);
     print("quest claimed: ${quest.id}");
+
+    // create next achievement
+    if (quest.questType == QuestType.achievement) {
+      await _generateAchievement(quest.questAction, quest.questUnit);
+    }
   }
 }
 
