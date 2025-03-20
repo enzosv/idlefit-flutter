@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/currency.dart';
@@ -166,19 +167,22 @@ class QuestRepository {
       case (QuestAction.spend, QuestUnit.coin):
         rewardUnit = CurrencyType.coin;
         reward = pow(1000, (level + 1)).toDouble();
-        requirement = reward * 1000;
+        requirement = reward * 100;
       case (QuestAction.spend, QuestUnit.energy):
         rewardUnit = CurrencyType.energy;
-        const requirements = [28800000, 86400000, 604800000, 2592000000];
-        const rewards = [1200000, 3600000, 7200000, 10800000];
+        const requirements = Constants.spendEnergyAchivementRequirements;
         requirement = requirements[level].toDouble();
-        reward = rewards[level].toDouble();
+        reward = Constants.baseSpendEnergyAchivementReward * pow(2, level);
       case (QuestAction.walk, QuestUnit.steps):
         rewardUnit = CurrencyType.space;
-        const requirements = [10000, 50000, 100000, 200000, 500000, 1000000];
-        const rewards = [1000, 2000, 3000, 4000, 5000, 6000];
+        const requirements = Constants.walkAchivementRequirements;
+        const rewards = Constants.walkAchivementRewards;
         requirement = requirements[level].toDouble();
         reward = rewards[level].toDouble();
+      case (QuestAction.watch, QuestUnit.ad):
+        rewardUnit = CurrencyType.space;
+        reward = 5000;
+        requirement = 5;
       // TODO: achievement for number of generators purchased
       // TODO: achievement for number of generator upgrades purchased
       // TODO: achievement for number of generator upgrades unlocked
