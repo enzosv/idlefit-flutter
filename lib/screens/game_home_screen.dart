@@ -43,6 +43,11 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
       gameStateNotifier.setIsPaused(true);
       return;
     }
+
+    // TODO: show dialog asking user if they want to be notified when coin capacity is reached
+    // Initialize notifications
+    await NotificationService.initialize();
+
     // going to foreground
     await ref
         .read(healthServiceProvider)

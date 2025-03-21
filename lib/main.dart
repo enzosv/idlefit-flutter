@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'services/health_service.dart';
 import 'services/storage_service.dart';
 import 'services/object_box.dart';
-import 'services/notification_service.dart';
 
 // Create providers for our services
 final healthServiceProvider = Provider<HealthService>(
@@ -27,9 +26,6 @@ void main() async {
   final storageService = StorageService(prefs);
   final objectBox = await ObjectBox.create();
   final healthService = HealthService();
-
-  // Initialize notifications
-  await NotificationService.initialize();
 
   runApp(
     ProviderScope(
