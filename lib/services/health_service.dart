@@ -10,27 +10,29 @@ import 'package:idlefit/services/ios_health_service.dart';
 class HealthService {
   final Health health = Health();
 
+  static final types =
+      Platform.isIOS
+          ? [HealthDataType.ACTIVE_ENERGY_BURNED, HealthDataType.STEPS]
+          : [
+            HealthDataType.ACTIVE_ENERGY_BURNED,
+            HealthDataType.STEPS,
+            HealthDataType.TOTAL_CALORIES_BURNED,
+            HealthDataType.BASAL_ENERGY_BURNED,
+          ];
+
   HealthService();
 
-  Future<void> initialize() async {
-    try {
-      await requestAuthorization();
-    } catch (e) {
-      debugPrint('Error initializing health service: $e');
-    }
+  Future<bool?> isAuthorized() async {
+    return await health.hasPermissions(types);
   }
 
   Future<bool> requestAuthorization() async {
     try {
-      final List<HealthDataType> types = [
-        HealthDataType.ACTIVE_ENERGY_BURNED,
-        HealthDataType.STEPS,
-      ];
       // Get permissions
-      bool? hasPermissions = await health.hasPermissions(types);
-
+      bool? hasPermissions = await isAuthorized();
       // If not authorized yet, request permissions
       if (hasPermissions == null || !hasPermissions) {
+        // may block if already granted so always check if already granted
         return await health.requestAuthorization(types);
       }
 
@@ -39,6 +41,56 @@ class HealthService {
       debugPrint('Error requesting health authorization: $e');
       return false;
     }
+  }
+
+  Future<double?> getActiveEnergyBurned(
+    DateTime startOfDay,
+    DateTime endOfDay,
+  ) async {
+    // Fetch Total Calories Burned (TCB)
+    final caloriesData = await health.getHealthDataFromTypes(
+      startTime: startOfDay,
+      endTime: endOfDay,
+      types: [HealthDataType.TOTAL_CALORIES_BURNED],
+    );
+    final totalCalories =
+        caloriesData.isNotEmpty
+            ? caloriesData.fold(
+              0.0,
+              (sum, item) =>
+                  sum +
+                  (item.value as NumericHealthValue).numericValue.toDouble(),
+            )
+            : null;
+
+    if (totalCalories == null) {
+      print("Calories data missing.");
+      return null;
+    }
+    // Fetch BMR (Basal Metabolic Rate)
+    final bmrData = await health.getHealthDataFromTypes(
+      startTime: startOfDay,
+      endTime: endOfDay,
+      types: [HealthDataType.BASAL_ENERGY_BURNED],
+    );
+    print("bmr $bmrData");
+    final bmr =
+        bmrData.isNotEmpty
+            ? (bmrData.last.value as NumericHealthValue).numericValue.toDouble()
+            : null;
+    if (bmr == null) {
+      print("BMR data missing. Assuming 1/3 of TCB.");
+      return totalCalories / 3;
+    }
+
+    // Compute time fraction (in days)
+    double timeFraction =
+        endOfDay.difference(startOfDay).inSeconds / (24 * 3600);
+    print('bmr: $bmr');
+    print('totalCalories: $totalCalories');
+    print('timeFraction: $timeFraction');
+    // Compute Active Energy Burned (AEB)
+    return totalCalories - (bmr * timeFraction);
   }
 
   Future<double> _getDailyHealth(
@@ -110,6 +162,9 @@ class HealthService {
               HealthDataType.ACTIVE_ENERGY_BURNED,
             ),
           ].wait;
+      if (calories == 0) {
+        calories = await getActiveEnergyBurned(startOfDay, endOfDay) ?? 0;
+      }
     }
 
     final stepsDif = await questStatsRepository.setProgress(
