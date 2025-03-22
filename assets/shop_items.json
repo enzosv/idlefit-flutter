@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "name": "Caffeine Intolerance",
+    "name": "Caffeine",
     "description": "Increases energy capacity by 10%",
     "baseCost": 1000,
     "effect": "energyCapacity",
@@ -10,7 +10,7 @@
   },
   {
     "id": 2,
-    "name": "Gym Expansion",
+    "name": "Floor Mats",
     "description": "Increases space capacity by 10%",
     "baseCost": 1000,
     "effect": "spaceCapacity",
@@ -37,7 +37,7 @@
   },
   {
     "id": 5,
-    "name": "Protein Shake",
+    "name": "Protein",
     "description": "Increases gain capacity by 10%",
     "baseCost": 1000,
     "effect": "coinCapacity",
