@@ -7,6 +7,8 @@ import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:idlefit/widgets/current_coins.dart';
 import '../helpers/util.dart';
 
+const _smallStyle = TextStyle(fontSize: 12, color: Colors.white70);
+
 class CoinsDisplay extends ConsumerWidget {
   const CoinsDisplay({super.key});
 
@@ -20,7 +22,7 @@ class CoinsDisplay extends ConsumerWidget {
       children: [
         Row(
           children: [
-            CurrencyType.coin.iconWithSize(32),
+            CurrencyType.coin.iconWithSize(28),
             const SizedBox(width: 8),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,10 +36,7 @@ class CoinsDisplay extends ConsumerWidget {
                     ),
                     Text(
                       '/${toLettersNotation(coins.max)}',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
+                      style: _smallStyle,
                     ),
                   ],
                 ),
@@ -45,10 +44,7 @@ class CoinsDisplay extends ConsumerWidget {
                   children: [
                     Text(
                       '${toLettersNotation(gameStateNotifier.passiveOutput)}/s ',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
+                      style: _smallStyle,
                     ),
                     OutlinedButton.icon(
                       onPressed: () {},
@@ -57,7 +53,7 @@ class CoinsDisplay extends ConsumerWidget {
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           const Icon(Icons.play_circle),
-                          Text("Boost"),
+                          Text("Boost", style: _smallStyle),
                         ],
                       ),
                       style: OutlinedButton.styleFrom(
@@ -107,7 +103,7 @@ class CurrencyWidget extends ConsumerWidget {
         currencyType.iconWithSize(20),
         const SizedBox(width: 4),
         Text(count, style: const TextStyle(fontWeight: FontWeight.bold)),
-        Text('/$max'),
+        Text('/$max', style: _smallStyle),
       ],
     );
   }
