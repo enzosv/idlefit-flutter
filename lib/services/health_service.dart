@@ -22,14 +22,10 @@ class HealthService {
 
   HealthService();
 
-  Future<bool?> isAuthorized() async {
-    return await health.hasPermissions(types);
-  }
-
-  Future<bool> requestAuthorization() async {
+  Future<bool> initialize() async {
     try {
       // Get permissions
-      bool? hasPermissions = await isAuthorized();
+      bool? hasPermissions = await health.hasPermissions(types);
       // If not authorized yet, request permissions
       if (hasPermissions == null || !hasPermissions) {
         // may block if already granted so always check if already granted
