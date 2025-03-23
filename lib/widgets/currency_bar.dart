@@ -4,6 +4,7 @@ import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
+import 'package:idlefit/widgets/boost_button.dart';
 import 'package:idlefit/widgets/current_coins.dart';
 import '../helpers/util.dart';
 
@@ -46,27 +47,7 @@ class CoinsDisplay extends ConsumerWidget {
                       '${toLettersNotation(gameStateNotifier.passiveOutput)}/s ',
                       style: _smallStyle,
                     ),
-                    OutlinedButton.icon(
-                      onPressed: () {},
-                      label: Text(""),
-                      icon: Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          const Icon(Icons.play_circle),
-                          Text("Boost", style: _smallStyle),
-                        ],
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: Constants.primaryColor,
-                        foregroundColor: Colors.white,
-                        iconSize: 12,
-                        padding: const EdgeInsets.only(left: 4),
-                        visualDensity: VisualDensity.compact,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        minimumSize: const Size(0, 0),
-                        side: BorderSide(color: CurrencyType.coin.color),
-                      ),
-                    ),
+                    BoostButton(),
                   ],
                 ),
               ],
@@ -127,7 +108,7 @@ class CurrencyBar extends StatelessWidget {
           Expanded(
             flex: 1,
             child: IconButton(
-              iconSize: 32,
+              iconSize: 28,
               onPressed: () {},
               icon: const Icon(Icons.menu),
             ),
