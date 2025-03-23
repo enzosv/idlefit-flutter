@@ -3,18 +3,23 @@ import 'dart:math';
 import 'package:flutter/rendering.dart';
 
 String durationNotation(double milliseconds) {
-  if (milliseconds < 3600000) {
-    final mins = (milliseconds / 60000);
-    if (mins >= 1 && mins < 1.01) {
-      return "${toLettersNotation(mins)}min";
-    }
-    return "${toLettersNotation(mins)}mins";
-  }
-  final hrs = milliseconds / 3600000;
-  if (hrs >= 1 && hrs < 1.01) {
-    return "${toLettersNotation(hrs)}hr";
-  }
-  return "${toLettersNotation(hrs)}hrs";
+  Duration duration = Duration(milliseconds: milliseconds.floor());
+  int hours = duration.inHours;
+  int minutes = duration.inMinutes.remainder(60);
+  return '$hours:${minutes.toString().padLeft(2, '0')}';
+
+  // if (milliseconds < 3600000) {
+  //   final mins = (milliseconds / 60000);
+  //   if (mins >= 1 && mins < 1.01) {
+  //     return "${toLettersNotation(mins)}m";
+  //   }
+  //   return "${toLettersNotation(mins)}mins";
+  // }
+  // final hrs = milliseconds / 3600000;
+  // if (hrs >= 1 && hrs < 1.01) {
+  //   return "${toLettersNotation(hrs)}hr";
+  // }
+  // return "${toLettersNotation(hrs)}hrs";
 }
 
 String toLettersNotation(double number) {
