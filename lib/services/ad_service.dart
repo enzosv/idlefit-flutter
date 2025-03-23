@@ -14,7 +14,10 @@ class AdService {
 
   static Future<void> initialize() async {
     await MobileAds.instance.initialize();
+    _loadRewardedAd();
   }
+
+  static RewardedAd? _rewardedAd;
 
   static BannerAd createBannerAd() {
     return BannerAd(
@@ -33,40 +36,45 @@ class AdService {
     );
   }
 
-  static Future<bool> showRewardedAd({
-    required Function() onRewarded,
-    required Function() onAdDismissed,
-    required Function(String) onAdFailedToShow,
-  }) async {
+  static Future<bool> _loadRewardedAd() async {
     try {
-      RewardedAd? rewardedAd;
       await RewardedAd.load(
         adUnitId: rewardedAdUnitId,
         request: const AdRequest(),
         rewardedAdLoadCallback: RewardedAdLoadCallback(
           onAdLoaded: (ad) {
-            rewardedAd = ad;
-            rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
-              onAdDismissedFullScreenContent: (ad) {
-                ad.dispose();
-                onAdDismissed();
-              },
-              onAdFailedToShowFullScreenContent: (ad, error) {
-                ad.dispose();
-                onAdFailedToShow(error.message);
-              },
-            );
-            rewardedAd!.show(
-              onUserEarnedReward: (_, __) {
-                onRewarded();
-              },
-            );
+            _rewardedAd = ad;
           },
           onAdFailedToLoad: (error) {
+            // TODO: retry with exponential backoff
             debugPrint('Failed to load rewarded ad: ${error.message}');
-            onAdFailedToShow('Failed to load ad: ${error.message}');
           },
         ),
+      );
+      return true;
+    } catch (e) {
+      // TODO: retry with exponential backoff
+      debugPrint('Error showing rewarded ad: $e');
+      return false;
+    }
+  }
+
+  static Future<bool> showRewardedAd({
+    required Function() onRewarded,
+    required Function() onAdDismissed,
+    required Function(String) onAdFailedToShow,
+  }) async {
+    final loadedAd = _rewardedAd;
+    _loadRewardedAd();
+    if (loadedAd == null) {
+      onAdFailedToShow('Rewarded ad not loaded');
+      return false;
+    }
+    try {
+      loadedAd.show(
+        onUserEarnedReward: (_, __) {
+          onRewarded();
+        },
       );
       return true;
     } catch (e) {
