@@ -9,12 +9,40 @@ class QuestStats {
   @Id()
   int id = 0;
 
-  int dayTimestamp;
+  int dayTimestamp = 0;
   int action;
   int unit;
-  double value;
+  double value = 0.0;
 
-  QuestStats(this.dayTimestamp, this.action, this.unit, this.value);
+  QuestStats(this.action, this.unit);
+
+  QuestAction get questAction => QuestAction.values[action];
+  QuestUnit get questUnit => QuestUnit.values[unit];
+
+  String get description {
+    switch ((questAction, questUnit)) {
+      case (QuestAction.tap, QuestUnit.generator):
+        return 'Generators tapped';
+      case (QuestAction.watch, QuestUnit.ad):
+        return 'Ads watched';
+      case (QuestAction.purchase, QuestUnit.generator):
+        return 'Generators purchased';
+      case (QuestAction.upgrade, QuestUnit.generator):
+        return 'Generators upgraded';
+      case (QuestAction.tap, QuestUnit.shopItem):
+        return 'Shop items tapped';
+      case (QuestAction.upgrade, QuestUnit.shopItem):
+        return 'Shop items upgraded';
+      case (QuestAction.purchase, QuestUnit.shopItem):
+        return 'Shop items purchased';
+      default:
+        assert(
+          false,
+          'unhandled action: ${questAction.name}, unit: ${questUnit.name} ',
+        );
+        return '';
+    }
+  }
 }
 
 class QuestStatsRepository {
@@ -42,7 +70,7 @@ class QuestStatsRepository {
       return existing;
     }
 
-    final newStats = QuestStats(dayTimestamp, action.index, unit.index, 0.0);
+    final newStats = QuestStats(action.index, unit.index);
     await box.putAsync(newStats);
     return newStats;
   }

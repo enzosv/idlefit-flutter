@@ -12,6 +12,13 @@ class GameStatsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final questStatsRepo = ref.watch(questStatsRepositoryProvider);
+    final stats = [
+      QuestStats(QuestAction.purchase.index, QuestUnit.generator.index),
+      QuestStats(QuestAction.upgrade.index, QuestUnit.generator.index),
+      QuestStats(QuestAction.tap.index, QuestUnit.generator.index),
+      QuestStats(QuestAction.upgrade.index, QuestUnit.shopItem.index),
+      QuestStats(QuestAction.watch.index, QuestUnit.ad.index),
+    ];
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -27,20 +34,8 @@ class GameStatsCard extends ConsumerWidget {
             _CurrencyListTile(currency: ref.watch(energyProvider)),
             _CurrencyListTile(currency: ref.watch(spaceProvider)),
             const Divider(),
-            _StateListTile(
-              action: QuestAction.purchase,
-              unit: QuestUnit.generator,
-              repo: questStatsRepo,
-            ),
-            _StateListTile(
-              action: QuestAction.upgrade,
-              unit: QuestUnit.generator,
-              repo: questStatsRepo,
-            ),
-            _StateListTile(
-              action: QuestAction.upgrade,
-              unit: QuestUnit.shopItem,
-              repo: questStatsRepo,
+            ...stats.map(
+              (stat) => _StateListTile(stats: stat, repo: questStatsRepo),
             ),
           ],
         ),
@@ -50,22 +45,17 @@ class GameStatsCard extends ConsumerWidget {
 }
 
 class _StateListTile extends StatelessWidget {
-  const _StateListTile({
-    required this.action,
-    required this.unit,
-    required this.repo,
-  });
+  const _StateListTile({required this.stats, required this.repo});
 
-  final QuestAction action;
-  final QuestUnit unit;
+  final QuestStats stats;
   final QuestStatsRepository repo;
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<(double, double)>(
       future: Future.wait([
-        repo.getProgress(action, unit, todayTimestamp),
-        repo.getTotalProgress(action, unit),
+        repo.getProgress(stats.questAction, stats.questUnit, todayTimestamp),
+        repo.getTotalProgress(stats.questAction, stats.questUnit),
       ]).then((values) => (values[0], values[1])),
       builder: (context, AsyncSnapshot<(double, double)> snapshot) {
         if (!snapshot.hasData) {
@@ -78,9 +68,7 @@ class _StateListTile extends StatelessWidget {
         }
 
         return ListTile(
-          title: Text(
-            "${unit.name.capitalize()}s ${action.name.capitalize()}d",
-          ),
+          title: Text(stats.description),
           subtitle: Text("Today: ${progress.floor()}"),
           trailing: Text("Total: ${total.floor()}"),
         );

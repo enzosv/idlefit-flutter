@@ -520,17 +520,16 @@ obx_int.ModelDefinition getObjectBoxModel() {
         objectFromFB: (obx.Store store, ByteData fbData) {
           final buffer = fb.BufferContext(fbData);
           final rootOffset = buffer.derefObject(0);
-          final dayTimestampParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
           final actionParam =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
           final unitParam =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0);
-          final valueParam =
-              const fb.Float64Reader().vTableGet(buffer, rootOffset, 12, 0);
-          final object = QuestStats(
-              dayTimestampParam, actionParam, unitParam, valueParam)
-            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+          final object = QuestStats(actionParam, unitParam)
+            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
+            ..dayTimestamp =
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0)
+            ..value =
+                const fb.Float64Reader().vTableGet(buffer, rootOffset, 12, 0);
 
           return object;
         })
