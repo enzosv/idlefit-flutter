@@ -8,21 +8,10 @@ import 'package:idlefit/services/ad_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
 
-class BoostButton extends ConsumerStatefulWidget {
+class BoostButton extends ConsumerWidget {
   const BoostButton({super.key});
 
-  @override
-  ConsumerState<BoostButton> createState() => _BoostButtonState();
-}
-
-class _BoostButtonState extends ConsumerState<BoostButton> {
-  bool loading = false;
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  void _watchAd() {
+  void _watchAd(WidgetRef ref) {
     // TODO: add loading state
     // TODO: DRY up against shop_double_coin_card
     AdService.showRewardedAd(
@@ -51,27 +40,11 @@ class _BoostButtonState extends ConsumerState<BoostButton> {
       onAdFailedToShow: (error) {
         debugPrint('Failed to show ad: $error');
       },
-    ).then((value) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        loading = false;
-      });
-    });
+    );
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (loading) {
-      return const Center(
-        child: SizedBox(
-          width: 12,
-          height: 12,
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
+  Widget build(BuildContext context, WidgetRef ref) {
     final gameState = ref.watch(gameStateProvider);
     final now = DateTime.now().millisecondsSinceEpoch;
     final timeLeft = (gameState.doubleCoinExpiry - now) ~/ 1000;
@@ -87,7 +60,7 @@ class _BoostButtonState extends ConsumerState<BoostButton> {
     // show boost button
     return OutlinedButton.icon(
       onPressed: () {
-        _watchAd();
+        _watchAd(ref);
       },
       label: Text(""),
       icon: Wrap(
