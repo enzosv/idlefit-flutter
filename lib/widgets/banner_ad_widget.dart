@@ -54,8 +54,7 @@ class _BannerAdWidgetState extends ConsumerState<BannerAdWidget> {
     }
 
     return Container(
-      padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
-      decoration: BoxDecoration(color: Constants.barColor),
+      padding: const EdgeInsets.all(12),
       width: MediaQuery.of(context).size.width,
       child: SizedBox(
         width: _bannerAd!.size.width.toDouble(),
