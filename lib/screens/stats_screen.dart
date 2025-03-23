@@ -27,11 +27,9 @@ class StatsScreen extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                // Game stats card
-                const GameStatsCard(),
+                const HealthStatsCard(),
                 spacer,
-                // Health data card
-                HealthStatsCard(),
+                const GameStatsCard(),
                 spacer,
                 // Daily quests
                 const QuestList(questType: QuestType.daily),

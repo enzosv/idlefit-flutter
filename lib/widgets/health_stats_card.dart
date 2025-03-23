@@ -112,7 +112,7 @@ class HealthStatsCard extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Health Activity',
+                      'Health Stats',
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     healthStats.when(
