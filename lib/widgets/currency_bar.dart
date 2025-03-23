@@ -108,6 +108,7 @@ class CurrencyBar extends StatelessWidget {
           Expanded(
             flex: 1,
             child: IconButton(
+              alignment: Alignment.centerLeft,
               iconSize: 28,
               onPressed: () {},
               icon: const Icon(Icons.menu),

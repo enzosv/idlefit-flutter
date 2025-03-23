@@ -4,8 +4,12 @@ import 'package:flutter/rendering.dart';
 
 String durationNotation(double milliseconds) {
   Duration duration = Duration(milliseconds: milliseconds.floor());
-  int hours = duration.inHours;
-  int minutes = duration.inMinutes.remainder(60);
+  final days = duration.inDays;
+  if (days > 1) {
+    return '$days days';
+  }
+  final hours = duration.inHours;
+  final minutes = duration.inMinutes.remainder(60);
   return '$hours:${minutes.toString().padLeft(2, '0')}';
 
   // if (milliseconds < 3600000) {
