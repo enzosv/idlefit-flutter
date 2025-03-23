@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:idlefit/providers/generator_provider.dart';
 import '../services/ad_service.dart';
 import '../helpers/constants.dart';
 
-class BannerAdWidget extends StatefulWidget {
+class BannerAdWidget extends ConsumerStatefulWidget {
   const BannerAdWidget({super.key});
 
   @override
-  State<BannerAdWidget> createState() => _BannerAdWidgetState();
+  ConsumerState<BannerAdWidget> createState() => _BannerAdWidgetState();
 }
 
-class _BannerAdWidgetState extends State<BannerAdWidget> {
+class _BannerAdWidgetState extends ConsumerState<BannerAdWidget> {
   BannerAd? _bannerAd;
   bool _isAdLoaded = false;
 
@@ -38,9 +40,15 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final highestTier = ref.read(
+      generatorProvider.notifier.select((value) => value.highestTier),
+    );
+    if (highestTier < 9) {
+      return SizedBox.shrink();
+    }
     if (!_isAdLoaded || _bannerAd == null) {
       return SizedBox(
-        height: 50, // TODO: height of currency bar
+        height: 32,
         width: MediaQuery.of(context).size.width,
       ); // Placeholder height for the ad
     }
