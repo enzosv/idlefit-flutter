@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/helpers/util.dart';
@@ -17,58 +16,26 @@ class BoostButton extends ConsumerStatefulWidget {
 }
 
 class _BoostButtonState extends ConsumerState<BoostButton> {
-  Timer? _timer;
-  int _timeLeft = 0;
-
+  bool loading = false;
   @override
   void initState() {
     super.initState();
-    _startTimer();
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  void _startTimer() {
-    // Update immediately
-    _updateTimeLeft();
-
-    // Then start periodic updates if needed
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      _updateTimeLeft();
-    });
-  }
-
-  void _updateTimeLeft() {
-    final gameState = ref.read(gameStateProvider);
-    final now = DateTime.now().millisecondsSinceEpoch;
-    final isActive = gameState.doubleCoinExpiry > now;
-
-    setState(() {
-      _timeLeft = isActive ? (gameState.doubleCoinExpiry - now) ~/ 1000 : 0;
-    });
-
-    // Stop timer if boost is no longer active
-    if (!isActive && _timer != null) {
-      _timer?.cancel();
-      _timer = null;
-    }
   }
 
   void _watchAd() {
+    // TODO: add loading state
+    // TODO: DRY up against shop_double_coin_card
     AdService.showRewardedAd(
       onRewarded: () {
+        // double coin boost
         ref
             .read(gameStateProvider.notifier)
             .setDoubleCoinExpiry(
               DateTime.now()
-                  .add(const Duration(minutes: 1))
+                  .add(const Duration(seconds: 10))
                   .millisecondsSinceEpoch,
             );
+        // update quest
         ref
             .read(questStatsRepositoryProvider)
             .progressTowards(
@@ -77,7 +44,6 @@ class _BoostButtonState extends ConsumerState<BoostButton> {
               todayTimestamp,
               1,
             );
-        _startTimer();
       },
       onAdDismissed: () {
         // Ad was dismissed without reward
@@ -85,22 +51,40 @@ class _BoostButtonState extends ConsumerState<BoostButton> {
       onAdFailedToShow: (error) {
         debugPrint('Failed to show ad: $error');
       },
-    );
+    ).then((value) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        loading = false;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (loading) {
+      return const Center(
+        child: SizedBox(
+          width: 12,
+          height: 12,
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     final gameState = ref.watch(gameStateProvider);
     final now = DateTime.now().millisecondsSinceEpoch;
-    final isActive = gameState.doubleCoinExpiry > now;
-    if (isActive) {
-      final minutes = _timeLeft ~/ 60;
-      final seconds = _timeLeft % 60;
+    final timeLeft = (gameState.doubleCoinExpiry - now) ~/ 1000;
+    if (timeLeft > 0) {
+      // show countdown
+      final minutes = timeLeft ~/ 60;
+      final seconds = timeLeft % 60;
       return Text(
         "2x $minutes:${seconds.toString().padLeft(2, '0')}",
         style: TextStyle(fontSize: 12, color: CurrencyType.coin.color),
       );
     }
+    // show boost button
     return OutlinedButton.icon(
       onPressed: () {
         _watchAd();
