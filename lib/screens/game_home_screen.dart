@@ -21,6 +21,7 @@ class GameHomePage extends ConsumerStatefulWidget {
 class _GameHomePageState extends ConsumerState<GameHomePage>
     with WidgetsBindingObserver {
   int _selectedIndex = 1; // Start with main screen
+
   final List<Widget> _screens = [
     const StatsScreen(),
     const GeneratorsScreen(),

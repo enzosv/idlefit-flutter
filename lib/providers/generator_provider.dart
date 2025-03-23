@@ -21,6 +21,10 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
     state = await _parseCoinGenerators('assets/coin_generators.json');
   }
 
+  int get highestTier {
+    return state.lastOrNull?.tier ?? 0;
+  }
+
   bool buyCoinGenerator(CoinGenerator generator) {
     final coins = ref.read(coinProvider);
     if (coins.count < generator.cost) return false;
