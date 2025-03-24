@@ -11,7 +11,6 @@ import 'package:idlefit/widgets/background_earnings_popup.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/widgets/currency_bar.dart';
-import 'package:idlefit/widgets/dev_reset_button.dart';
 import 'package:idlefit/widgets/sidebar.dart';
 
 final sidebarProvider = StateProvider<bool>((ref) => false);
