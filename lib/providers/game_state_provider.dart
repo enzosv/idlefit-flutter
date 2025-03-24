@@ -25,30 +25,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     _startGenerators();
   }
 
-  Future<void> initialize(
-    StorageService storageService,
-    Store objectBoxService,
-  ) async {
-    state.currencyRepo.ensureDefaultCurrencies();
-    final currencies = state.currencyRepo.loadCurrencies();
-
-    // Schedule provider updates for the next frame
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      ref.read(gemProvider.notifier).initialize(currencies[CurrencyType.gem]!);
-      ref
-          .read(energyProvider.notifier)
-          .initialize(currencies[CurrencyType.energy]!);
-      ref
-          .read(spaceProvider.notifier)
-          .initialize(currencies[CurrencyType.space]!);
-      ref
-          .read(coinProvider.notifier)
-          .initialize(currencies[CurrencyType.coin]!);
-
-      // Load data from repositories
-      await ref.read(generatorProvider.notifier).initialize();
-      await ref.read(shopItemProvider.notifier).initialize();
-    });
+    _prefs = await SharedPreferences.getInstance();
 
     // Try to load saved state
     final savedState = await storageService.loadGameState();

@@ -85,13 +85,20 @@ class ShopItemNotifier extends StateNotifier<List<ShopItem>> {
         .where((item) => item.shopItemEffect == effect)
         .fold(start, (sum, item) => sum + (item.effectValue * item.level));
   }
+
+  Future<void> reset() async {
+    box.removeAll();
+    initialize();
+  }
 }
 
 final shopItemProvider =
     StateNotifierProvider<ShopItemNotifier, List<ShopItem>>((ref) {
-      return ShopItemNotifier(
+      final notifier = ShopItemNotifier(
         ref,
         ref.read(objectBoxProvider).store.box<ShopItem>(),
         [],
       );
+      notifier.initialize();
+      return notifier;
     });
