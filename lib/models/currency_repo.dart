@@ -34,7 +34,7 @@ class CurrencyRepo {
     box.putManyAsync(currencies);
   }
 
-  Future<void> reset(Ref ref) async {
+  Future<void> reset() async {
     box.removeAll();
   }
 }

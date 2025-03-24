@@ -226,7 +226,7 @@ class GameStateNotifier extends Notifier<GameState> {
     [
       ref.read(generatorProvider.notifier).reset(),
       ref.read(questStatsRepositoryProvider).box.removeAllAsync(),
-      ref.read(currencyRepoProvider).reset(ref),
+      ref.read(currencyRepoProvider).reset(),
       ref.read(shopItemProvider.notifier).reset(),
       ref.read(questRepositoryProvider).box.removeAllAsync(),
     ].wait;
