@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import '../objectbox.g.dart'; // created by `flutter pub run build_runner build`
@@ -18,5 +20,10 @@ class ObjectBox {
       directory: p.join(docsDir.path, "obx-example"),
     );
     return ObjectBox._create(store);
+  }
+
+  Future<void> reset() async {
+    final docsDir = await getApplicationDocumentsDirectory();
+    Directory(p.join(docsDir.path, "obx-example")).delete();
   }
 }
