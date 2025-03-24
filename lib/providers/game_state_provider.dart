@@ -1,11 +1,8 @@
 import 'dart:async';
 import 'package:idlefit/helpers/constants.dart';
-import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/currency_repo.dart';
-import 'package:idlefit/models/quest_repo.dart';
-import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/generator_provider.dart';
 import 'package:idlefit/providers/shop_item_provider.dart';
@@ -153,25 +150,10 @@ class GameStateNotifier extends StateNotifier<GameState> {
       spaceEarned: spaceGain,
     );
     if (steps > 0) {
-      ref
-          .read(questStatsRepositoryProvider)
-          .progressTowards(
-            QuestAction.walk,
-            QuestUnit.steps,
-            todayTimestamp,
-            steps.toDouble(),
-          );
+      // Steps are already tracked by setProgress in HealthService
       ref.read(spaceProvider.notifier).earn(spaceGain);
     }
     if (calories > 0) {
-      ref
-          .read(questStatsRepositoryProvider)
-          .progressTowards(
-            QuestAction.burn,
-            QuestUnit.calories,
-            todayTimestamp,
-            calories,
-          );
       ref.read(energyProvider.notifier).earn(energyGain);
     }
 
