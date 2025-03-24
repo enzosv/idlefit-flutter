@@ -69,8 +69,6 @@ flutter:
   assets:
     - assets/coin_generators.json
     - assets/shop_items.json
-    - assets/achievements.json
-    - assets/daily_quests.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:
