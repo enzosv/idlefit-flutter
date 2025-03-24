@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/currency_repo.dart';
+import 'package:idlefit/models/quest_repo.dart';
 import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/generator_provider.dart';
@@ -230,6 +231,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
       ref.read(questStatsRepositoryProvider).box.removeAllAsync(),
       ref.read(currencyRepoProvider).reset(ref),
       ref.read(shopItemProvider.notifier).reset(),
+      ref.read(questRepositoryProvider).box.removeAllAsync(),
     ].wait;
 
     state = state.copyWith(
@@ -242,6 +244,8 @@ class GameStateNotifier extends StateNotifier<GameState> {
     await ref
         .read(healthServiceProvider)
         .syncHealthData(this, ref.read(questStatsRepositoryProvider));
+
+    setIsPaused(false);
   }
 }
 
