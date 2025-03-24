@@ -139,7 +139,6 @@ class HealthService {
   ) async {
     final startOfDay = DateTime(day.year, day.month, day.day);
     final endOfDay = DateTime(day.year, day.month, day.day, 23, 59, 59, 999);
-    final dayTimestamp = startOfDay.millisecondsSinceEpoch;
 
     double steps = 0;
     double calories = 0;
@@ -162,6 +161,7 @@ class HealthService {
         calories = await getActiveEnergyBurned(startOfDay, endOfDay) ?? 0;
       }
     }
+    final dayTimestamp = startOfDay.millisecondsSinceEpoch;
 
     final stepsDif = await questStatsRepository.setProgress(
       QuestAction.walk,
