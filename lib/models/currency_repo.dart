@@ -1,5 +1,9 @@
+import 'package:idlefit/providers/currency_provider.dart';
 import 'package:objectbox/objectbox.dart';
 import 'currency.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/main.dart';
+import 'package:idlefit/objectbox.g.dart';
 
 class CurrencyRepo {
   final Box<Currency> box;
@@ -7,7 +11,7 @@ class CurrencyRepo {
   CurrencyRepo({required this.box});
 
   /// Loads all currencies from storage and returns them in a map
-  Map<CurrencyType, Currency> loadCurrencies() {
+  Map<CurrencyType, Currency> _loadCurrencies() {
     final currencies = box.getAll().toList();
     final currencyMap = <CurrencyType, Currency>{};
 
@@ -26,8 +30,8 @@ class CurrencyRepo {
   }
 
   /// Creates default currencies if they don't exist
-  void ensureDefaultCurrencies() {
-    final existingCurrencies = loadCurrencies();
+  void _ensureDefaultCurrencies() {
+    final existingCurrencies = _loadCurrencies();
 
     final defaultCurrencies = [
       Currency(id: CurrencyType.coin.index, count: 10, baseMax: 100),
@@ -46,8 +50,29 @@ class CurrencyRepo {
     }
   }
 
-  Future<void> reset() async {
+  Future<void> reset(Ref ref) async {
     box.removeAll();
-    ensureDefaultCurrencies();
+    _initialize(ref);
+  }
+
+  Future<void> _initialize(Ref ref) async {
+    _ensureDefaultCurrencies();
+    final currencies = _loadCurrencies();
+
+    ref.read(gemProvider.notifier).initialize(currencies[CurrencyType.gem]!);
+    ref
+        .read(energyProvider.notifier)
+        .initialize(currencies[CurrencyType.energy]!);
+    ref
+        .read(spaceProvider.notifier)
+        .initialize(currencies[CurrencyType.space]!);
+    ref.read(coinProvider.notifier).initialize(currencies[CurrencyType.coin]!);
   }
 }
+
+final currencyRepoProvider = Provider<CurrencyRepo>((ref) {
+  final box = ref.read(objectBoxProvider).store.box<Currency>();
+  final repo = CurrencyRepo(box: box);
+  repo._initialize(ref);
+  return repo;
+});
