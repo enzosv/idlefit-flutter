@@ -54,9 +54,6 @@ class _OtherStatsListTile extends StatelessWidget {
           return const SizedBox.shrink();
         }
         final (shop, ads) = snapshot.data!;
-        if (shop < 1 && ads < 1) {
-          return const SizedBox.shrink();
-        }
         return ListTile(
           title: Text("Others"),
           subtitle: Row(
