@@ -49,9 +49,7 @@ final generatorProvider =
 
 final currencyRepoProvider = Provider<CurrencyRepo>((ref) {
   final box = ref.read(objectBoxProvider).store.box<Currency>();
-  final repo = CurrencyRepo(box: box);
-  repo.initialize(ref);
-  return repo;
+  return CurrencyRepo(box: box);
 });
 
 final questStatsRepositoryProvider = Provider<QuestStatsRepository>((ref) {

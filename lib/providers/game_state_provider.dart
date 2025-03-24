@@ -230,6 +230,9 @@ class GameStateNotifier extends Notifier<GameState> {
       ref.read(shopItemProvider.notifier).reset(),
       ref.read(questRepositoryProvider).box.removeAllAsync(),
     ].wait;
+    ref.read(coinProvider.notifier).reset();
+    ref.read(spaceProvider.notifier).reset();
+    ref.read(energyProvider.notifier).reset();
 
     state = state.copyWith(
       lastGenerated: 0,

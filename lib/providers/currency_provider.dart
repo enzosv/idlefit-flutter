@@ -11,28 +11,11 @@ class CurrencyNotifier extends Notifier<Currency> {
 
   @override
   Currency build() {
-    // Initialize different currency types
-    switch (type) {
-      case CurrencyType.coin:
-        return Currency(id: CurrencyType.coin.index, count: 10, baseMax: 100);
-      case CurrencyType.energy:
-        return Currency(
-          id: CurrencyType.energy.index,
-          count: 0,
-          baseMax: 43200000,
-        ); // 12 hours
-      case CurrencyType.space:
-        return Currency(id: CurrencyType.space.index, count: 0, baseMax: 5000);
-      case CurrencyType.gem:
-        return Currency(id: CurrencyType.gem.index, count: 10, baseMax: 100);
-      default:
-        assert(false, "unhandled currency type $type");
-        return Currency(
-          id: CurrencyType.unknown.index,
-          count: 10,
-          baseMax: 100,
-        );
-    }
+    return ref.read(currencyRepoProvider).load(type);
+  }
+
+  void reset() {
+    state = ref.read(currencyRepoProvider).load(type);
   }
 
   void earn(double amount, {bool allowExcess = false}) {
