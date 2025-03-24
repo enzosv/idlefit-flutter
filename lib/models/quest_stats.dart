@@ -33,8 +33,6 @@ class QuestStats {
         return 'Shop items tapped';
       case (QuestAction.upgrade, QuestUnit.shopItem):
         return 'Shop items upgraded';
-      case (QuestAction.purchase, QuestUnit.shopItem):
-        return 'Shop items purchased';
       default:
         assert(
           false,

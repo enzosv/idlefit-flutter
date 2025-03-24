@@ -29,13 +29,13 @@ class StatsScreen extends StatelessWidget {
               children: [
                 const HealthStatsCard(),
                 spacer,
-                const GameStatsCard(),
-                spacer,
                 // Daily quests
                 const QuestList(questType: QuestType.daily),
                 spacer,
                 // Achievement list
                 const QuestList(questType: QuestType.achievement),
+                spacer,
+                const GameStatsCard(),
               ],
             ),
           ),

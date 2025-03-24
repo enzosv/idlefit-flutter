@@ -11,14 +11,7 @@ class GameStatsCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final questStatsRepo = ref.watch(questStatsRepositoryProvider);
-    final stats = [
-      QuestStats(QuestAction.purchase.index, QuestUnit.generator.index),
-      QuestStats(QuestAction.upgrade.index, QuestUnit.generator.index),
-      QuestStats(QuestAction.tap.index, QuestUnit.generator.index),
-      QuestStats(QuestAction.upgrade.index, QuestUnit.shopItem.index),
-      QuestStats(QuestAction.watch.index, QuestUnit.ad.index),
-    ];
+    final questStatsRepo = ref.read(questStatsRepositoryProvider);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -34,9 +27,9 @@ class GameStatsCard extends ConsumerWidget {
             _CurrencyListTile(currency: ref.watch(energyProvider)),
             _CurrencyListTile(currency: ref.watch(spaceProvider)),
             const Divider(),
-            ...stats.map(
-              (stat) => _StateListTile(stats: stat, repo: questStatsRepo),
-            ),
+            _GeneratorStatsListTile(repo: questStatsRepo),
+            const Divider(),
+            _OtherStatsListTile(repo: questStatsRepo),
           ],
         ),
       ),
@@ -44,33 +37,71 @@ class GameStatsCard extends ConsumerWidget {
   }
 }
 
-class _StateListTile extends StatelessWidget {
-  const _StateListTile({required this.stats, required this.repo});
+class _OtherStatsListTile extends StatelessWidget {
+  const _OtherStatsListTile({required this.repo});
 
-  final QuestStats stats;
   final QuestStatsRepository repo;
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<(double, double)>(
+    return FutureBuilder<(int, int)>(
       future: Future.wait([
-        repo.getProgress(stats.questAction, stats.questUnit, todayTimestamp),
-        repo.getTotalProgress(stats.questAction, stats.questUnit),
-      ]).then((values) => (values[0], values[1])),
-      builder: (context, AsyncSnapshot<(double, double)> snapshot) {
+        repo.getTotalProgress(QuestAction.upgrade, QuestUnit.shopItem),
+        repo.getTotalProgress(QuestAction.watch, QuestUnit.ad),
+      ]).then((values) => (values[0].floor(), values[1].floor())),
+      builder: (context, AsyncSnapshot<(int, int)> snapshot) {
         if (!snapshot.hasData) {
           return const SizedBox.shrink();
         }
-
-        final (progress, total) = snapshot.data!;
-        if (total < 1) {
+        final (shop, ads) = snapshot.data!;
+        if (shop < 1 && ads < 1) {
           return const SizedBox.shrink();
         }
-
         return ListTile(
-          title: Text(stats.description),
-          subtitle: Text("Today: ${progress.floor()}"),
-          trailing: Text("Total: ${total.floor()}"),
+          title: Text("Others"),
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [Text("Upgrades: $shop"), Text("Ads Watched: $ads")],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _GeneratorStatsListTile extends StatelessWidget {
+  const _GeneratorStatsListTile({required this.repo});
+
+  final QuestStatsRepository repo;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<(int, int, int)>(
+      future: Future.wait([
+        repo.getTotalProgress(QuestAction.purchase, QuestUnit.generator),
+        repo.getTotalProgress(QuestAction.upgrade, QuestUnit.generator),
+        repo.getTotalProgress(QuestAction.tap, QuestUnit.generator),
+      ]).then(
+        (values) => (values[0].floor(), values[1].floor(), values[2].floor()),
+      ),
+      builder: (context, AsyncSnapshot<(int, int, int)> snapshot) {
+        if (!snapshot.hasData) {
+          return const SizedBox.shrink();
+        }
+        final (purchase, upgrade, tap) = snapshot.data!;
+        if (purchase < 1) {
+          return const SizedBox.shrink();
+        }
+        return ListTile(
+          title: Text("Exercises"),
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Reps: $purchase"),
+              Text("Upgrades: $upgrade"),
+              Text("Taps: $tap"),
+            ],
+          ),
         );
       },
     );
@@ -103,7 +134,12 @@ class _CurrencyListTile extends StatelessWidget {
       trailing: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
-        children: [Text('Spent: ${_formatted(currency.totalSpent)}')],
+        children: [
+          Text(
+            'Spent:\n${_formatted(currency.totalSpent)}',
+            textAlign: TextAlign.end,
+          ),
+        ],
       ),
     );
   }
