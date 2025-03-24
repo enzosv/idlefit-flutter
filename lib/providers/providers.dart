@@ -23,13 +23,8 @@ final energyProvider = NotifierProvider<CurrencyNotifier, Currency>(() {
   return CurrencyNotifier(CurrencyType.energy);
 });
 
-final gameStateProvider = StateNotifierProvider<GameStateNotifier, GameState>((
-  ref,
-) {
-  return GameStateNotifier(
-    ref,
-    GameState(isPaused: true, lastGenerated: 0, doubleCoinExpiry: 0),
-  );
+final gameStateProvider = NotifierProvider<GameStateNotifier, GameState>(() {
+  return GameStateNotifier();
 });
 
 final shopItemProvider =

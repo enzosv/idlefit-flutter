@@ -1,21 +1,29 @@
 import 'dart:async';
+import 'dart:math';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/helpers/constants.dart';
-import 'package:idlefit/models/quest_repo.dart';
 import 'package:idlefit/models/background_activity.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:objectbox/objectbox.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/shop_items.dart';
-import 'dart:math';
 import '../services/notification_service.dart';
 import 'package:idlefit/providers/providers.dart';
 
-class GameStateNotifier extends StateNotifier<GameState> {
-  final Ref ref;
+class GameStateNotifier extends Notifier<GameState> {
   Timer? _generatorTimer;
 
-  GameStateNotifier(this.ref, super.state) {
+  @override
+  GameState build() {
     _startGenerators();
+    ref.onDispose(() {
+      _generatorTimer?.cancel();
+    });
+    return GameState(
+      isPaused: true,
+      lastGenerated: 0,
+      doubleCoinExpiry: 0,
+      backgroundActivity: BackgroundActivity(),
+    );
   }
 
   Future<void> initialize(Store objectBoxService) async {
@@ -27,12 +35,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
       doubleCoinExpiry: savedState['doubleCoinExpiry'] ?? 0,
       backgroundActivity: BackgroundActivity(),
     );
-  }
-
-  @override
-  void dispose() {
-    _generatorTimer?.cancel();
-    super.dispose();
   }
 
   void setIsPaused(bool isPaused) {
@@ -60,7 +62,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
     state.saveGameState();
     ref.read(currencyRepoProvider).saveCurrencies([
       ref.read(coinProvider),
-      ref.read(gemProvider),
       ref.read(energyProvider),
       ref.read(spaceProvider),
     ]);
