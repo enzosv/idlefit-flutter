@@ -1,9 +1,7 @@
 import 'dart:math';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/helpers/util.dart';
-import 'package:idlefit/main.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/objectbox.g.dart';
