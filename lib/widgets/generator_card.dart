@@ -223,7 +223,10 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
           description: generator.description,
           additionalInfo: additionalInfo,
           cost: generator.cost,
-          affordable: coins.count >= generator.cost,
+          affordable:
+              coins.count >=
+              generator
+                  .cost, // TODO: sometimes visually enough but not mathematically enough
           costCurrency: CurrencyType.coin,
           buttonText: 'Add Rep',
           onButtonPressed:
