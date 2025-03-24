@@ -21,13 +21,4 @@ class ObjectBox {
     );
     return ObjectBox._create(store);
   }
-
-  Future<void> reset() async {
-    final docsDir = await getApplicationDocumentsDirectory();
-    Directory(p.join(docsDir.path, "obx-example")).delete();
-    final store = await openStore(
-      directory: p.join(docsDir.path, "obx-example"),
-    );
-    ObjectBox._create(store);
-  }
 }

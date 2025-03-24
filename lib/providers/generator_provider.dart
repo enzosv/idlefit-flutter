@@ -139,6 +139,11 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
       return generator;
     }).toList();
   }
+
+  Future<void> reset() async {
+    box.removeAll();
+    state = await _parseCoinGenerators('assets/coin_generators.json');
+  }
 }
 
 final generatorProvider =

@@ -3,6 +3,7 @@ import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/main.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/currency_repo.dart';
+import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/generator_provider.dart';
 import 'package:idlefit/providers/shop_item_provider.dart';
@@ -204,7 +205,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
   /// **Calculate Passive Output**
   double get passiveOutput {
-    final generators = ref.read(generatorProvider);
+    final generators = ref.watch(generatorProvider);
     double output = generators.fold(
       0,
       (sum, generator) => sum + generator.output,
@@ -240,6 +241,31 @@ class GameStateNotifier extends StateNotifier<GameState> {
     // compare if calorie burn time is within this attempt time
     // if so, grant user coins based on current passive output and available energy
     return min(dif, ref.read(energyProvider).count.floor());
+  }
+
+  Future<void> reset() async {
+    ref.read(generatorProvider.notifier).reset();
+    ref.read(questStatsRepositoryProvider).box.removeAll();
+    await state.currencyRepo.reset();
+
+    final currencies = state.currencyRepo.loadCurrencies();
+    print("CURRENCIES: $currencies");
+
+    ref
+        .read(energyProvider.notifier)
+        .initialize(currencies[CurrencyType.energy]!);
+    ref
+        .read(spaceProvider.notifier)
+        .initialize(currencies[CurrencyType.space]!);
+    ref.read(coinProvider.notifier).initialize(currencies[CurrencyType.coin]!);
+
+    print("RESET COINS: ${ref.read(coinProvider).count}");
+
+    // Load data from repositories
+    await ref.read(shopItemProvider.notifier).initialize();
+
+    state = state.copyWith(lastGenerated: 0, doubleCoinExpiry: 0);
+    // TODO: fetch health data
   }
 }
 

@@ -45,4 +45,9 @@ class CurrencyRepo {
       }
     }
   }
+
+  Future<void> reset() async {
+    box.removeAll();
+    ensureDefaultCurrencies();
+  }
 }
