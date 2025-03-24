@@ -23,7 +23,7 @@
 
 1. ✅ ~~track more stats~~  
 2. Weekly, monthly quests
-3. Defer ads to when user is more engaged
+3. ✅ ~~Defer ads to when user is more engaged~~  
 4. in app purchases
 
 - remove ads
