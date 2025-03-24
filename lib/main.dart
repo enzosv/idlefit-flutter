@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:idlefit/screens/game_home_screen.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'services/health_service.dart';
-import 'services/storage_service.dart';
 import 'services/object_box.dart';
 
 // Create providers for our services
@@ -14,16 +12,11 @@ final healthServiceProvider = Provider<HealthService>(
 final objectBoxProvider = Provider<ObjectBox>(
   (ref) => throw UnimplementedError('Initialize in main'),
 );
-final storageServiceProvider = Provider<StorageService>(
-  (ref) => throw UnimplementedError('Initialize in main'),
-);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize services
-  final prefs = await SharedPreferences.getInstance();
-  final storageService = StorageService(prefs);
   final objectBox = await ObjectBox.create();
   final healthService = HealthService();
 
@@ -33,7 +26,6 @@ void main() async {
         // Override the providers with initialized instances
         healthServiceProvider.overrideWithValue(healthService),
         objectBoxProvider.overrideWithValue(objectBox),
-        storageServiceProvider.overrideWithValue(storageService),
       ],
       child: const MyApp(),
     ),
@@ -87,13 +79,10 @@ class _GameInitializerState extends ConsumerState<GameInitializer> {
   }
 
   Future<void> _initializeGameState() async {
-    final storageService = ref.read(storageServiceProvider);
     final objectBox = ref.read(objectBoxProvider);
 
     // Initialize the game state
-    await ref
-        .read(gameStateProvider.notifier)
-        .initialize(storageService, objectBox.store);
+    await ref.read(gameStateProvider.notifier).initialize(objectBox.store);
 
     setState(() {
       _isInitialized = true;

@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'package:idlefit/helpers/constants.dart';
-import 'package:idlefit/main.dart';
-import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/currency_repo.dart';
 import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/providers/currency_provider.dart';
@@ -11,24 +9,27 @@ import 'package:idlefit/models/background_activity.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../services/storage_service.dart';
 import '../models/shop_items.dart';
 import 'dart:math';
 import '../services/notification_service.dart';
-import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GameStateNotifier extends StateNotifier<GameState> {
+  static const _gameStateKey = 'game_state';
   final Ref ref;
   Timer? _generatorTimer;
+  late final SharedPreferences _prefs;
 
   GameStateNotifier(this.ref, super.state) {
     _startGenerators();
   }
 
+  Future<void> initialize(Store objectBoxService) async {
     _prefs = await SharedPreferences.getInstance();
 
     // Try to load saved state
-    final savedState = await storageService.loadGameState();
+    final savedState = await loadGameState();
 
     state = state.copyWith(
       lastGenerated: savedState?['lastGenerated'] ?? 0,
@@ -58,8 +59,8 @@ class GameStateNotifier extends StateNotifier<GameState> {
   }
 
   void save() async {
-    state.storageService.saveGameState(state.toJson());
-    state.currencyRepo.saveCurrencies([
+    saveGameState(state.toJson());
+    ref.read(currencyRepoProvider).saveCurrencies([
       ref.read(coinProvider),
       ref.read(gemProvider),
       ref.read(energyProvider),
@@ -220,29 +221,36 @@ class GameStateNotifier extends StateNotifier<GameState> {
     return min(dif, ref.read(energyProvider).count.floor());
   }
 
-  Future<void> reset() async {
+  Future<void> fullReset() async {
     ref.read(generatorProvider.notifier).reset();
     ref.read(questStatsRepositoryProvider).box.removeAll();
-    await state.currencyRepo.reset();
+    ref.read(currencyRepoProvider).reset(ref);
+    await _prefs.remove(_gameStateKey);
+    await ref.read(shopItemProvider.notifier).reset();
 
-    final currencies = state.currencyRepo.loadCurrencies();
-    print("CURRENCIES: $currencies");
-
-    ref
-        .read(energyProvider.notifier)
-        .initialize(currencies[CurrencyType.energy]!);
-    ref
-        .read(spaceProvider.notifier)
-        .initialize(currencies[CurrencyType.space]!);
-    ref.read(coinProvider.notifier).initialize(currencies[CurrencyType.coin]!);
-
-    print("RESET COINS: ${ref.read(coinProvider).count}");
-
-    // Load data from repositories
-    await ref.read(shopItemProvider.notifier).initialize();
-
-    state = state.copyWith(lastGenerated: 0, doubleCoinExpiry: 0);
+    state = state.copyWith(
+      lastGenerated: 0,
+      doubleCoinExpiry: 0,
+      backgroundActivity: null,
+    );
     // TODO: fetch health data
+  }
+
+  /// **Save Game State**
+
+  Future<void> saveGameState(Map<String, dynamic> gameState) async {
+    await _prefs.setString(_gameStateKey, jsonEncode(gameState));
+  }
+
+  Future<Map<String, dynamic>?> loadGameState() async {
+    final stateString = _prefs.getString(_gameStateKey);
+    if (stateString == null) return null;
+
+    try {
+      return jsonDecode(stateString) as Map<String, dynamic>;
+    } catch (e) {
+      return null;
+    }
   }
 }
 
@@ -250,16 +258,8 @@ class GameStateNotifier extends StateNotifier<GameState> {
 final gameStateProvider = StateNotifierProvider<GameStateNotifier, GameState>((
   ref,
 ) {
-  final store = ref.read(objectBoxProvider).store;
-  final storageService = ref.read(storageServiceProvider);
   return GameStateNotifier(
     ref,
-    GameState(
-      isPaused: true,
-      lastGenerated: 0,
-      doubleCoinExpiry: 0,
-      storageService: storageService,
-      currencyRepo: CurrencyRepo(box: store.box<Currency>()),
-    ),
+    GameState(isPaused: true, lastGenerated: 0, doubleCoinExpiry: 0),
   );
 });
