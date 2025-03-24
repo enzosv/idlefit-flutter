@@ -5,7 +5,6 @@ import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/shop_item_provider.dart';
 import '../models/shop_items.dart';
 import 'common_card.dart';
-import 'shop_double_coin_card.dart';
 
 class ShopItemCard extends ConsumerWidget {
   final ShopItem item;
@@ -14,10 +13,6 @@ class ShopItemCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (item.id == 4) {
-      return DoubleCoinsCard(item: item);
-    }
-
     final isMaxLevel = item.level >= item.maxLevel;
     final space = ref.watch(spaceProvider);
     return CommonCard(

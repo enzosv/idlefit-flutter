@@ -28,15 +28,6 @@
   },
   {
     "id": 4,
-    "name": "Heartbreak",
-    "description": "Doubles passive and offline gain production for 2hrs",
-    "baseCost": 0,
-    "effect": "coinMultiplier",
-    "effectValue": 1,
-    "maxLevel": 1
-  },
-  {
-    "id": 5,
     "name": "Protein",
     "description": "Increases gain capacity by 10%",
     "baseCost": 1000,

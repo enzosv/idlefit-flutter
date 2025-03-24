@@ -20,8 +20,6 @@ class ShopItemNotifier extends StateNotifier<List<ShopItem>> {
   }
 
   bool upgradeShopItem(ShopItem item, WidgetRef ref) {
-    if (item.id == 4 || item.level >= item.maxLevel) return false;
-
     if (ref.read(spaceProvider).count < item.currentCost.toDouble()) {
       return false;
     }
