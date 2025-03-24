@@ -125,7 +125,7 @@ class CoinGeneratorNotifier extends Notifier<List<CoinGenerator>> {
   }
 
   Future<void> reset() async {
-    _repo.clearAll();
+    await _repo.clearAll();
     _loadCoinGenerators();
   }
 }

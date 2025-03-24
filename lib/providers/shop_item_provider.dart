@@ -69,7 +69,7 @@ class ShopItemNotifier extends Notifier<List<ShopItem>> {
   }
 
   Future<void> reset() async {
-    _repo.clearAll();
+    await _repo.clearAll();
     _loadShopItems();
   }
 }
