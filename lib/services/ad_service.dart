@@ -14,7 +14,7 @@ class AdService {
 
   static Future<void> initialize() async {
     await MobileAds.instance.initialize();
-    _loadRewardedAd();
+    Future.microtask(() => _loadRewardedAd());
   }
 
   static RewardedAd? _rewardedAd;
