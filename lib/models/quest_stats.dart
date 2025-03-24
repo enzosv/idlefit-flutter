@@ -1,8 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/main.dart';
 import 'package:idlefit/models/quest_repo.dart';
 import 'package:idlefit/objectbox.g.dart';
-import 'package:objectbox/objectbox.dart';
 
 @Entity()
 class QuestStats {
