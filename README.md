@@ -37,6 +37,7 @@
 - Sell all generators
 - Reset coins to 10
 - Gain unique currency
+- dev button to reset everything
 9. Unique currency
 - increase health conversion?
 - increase offline production
@@ -50,6 +51,7 @@
 - step leader
 - calorie leader
 - coin leader
+12. tutorial
 
 # What if's
 
