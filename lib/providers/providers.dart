@@ -38,13 +38,8 @@ final shopItemProvider =
     });
 
 final generatorProvider =
-    StateNotifierProvider<CoinGeneratorNotifier, List<CoinGenerator>>((ref) {
-      final notifier = CoinGeneratorNotifier(
-        ref.read(objectBoxProvider).store.box<CoinGenerator>(),
-        [],
-      );
-      notifier.initialize();
-      return notifier;
+    NotifierProvider<CoinGeneratorNotifier, List<CoinGenerator>>(() {
+      return CoinGeneratorNotifier();
     });
 
 final currencyRepoProvider = Provider<CurrencyRepo>((ref) {

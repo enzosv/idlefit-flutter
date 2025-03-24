@@ -9,11 +9,17 @@ import 'package:idlefit/models/quest_repo.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:idlefit/providers/providers.dart';
 
-class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
-  final Box<CoinGenerator> box;
-  CoinGeneratorNotifier(this.box, super.state);
+class CoinGeneratorNotifier extends Notifier<List<CoinGenerator>> {
+  late final Box<CoinGenerator> box;
 
-  Future<void> initialize() async {
+  @override
+  List<CoinGenerator> build() {
+    box = ref.read(objectBoxProvider).store.box<CoinGenerator>();
+    _loadCoinGenerators();
+    return [];
+  }
+
+  Future<void> _loadCoinGenerators() async {
     state = await _parseCoinGenerators('assets/coin_generators.json');
   }
 
@@ -138,6 +144,6 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
 
   Future<void> reset() async {
     box.removeAll();
-    initialize();
+    _loadCoinGenerators();
   }
 }
