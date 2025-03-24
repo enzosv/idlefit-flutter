@@ -34,13 +34,20 @@ class GameStateNotifier extends StateNotifier<GameState> {
     );
   }
 
+  @override
+  void dispose() {
+    _generatorTimer?.cancel();
+    super.dispose();
+  }
+
   void setIsPaused(bool isPaused) {
     state = state.copyWith(isPaused: isPaused);
-    if (isPaused) {
-      resetBackgroundActivity();
-      save();
-      _scheduleCoinCapacityNotification();
+    if (!isPaused) {
+      return;
     }
+    resetBackgroundActivity();
+    save();
+    _scheduleCoinCapacityNotification();
   }
 
   void resetBackgroundActivity() {
@@ -143,12 +150,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
     state = state.copyWith(backgroundActivity: newBackgroundActivity);
     print("updated state");
     save();
-  }
-
-  @override
-  void dispose() {
-    _generatorTimer?.cancel();
-    super.dispose();
   }
 
   void setDoubleCoinExpiry(int expiry) {
