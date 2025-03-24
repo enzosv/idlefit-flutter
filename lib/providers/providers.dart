@@ -27,15 +27,9 @@ final gameStateProvider = NotifierProvider<GameStateNotifier, GameState>(() {
   return GameStateNotifier();
 });
 
-final shopItemProvider =
-    StateNotifierProvider<ShopItemNotifier, List<ShopItem>>((ref) {
-      final notifier = ShopItemNotifier(
-        ref.read(objectBoxProvider).store.box<ShopItem>(),
-        [],
-      );
-      notifier.initialize();
-      return notifier;
-    });
+final shopItemProvider = NotifierProvider<ShopItemNotifier, List<ShopItem>>(() {
+  return ShopItemNotifier();
+});
 
 final generatorProvider =
     NotifierProvider<CoinGeneratorNotifier, List<CoinGenerator>>(() {
