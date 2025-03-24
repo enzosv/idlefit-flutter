@@ -7,81 +7,69 @@ import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:idlefit/widgets/card_button.dart';
 import 'package:idlefit/main.dart';
 
-// Provider for health stats data
-final _healthStatsProvider = FutureProvider.autoDispose<(DateTime?, DateTime?)>(
-  (ref) async {
-    final repository = ref.read(questStatsRepositoryProvider);
-    final earliest = await repository.firstHealthDay();
-    final latest = await repository.lastHealthDay();
-    return (latest, earliest);
-  },
-);
-
-// Provider for health tile stats
-final _healthTileStatsProvider = FutureProvider.family
-    .autoDispose<(double, double), (QuestAction, QuestUnit)>((
-      ref,
-      params,
-    ) async {
-      final (action, unit) = params;
-      final repository = ref.watch(questStatsRepositoryProvider);
-      final [today, total] =
-          await [
-            repository.getProgress(action, unit, todayTimestamp),
-            repository.getTotalProgress(action, unit),
-          ].wait;
-      return (today, total);
-    });
-
-class _HealthStatsTile extends ConsumerWidget {
+class _HealthStatsTile extends StatelessWidget {
   final QuestAction action;
   final QuestUnit unit;
   final IconData icon;
   final String title;
   final Color? iconColor;
+  final QuestStatsRepository repository;
 
   const _HealthStatsTile({
     required this.action,
     required this.unit,
     required this.icon,
     required this.title,
+    required this.repository,
     this.iconColor,
   });
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final statsAsync = ref.watch(_healthTileStatsProvider((action, unit)));
+  Future<(double, double)> _fetchStats(QuestStatsRepository repository) async {
+    final today = repository.getProgress(action, unit, todayTimestamp);
+    final total = repository.getTotalProgress(action, unit);
+    return (today, total).wait;
+  }
 
-    return statsAsync.when(
-      data: (data) {
-        final (today, total) = data;
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<(double, double)>(
+      future: _fetchStats(repository),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return ListTile(
+            leading: Icon(icon, color: iconColor),
+            title: Text(title),
+            subtitle: const Text('Today: loading...'),
+          );
+        } else if (snapshot.hasError || !snapshot.hasData) {
+          return ListTile(
+            leading: Icon(icon, color: iconColor),
+            title: Text(title),
+            subtitle: const Text('Error loading'),
+          );
+        }
+        final (today, total) = snapshot.data!;
         return ListTile(
-          leading: Icon(icon, color: iconColor, size: 32),
+          leading: Icon(icon, color: iconColor, size: 28),
           title: Text(title),
           subtitle: Text('Today: ${toLettersNotation(today)}'),
           trailing: Text('Total: ${toLettersNotation(total)}'),
         );
       },
-      loading:
-          () => ListTile(
-            leading: Icon(icon, color: iconColor),
-            title: Text(title),
-            subtitle: const Text('Today: loading...'),
-            trailing: const SizedBox.shrink(),
-          ),
-      error:
-          (_, __) => ListTile(
-            leading: Icon(icon, color: iconColor),
-            title: Text(title),
-            subtitle: const Text('Error loading'),
-            trailing: const SizedBox.shrink(),
-          ),
     );
   }
 }
 
 class HealthStatsCard extends ConsumerWidget {
   const HealthStatsCard({super.key});
+
+  Future<(DateTime?, DateTime?)> _fetchHealthStats(
+    QuestStatsRepository repository,
+  ) async {
+    final earliest = await repository.firstHealthDay();
+    final latest = await repository.lastHealthDay();
+    return (latest, earliest);
+  }
 
   Future<void> _syncHealthData(WidgetRef ref) async {
     await ref
@@ -90,14 +78,11 @@ class HealthStatsCard extends ConsumerWidget {
           ref.read(gameStateProvider.notifier),
           ref.read(questStatsRepositoryProvider),
         );
-    // Invalidate both providers to refresh all data
-    ref.invalidate(_healthStatsProvider);
-    ref.invalidate(_healthTileStatsProvider);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final healthStats = ref.watch(_healthStatsProvider);
+    final repository = ref.watch(questStatsRepositoryProvider);
 
     return Card(
       child: Padding(
@@ -115,9 +100,16 @@ class HealthStatsCard extends ConsumerWidget {
                       'Health Stats',
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
-                    healthStats.when(
-                      data: (data) {
-                        final (latest, earliest) = data;
+                    FutureBuilder<(DateTime?, DateTime?)>(
+                      future: _fetchHealthStats(repository),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Text('Loading...');
+                        } else if (snapshot.hasError || !snapshot.hasData) {
+                          return const Text('Error loading health data');
+                        }
+                        final (latest, earliest) = snapshot.data!;
                         if (latest == null) {
                           return Text(
                             'Last sync: Never',
@@ -139,8 +131,6 @@ class HealthStatsCard extends ConsumerWidget {
                           ],
                         );
                       },
-                      loading: () => const Text('Loading...'),
-                      error: (_, __) => const Text('Error loading health data'),
                     ),
                   ],
                 ),
@@ -152,19 +142,21 @@ class HealthStatsCard extends ConsumerWidget {
               ],
             ),
             const Divider(),
-            const _HealthStatsTile(
+            _HealthStatsTile(
               action: QuestAction.walk,
               unit: QuestUnit.steps,
               icon: Icons.directions_walk,
               title: "Steps",
               iconColor: Colors.blue,
+              repository: repository,
             ),
-            const _HealthStatsTile(
+            _HealthStatsTile(
               action: QuestAction.burn,
               unit: QuestUnit.calories,
               icon: Icons.local_fire_department,
               title: "Calories Burned",
               iconColor: Colors.red,
+              repository: repository,
             ),
           ],
         ),
