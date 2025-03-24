@@ -9,11 +9,17 @@ import 'package:idlefit/models/shop_items.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:idlefit/providers/providers.dart';
 
-class ShopItemNotifier extends StateNotifier<List<ShopItem>> {
-  final Box<ShopItem> box;
-  ShopItemNotifier(this.box, super.state);
+class ShopItemNotifier extends Notifier<List<ShopItem>> {
+  late final Box<ShopItem> box;
 
-  Future<void> initialize() async {
+  @override
+  List<ShopItem> build() {
+    box = ref.read(objectBoxProvider).store.box<ShopItem>();
+    _loadShopItems();
+    return [];
+  }
+
+  Future<void> _loadShopItems() async {
     state = await _parseShopItems('assets/shop_items.json');
   }
 
@@ -83,6 +89,6 @@ class ShopItemNotifier extends StateNotifier<List<ShopItem>> {
 
   Future<void> reset() async {
     box.removeAll();
-    initialize();
+    _loadShopItems();
   }
 }
