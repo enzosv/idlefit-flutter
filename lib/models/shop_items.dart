@@ -1,6 +1,9 @@
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:objectbox/objectbox.dart';
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
 
 enum ShopItemEffect {
   unknown,
@@ -86,5 +89,34 @@ class ShopItem {
       default:
         return '+${(value * 100).toStringAsFixed(0)}%';
     }
+  }
+}
+
+class ShopItemsRepository {
+  final Box<ShopItem> _box;
+
+  ShopItemsRepository(this._box);
+
+  Future<List<ShopItem>> loadShopItems(String jsonString) async {
+    final String response = await rootBundle.loadString(jsonString);
+    final List<dynamic> data = jsonDecode(response);
+
+    return data.map((d) {
+      ShopItem item = ShopItem.fromJson(d);
+      final stored = _box.get(item.id);
+      if (stored == null) {
+        return item;
+      }
+      item.level = stored.level;
+      return item;
+    }).toList();
+  }
+
+  Future<void> saveShopItem(ShopItem item) async {
+    _box.putAsync(item);
+  }
+
+  Future<void> clearAll() async {
+    _box.removeAllAsync();
   }
 }

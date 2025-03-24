@@ -102,7 +102,8 @@ class CoinGeneratorRepository {
     }).toList();
   }
 
-  void saveGenerator(CoinGenerator generator) => _box.put(generator);
+  Future<void> saveGenerator(CoinGenerator generator) =>
+      _box.putAsync(generator);
 
-  void clearAll() => _box.removeAll();
+  Future<void> clearAll() => _box.removeAllAsync();
 }

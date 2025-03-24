@@ -1,29 +1,25 @@
-import 'dart:convert';
-
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/models/quest_repo.dart';
 import 'package:idlefit/models/shop_items.dart';
-import 'package:objectbox/objectbox.dart';
 import 'package:idlefit/providers/providers.dart';
 
 class ShopItemNotifier extends Notifier<List<ShopItem>> {
-  late final Box<ShopItem> box;
-
+  late final ShopItemsRepository _repo;
   @override
   List<ShopItem> build() {
-    box = ref.read(objectBoxProvider).store.box<ShopItem>();
+    final box = ref.read(objectBoxProvider).store.box<ShopItem>();
+    _repo = ShopItemsRepository(box);
     _loadShopItems();
     return [];
   }
 
   Future<void> _loadShopItems() async {
-    state = await _parseShopItems('assets/shop_items.json');
+    state = await _repo.loadShopItems('assets/shop_items.json');
   }
 
-  bool upgradeShopItem(ShopItem item, WidgetRef ref) {
+  bool upgradeShopItem(ShopItem item) {
     if (ref.read(spaceProvider).count < item.currentCost.toDouble()) {
       return false;
     }
@@ -50,7 +46,7 @@ class ShopItemNotifier extends Notifier<List<ShopItem>> {
     final newState = List<ShopItem>.from(state);
     newState[item.id - 1] = item;
     state = newState;
-    box.putAsync(item);
+    _repo.saveShopItem(item);
     ref
         .read(questStatsRepositoryProvider)
         .progressTowards(
@@ -60,21 +56,6 @@ class ShopItemNotifier extends Notifier<List<ShopItem>> {
           1,
         );
     return true;
-  }
-
-  Future<List<ShopItem>> _parseShopItems(String jsonString) async {
-    final String response = await rootBundle.loadString(jsonString);
-    final List<dynamic> data = jsonDecode(response);
-
-    return data.map((d) {
-      ShopItem item = ShopItem.fromJson(d);
-      final stored = box.get(item.id);
-      if (stored == null) {
-        return item;
-      }
-      item.level = stored.level;
-      return item;
-    }).toList();
   }
 
   double multiplier(ShopItemEffect effect) {
@@ -88,7 +69,7 @@ class ShopItemNotifier extends Notifier<List<ShopItem>> {
   }
 
   Future<void> reset() async {
-    box.removeAll();
+    _repo.clearAll();
     _loadShopItems();
   }
 }

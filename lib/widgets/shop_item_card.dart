@@ -29,9 +29,7 @@ class ShopItemCard extends ConsumerWidget {
       onButtonPressed:
           (isMaxLevel || space.count < item.currentCost)
               ? null
-              : () => ref
-                  .read(shopItemProvider.notifier)
-                  .upgradeShopItem(item, ref),
+              : () => ref.read(shopItemProvider.notifier).upgradeShopItem(item),
     );
   }
 }
