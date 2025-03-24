@@ -10,6 +10,11 @@ import 'package:idlefit/services/notification_service.dart';
 import 'package:idlefit/widgets/background_earnings_popup.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/main.dart';
+import 'package:idlefit/widgets/currency_bar.dart';
+import 'package:idlefit/widgets/dev_reset_button.dart';
+import 'package:idlefit/widgets/sidebar.dart';
+
+final sidebarProvider = StateProvider<bool>((ref) => false);
 
 class GameHomePage extends ConsumerStatefulWidget {
   const GameHomePage({super.key});
@@ -114,8 +119,29 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
 
   @override
   Widget build(BuildContext context) {
+    final isSidebarOpen = ref.watch(sidebarProvider);
+
     return Scaffold(
-      body: _screens[_selectedIndex],
+      appBar: AppBar(
+        toolbarHeight: 80,
+        backgroundColor: Constants.barColor,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        title: CurrencyBar(
+          onMenuPressed:
+              () => ref.read(sidebarProvider.notifier).state = !isSidebarOpen,
+        ),
+      ),
+      body: Stack(
+        children: [
+          _screens[_selectedIndex],
+          Sidebar(
+            isOpen: isSidebarOpen,
+            toggleSidebar:
+                () => ref.read(sidebarProvider.notifier).state = !isSidebarOpen,
+          ),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         selectedItemColor: Constants.primaryColor,

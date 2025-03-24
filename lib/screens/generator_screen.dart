@@ -1,11 +1,9 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/generator_provider.dart';
 import 'package:idlefit/widgets/generator_card.dart';
-import '../widgets/currency_bar.dart';
 
 class FlameBackground extends FlameGame {
   @override
@@ -19,51 +17,36 @@ class GeneratorsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return Column(
       children: [
-        // Game UI overlay
-        SafeArea(
-          top: false,
-          child: Column(
-            children: [
-              Container(
-                height: MediaQuery.paddingOf(context).top,
-                color: Constants.barColor,
-              ),
+        // GameWidget(game: FlameBackground()),
 
-              // Currency display
-              const CurrencyBar(),
-              // GameWidget(game: FlameBackground()),
+        // Generators list
+        Expanded(
+          child: Consumer(
+            builder: (context, ref, child) {
+              final coinGenerators = ref.watch(generatorProvider);
+              final coins = ref.watch(coinProvider);
 
-              // Generators list
-              Expanded(
-                child: Consumer(
-                  builder: (context, ref, child) {
-                    final coinGenerators = ref.watch(generatorProvider);
-                    final coins = ref.watch(coinProvider);
-
-                    // Filter affordable generators and sort by price
-                    final affordableGenerators =
-                        coinGenerators
-                            .where((generator) => generator.cost <= coins.max)
-                            .toList()
-                          ..sort((a, b) => b.tier.compareTo(a.tier));
-                    // TODO: new generator should require scroll up
-                    return ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: affordableGenerators.length,
-                      itemBuilder: (context, index) {
-                        return GeneratorCard(
-                          generatorIndex: coinGenerators.indexOf(
-                            affordableGenerators[index],
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
+              // Filter affordable generators and sort by price
+              final affordableGenerators =
+                  coinGenerators
+                      .where((generator) => generator.cost <= coins.max)
+                      .toList()
+                    ..sort((a, b) => b.tier.compareTo(a.tier));
+              // TODO: new generator should require scroll up
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: affordableGenerators.length,
+                itemBuilder: (context, index) {
+                  return GeneratorCard(
+                    generatorIndex: coinGenerators.indexOf(
+                      affordableGenerators[index],
+                    ),
+                  );
+                },
+              );
+            },
           ),
         ),
       ],

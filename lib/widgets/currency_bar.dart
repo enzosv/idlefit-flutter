@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
@@ -27,7 +26,6 @@ class CoinsDisplay extends ConsumerWidget {
             const SizedBox(width: 8),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              // mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Row(
                   children: [
@@ -47,7 +45,7 @@ class CoinsDisplay extends ConsumerWidget {
                       '${toLettersNotation(gameStateNotifier.passiveOutput)}/s ',
                       style: _smallStyle,
                     ),
-                    BoostButton(),
+                    const BoostButton(),
                   ],
                 ),
               ],
@@ -83,49 +81,44 @@ class CurrencyWidget extends ConsumerWidget {
       children: [
         currencyType.iconWithSize(20),
         const SizedBox(width: 4),
-        Text(count, style: const TextStyle(fontWeight: FontWeight.bold)),
+        Text(
+          count,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+        ),
         Text('/$max', style: _smallStyle),
       ],
     );
   }
 }
 
-class CurrencyBar extends StatelessWidget {
-  static final GlobalKey currencyBarKey = GlobalKey();
-  const CurrencyBar({super.key});
+class CurrencyBar extends ConsumerWidget {
+  final VoidCallback onMenuPressed;
+
+  const CurrencyBar({super.key, required this.onMenuPressed});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      key: currencyBarKey,
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 12),
-      decoration: BoxDecoration(color: Constants.barColor),
-      child: Flex(
-        direction: Axis.horizontal,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        // crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            flex: 1,
-            child: IconButton(
-              alignment: Alignment.centerLeft,
-              iconSize: 28,
-              onPressed: () {},
-              icon: const Icon(Icons.menu),
-            ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.menu),
+          iconSize: 28,
+          onPressed: onMenuPressed,
+        ),
+        const SizedBox(width: 8),
+        const Expanded(flex: 3, child: CoinsDisplay()),
+        Expanded(
+          flex: 2,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              CurrencyWidget(currencyType: CurrencyType.energy),
+              CurrencyWidget(currencyType: CurrencyType.space),
+            ],
           ),
-          Expanded(flex: 3, child: CoinsDisplay()),
-          Expanded(
-            flex: 2,
-            child: Column(
-              children: [
-                CurrencyWidget(currencyType: CurrencyType.energy),
-                CurrencyWidget(currencyType: CurrencyType.space),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
