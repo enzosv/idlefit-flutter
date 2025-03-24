@@ -130,6 +130,7 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
         title: CurrencyBar(
           onMenuPressed:
               () => ref.read(sidebarProvider.notifier).state = !isSidebarOpen,
+          isSidebarOpen: isSidebarOpen,
         ),
       ),
       body: Stack(
@@ -138,7 +139,7 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
           Sidebar(
             isOpen: isSidebarOpen,
             toggleSidebar:
-                () => ref.read(sidebarProvider.notifier).state = !isSidebarOpen,
+                () => ref.read(sidebarProvider.notifier).state = false,
           ),
         ],
       ),

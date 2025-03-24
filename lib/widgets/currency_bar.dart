@@ -43,7 +43,10 @@ class CoinsDisplay extends ConsumerWidget {
                   children: [
                     Text(
                       '${toLettersNotation(gameStateNotifier.passiveOutput)}/s ',
-                      style: _smallStyle,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.white70,
+                      ),
                     ),
                     const BoostButton(),
                   ],
@@ -93,8 +96,13 @@ class CurrencyWidget extends ConsumerWidget {
 
 class CurrencyBar extends ConsumerWidget {
   final VoidCallback onMenuPressed;
+  final bool isSidebarOpen;
 
-  const CurrencyBar({super.key, required this.onMenuPressed});
+  const CurrencyBar({
+    super.key,
+    required this.onMenuPressed,
+    required this.isSidebarOpen,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -102,7 +110,13 @@ class CurrencyBar extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         IconButton(
-          icon: const Icon(Icons.menu),
+          icon: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: Icon(
+              isSidebarOpen ? Icons.close : Icons.menu,
+              key: ValueKey(isSidebarOpen),
+            ),
+          ),
           iconSize: 28,
           onPressed: onMenuPressed,
         ),

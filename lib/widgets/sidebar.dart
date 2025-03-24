@@ -11,43 +11,33 @@ class Sidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
 
-    return AnimatedPositioned(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      left: isOpen ? 0 : -screenWidth * (2 / 3),
-      top: 0,
-      bottom: 0,
-      width: screenWidth * (2 / 3),
-      child: Material(
-        elevation: 8,
-        child: Container(
-          color: Theme.of(context).drawerTheme.backgroundColor ?? Colors.white,
-          child: SafeArea(
+    return Stack(
+      children: [
+        // Semi-transparent overlay
+        if (isOpen)
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: toggleSidebar,
+              child: Container(color: Colors.black54),
+            ),
+          ),
+        // Sidebar
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          left: isOpen ? 0 : -screenWidth * 0.8,
+          top: 0,
+          bottom: 0,
+          width: screenWidth * 0.8,
+          child: Material(
+            elevation: 8,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ListTile(
-                  leading: IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: toggleSidebar,
-                  ),
-                  title: const Text(
-                    'IdleFit Menu',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.refresh),
-                  title: const Text('Reset Game'),
-                  subtitle: const Text('Reset all progress'),
-                  trailing: DevResetButton(),
-                ),
-              ],
+              children: [DevResetButton()],
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }
