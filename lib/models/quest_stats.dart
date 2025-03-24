@@ -14,7 +14,7 @@ class QuestStats {
   int unit;
   double value = 0.0;
 
-  QuestStats(this.action, this.unit);
+  QuestStats({required this.action, required this.unit, this.dayTimestamp = 0});
 
   QuestAction get questAction => QuestAction.values[action];
   QuestUnit get questUnit => QuestUnit.values[unit];
@@ -68,8 +68,12 @@ class QuestStatsRepository {
       return existing;
     }
 
-    final newStats = QuestStats(action.index, unit.index);
-    await box.putAsync(newStats);
+    final newStats = QuestStats(
+      action: action.index,
+      unit: unit.index,
+      dayTimestamp: dayTimestamp,
+    );
+    box.put(newStats);
     return newStats;
   }
 
