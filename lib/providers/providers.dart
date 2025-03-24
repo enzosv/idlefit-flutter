@@ -13,36 +13,14 @@ import 'package:idlefit/services/health_service.dart';
 import 'package:idlefit/services/object_box.dart';
 import 'package:idlefit/services/game_state.dart';
 
-final coinProvider = StateNotifierProvider<CurrencyNotifier, Currency>((ref) {
-  return CurrencyNotifier(
-    ref,
-    Currency(id: CurrencyType.coin.index, count: 10, baseMax: 100),
-  );
+final coinProvider = NotifierProvider<CurrencyNotifier, Currency>(() {
+  return CurrencyNotifier(CurrencyType.coin);
 });
-
-final energyProvider = StateNotifierProvider<CurrencyNotifier, Currency>((ref) {
-  return CurrencyNotifier(
-    ref,
-    Currency(
-      id: CurrencyType.energy.index,
-      count: 0,
-      baseMax: 43200000, //12hrs
-    ),
-  );
+final spaceProvider = NotifierProvider<CurrencyNotifier, Currency>(() {
+  return CurrencyNotifier(CurrencyType.space);
 });
-
-final spaceProvider = StateNotifierProvider<CurrencyNotifier, Currency>((ref) {
-  return CurrencyNotifier(
-    ref,
-    Currency(id: CurrencyType.space.index, count: 0, baseMax: 5000),
-  );
-});
-
-final gemProvider = StateNotifierProvider<CurrencyNotifier, Currency>((ref) {
-  return CurrencyNotifier(
-    ref,
-    Currency(id: CurrencyType.gem.index, count: 10, baseMax: 100),
-  );
+final energyProvider = NotifierProvider<CurrencyNotifier, Currency>(() {
+  return CurrencyNotifier(CurrencyType.energy);
 });
 
 final gameStateProvider = StateNotifierProvider<GameStateNotifier, GameState>((
