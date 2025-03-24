@@ -93,19 +93,22 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
     final healthService = ref.read(healthServiceProvider);
     final gameStateNotifier = ref.read(gameStateProvider.notifier);
     final questStatsRepository = ref.read(questStatsRepositoryProvider);
+
+    healthService.initialize().then((authorized) async {
+      if (authorized) {
+        await healthService.syncHealthData(
+          gameStateNotifier,
+          questStatsRepository,
+        );
+      }
+      gameStateNotifier.setIsPaused(false);
+    });
+
     // Initialize ads
     AdService.initialize();
 
     // TODO: delay until after first return from background
     NotificationService.initialize();
-
-    healthService.initialize().then((_) async {
-      await healthService.syncHealthData(
-        gameStateNotifier,
-        questStatsRepository,
-      );
-      gameStateNotifier.setIsPaused(false);
-    });
 
     WidgetsBinding.instance.addObserver(this);
   }
