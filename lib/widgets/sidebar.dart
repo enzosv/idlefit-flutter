@@ -14,9 +14,7 @@ class Sidebar extends ConsumerWidget {
   }
 
   Future<void> _handleDevReset(WidgetRef ref) async {
-    print("RESETTING");
     await ref.read(gameStateProvider.notifier).fullReset();
-    print("RESETTED");
   }
 
   @override

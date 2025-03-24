@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:idlefit/helpers/constants.dart';
+import 'package:idlefit/main.dart';
 import 'package:idlefit/models/currency_repo.dart';
 import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/providers/currency_provider.dart';
@@ -12,28 +13,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/shop_items.dart';
 import 'dart:math';
 import '../services/notification_service.dart';
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class GameStateNotifier extends StateNotifier<GameState> {
-  static const _gameStateKey = 'game_state';
   final Ref ref;
   Timer? _generatorTimer;
-  late final SharedPreferences _prefs;
 
   GameStateNotifier(this.ref, super.state) {
     _startGenerators();
   }
 
   Future<void> initialize(Store objectBoxService) async {
-    _prefs = await SharedPreferences.getInstance();
-
     // Try to load saved state
-    final savedState = await loadGameState();
+    final savedState = await state.loadGameState();
 
     state = state.copyWith(
-      lastGenerated: savedState?['lastGenerated'] ?? 0,
-      doubleCoinExpiry: savedState?['doubleCoinExpiry'] ?? 0,
+      lastGenerated: savedState['lastGenerated'] ?? 0,
+      doubleCoinExpiry: savedState['doubleCoinExpiry'] ?? 0,
       backgroundActivity: BackgroundActivity(),
     );
   }
@@ -59,7 +54,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
   }
 
   void save() async {
-    saveGameState(state.toJson());
+    state.saveGameState();
     ref.read(currencyRepoProvider).saveCurrencies([
       ref.read(coinProvider),
       ref.read(gemProvider),
@@ -115,29 +110,37 @@ class GameStateNotifier extends StateNotifier<GameState> {
   }
 
   Future<void> convertHealthStats(int steps, double calories) async {
+    if (steps <= 0 && calories <= 0) {
+      return;
+    }
     final healthMultiplier = ref
         .read(shopItemProvider.notifier)
         .multiplier(ShopItemEffect.healthMultiplier);
-
     final energyGain =
         calories * healthMultiplier * Constants.calorieToEnergyMultiplier;
     final spaceGain =
         steps * healthMultiplier * Constants.stepsToSpaceMultiplier;
 
+    if (spaceGain > 0) {
+      ref.read(spaceProvider.notifier).earn(spaceGain);
+    }
+    if (energyGain > 0) {
+      ref.read(energyProvider.notifier).earn(energyGain);
+    }
+    if (state.backgroundActivity.energySpent <= 0) {
+      save();
+
+      return;
+    }
+    print("generating background activity");
     final newBackgroundActivity = state.backgroundActivity.copyWith(
       energyEarned: energyGain,
       spaceEarned: spaceGain,
     );
-    if (steps > 0) {
-      // Steps are already tracked by setProgress in HealthService
-      ref.read(spaceProvider.notifier).earn(spaceGain);
-    }
-    if (calories > 0) {
-      ref.read(energyProvider.notifier).earn(energyGain);
-    }
+    print('newBackgroundActivity: $newBackgroundActivity');
 
     state = state.copyWith(backgroundActivity: newBackgroundActivity);
-
+    print("updated state");
     save();
   }
 
@@ -222,35 +225,23 @@ class GameStateNotifier extends StateNotifier<GameState> {
   }
 
   Future<void> fullReset() async {
-    ref.read(generatorProvider.notifier).reset();
-    ref.read(questStatsRepositoryProvider).box.removeAll();
-    ref.read(currencyRepoProvider).reset(ref);
-    await _prefs.remove(_gameStateKey);
-    await ref.read(shopItemProvider.notifier).reset();
+    [
+      ref.read(generatorProvider.notifier).reset(),
+      ref.read(questStatsRepositoryProvider).box.removeAllAsync(),
+      ref.read(currencyRepoProvider).reset(ref),
+      ref.read(shopItemProvider.notifier).reset(),
+    ].wait;
 
     state = state.copyWith(
       lastGenerated: 0,
       doubleCoinExpiry: 0,
       backgroundActivity: null,
+      isPaused: true,
     );
-    // TODO: fetch health data
-  }
 
-  /// **Save Game State**
-
-  Future<void> saveGameState(Map<String, dynamic> gameState) async {
-    await _prefs.setString(_gameStateKey, jsonEncode(gameState));
-  }
-
-  Future<Map<String, dynamic>?> loadGameState() async {
-    final stateString = _prefs.getString(_gameStateKey);
-    if (stateString == null) return null;
-
-    try {
-      return jsonDecode(stateString) as Map<String, dynamic>;
-    } catch (e) {
-      return null;
-    }
+    await ref
+        .read(healthServiceProvider)
+        .syncHealthData(this, ref.read(questStatsRepositoryProvider));
   }
 }
 

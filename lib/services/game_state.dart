@@ -1,10 +1,15 @@
+import 'dart:convert';
+
 import 'package:idlefit/models/background_activity.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GameState {
   // Game state
   final bool _isPaused;
   final int _lastGenerated;
   final int _doubleCoinExpiry;
+
+  static const _gameStateKey = 'game_state';
 
   // Services
   final BackgroundActivity _backgroundActivity;
@@ -40,11 +45,31 @@ class GameState {
     );
   }
 
-  /// **Convert to JSON (Persistence)**
-  Map<String, dynamic> toJson() {
-    return {
-      'lastGenerated': _lastGenerated,
-      'doubleCoinExpiry': _doubleCoinExpiry,
-    };
+  /// **Persistence**
+
+  Future<void> saveGameState() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      _gameStateKey,
+      jsonEncode({
+        'lastGenerated': _lastGenerated,
+        'doubleCoinExpiry': _doubleCoinExpiry,
+      }),
+    );
+  }
+
+  Future<Map<String, dynamic>> loadGameState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final stateString = prefs.getString(_gameStateKey);
+    if (stateString == null) {
+      return {'lastGenerated': 0, 'doubleCoinExpiry': 0};
+    }
+
+    return jsonDecode(stateString) as Map<String, dynamic>;
+  }
+
+  Future<void> reset() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_gameStateKey);
   }
 }

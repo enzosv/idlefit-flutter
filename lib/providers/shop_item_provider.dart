@@ -13,14 +13,13 @@ import 'package:objectbox/objectbox.dart';
 
 class ShopItemNotifier extends StateNotifier<List<ShopItem>> {
   final Box<ShopItem> box;
-  final Ref ref;
-  ShopItemNotifier(this.ref, this.box, super.state);
+  ShopItemNotifier(this.box, super.state);
 
   Future<void> initialize() async {
     state = await _parseShopItems('assets/shop_items.json');
   }
 
-  bool upgradeShopItem(ShopItem item) {
+  bool upgradeShopItem(ShopItem item, WidgetRef ref) {
     if (item.id == 4 || item.level >= item.maxLevel) return false;
 
     if (ref.read(spaceProvider).count < item.currentCost.toDouble()) {
@@ -95,7 +94,6 @@ class ShopItemNotifier extends StateNotifier<List<ShopItem>> {
 final shopItemProvider =
     StateNotifierProvider<ShopItemNotifier, List<ShopItem>>((ref) {
       final notifier = ShopItemNotifier(
-        ref,
         ref.read(objectBoxProvider).store.box<ShopItem>(),
         [],
       );
