@@ -22,8 +22,7 @@ class CurrencyRepo {
 
   /// Saves multiple currencies to storage
   Future<void> saveCurrencies(List<Currency> currencies) async {
-    await box.putManyAsync(currencies);
-    print("saved currencies");
+    box.putManyAsync(currencies);
   }
 
   /// Creates default currencies if they don't exist
