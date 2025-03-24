@@ -86,9 +86,6 @@ class _GeneratorStatsListTile extends StatelessWidget {
           return const SizedBox.shrink();
         }
         final (purchase, upgrade, tap) = snapshot.data!;
-        if (purchase < 1) {
-          return const SizedBox.shrink();
-        }
         return ListTile(
           title: Text("Exercises"),
           subtitle: Row(
