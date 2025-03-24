@@ -22,7 +22,8 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
   }
 
   int get highestTier {
-    return state.lastOrNull?.tier ?? 0;
+    return state.where((generator) => generator.count > 0).lastOrNull?.tier ??
+        0;
   }
 
   bool buyCoinGenerator(CoinGenerator generator) {
