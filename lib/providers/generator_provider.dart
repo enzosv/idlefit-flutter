@@ -1,26 +1,24 @@
-import 'dart:convert';
 import 'dart:math';
 
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/quest_repo.dart';
-import 'package:objectbox/objectbox.dart';
 import 'package:idlefit/providers/providers.dart';
 
 class CoinGeneratorNotifier extends Notifier<List<CoinGenerator>> {
-  late final Box<CoinGenerator> box;
+  late final CoinGeneratorRepository _repo;
 
   @override
   List<CoinGenerator> build() {
-    box = ref.read(objectBoxProvider).store.box<CoinGenerator>();
+    final box = ref.read(objectBoxProvider).store.box<CoinGenerator>();
+    _repo = CoinGeneratorRepository(box);
     _loadCoinGenerators();
     return [];
   }
 
   Future<void> _loadCoinGenerators() async {
-    state = await _parseCoinGenerators('assets/coin_generators.json');
+    state = await _repo.loadCoinGenerators('assets/coin_generators.json');
   }
 
   int get highestTier {
@@ -123,27 +121,11 @@ class CoinGeneratorNotifier extends Notifier<List<CoinGenerator>> {
     final newState = List<CoinGenerator>.from(state);
     newState[generator.tier - 1] = generator;
     state = newState;
-    box.put(generator);
-  }
-
-  Future<List<CoinGenerator>> _parseCoinGenerators(String jsonString) async {
-    final String response = await rootBundle.loadString(jsonString);
-    final List<dynamic> data = jsonDecode(response);
-
-    return data.map((item) {
-      CoinGenerator generator = CoinGenerator.fromJson(item);
-      final stored = box.get(generator.tier);
-      if (stored == null) {
-        return generator;
-      }
-      generator.count = stored.count;
-      generator.level = stored.level;
-      return generator;
-    }).toList();
+    _repo.saveGenerator(generator);
   }
 
   Future<void> reset() async {
-    box.removeAll();
+    _repo.clearAll();
     _loadCoinGenerators();
   }
 }

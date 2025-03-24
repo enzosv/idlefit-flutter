@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/services.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()
@@ -78,4 +80,29 @@ class CoinGenerator {
       description: json['description'],
     );
   }
+}
+
+class CoinGeneratorRepository {
+  final Box<CoinGenerator> _box;
+
+  CoinGeneratorRepository(this._box);
+
+  Future<List<CoinGenerator>> loadCoinGenerators(String jsonPath) async {
+    final String response = await rootBundle.loadString(jsonPath);
+    final List<dynamic> data = jsonDecode(response);
+
+    return data.map((item) {
+      CoinGenerator generator = CoinGenerator.fromJson(item);
+      final stored = _box.get(generator.tier);
+      if (stored != null) {
+        generator.count = stored.count;
+        generator.level = stored.level;
+      }
+      return generator;
+    }).toList();
+  }
+
+  void saveGenerator(CoinGenerator generator) => _box.put(generator);
+
+  void clearAll() => _box.removeAll();
 }
