@@ -6,7 +6,6 @@ import 'package:idlefit/screens/shop_screen.dart';
 import 'package:idlefit/screens/stats_screen.dart';
 import 'package:idlefit/services/ad_service.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
-import 'package:idlefit/services/game_state.dart';
 import 'package:idlefit/services/notification_service.dart';
 import 'package:idlefit/widgets/background_earnings_popup.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
