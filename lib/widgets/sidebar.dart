@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/providers/game_state_provider.dart';
-import 'package:idlefit/providers/generator_provider.dart';
+import 'package:idlefit/providers/providers.dart';
 
 class Sidebar extends ConsumerWidget {
   final bool isOpen;

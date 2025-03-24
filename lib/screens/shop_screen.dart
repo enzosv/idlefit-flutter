@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/providers/generator_provider.dart';
-import 'package:idlefit/providers/shop_item_provider.dart';
 import 'package:idlefit/widgets/generator_upgrade_card.dart';
 import 'package:idlefit/widgets/shop_item_card.dart';
+import 'package:idlefit/providers/providers.dart';
 
 class ShopScreen extends StatelessWidget {
   const ShopScreen({super.key});

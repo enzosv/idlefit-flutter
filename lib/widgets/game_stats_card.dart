@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/quest_repo.dart';
 import 'package:idlefit/models/quest_stats.dart';
-import 'package:idlefit/providers/currency_provider.dart';
 import '../helpers/util.dart';
+import 'package:idlefit/providers/providers.dart';
 
 class GameStatsCard extends ConsumerWidget {
   const GameStatsCard({super.key});

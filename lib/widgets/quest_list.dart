@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/quest_repo.dart';
-import 'package:idlefit/models/quest_stats.dart';
-import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/widgets/quest_card.dart';
+import 'package:idlefit/providers/providers.dart';
 
 // cache quests to be used on widget rebuild
 final _questsProvider = FutureProvider.family

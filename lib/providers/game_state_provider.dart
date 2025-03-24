@@ -1,12 +1,6 @@
 import 'dart:async';
 import 'package:idlefit/helpers/constants.dart';
-import 'package:idlefit/main.dart';
-import 'package:idlefit/models/currency_repo.dart';
 import 'package:idlefit/models/quest_repo.dart';
-import 'package:idlefit/models/quest_stats.dart';
-import 'package:idlefit/providers/currency_provider.dart';
-import 'package:idlefit/providers/generator_provider.dart';
-import 'package:idlefit/providers/shop_item_provider.dart';
 import 'package:idlefit/models/background_activity.dart';
 import 'package:idlefit/services/game_state.dart';
 import 'package:objectbox/objectbox.dart';
@@ -14,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/shop_items.dart';
 import 'dart:math';
 import '../services/notification_service.dart';
+import 'package:idlefit/providers/providers.dart';
 
 class GameStateNotifier extends StateNotifier<GameState> {
   final Ref ref;
@@ -249,13 +244,3 @@ class GameStateNotifier extends StateNotifier<GameState> {
     setIsPaused(false);
   }
 }
-
-// Create providers
-final gameStateProvider = StateNotifierProvider<GameStateNotifier, GameState>((
-  ref,
-) {
-  return GameStateNotifier(
-    ref,
-    GameState(isPaused: true, lastGenerated: 0, doubleCoinExpiry: 0),
-  );
-});

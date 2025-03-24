@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
-import 'package:idlefit/providers/currency_provider.dart';
-import 'package:idlefit/providers/generator_provider.dart';
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/widgets/current_coins.dart';
 import 'common_card.dart';
+import 'package:idlefit/providers/providers.dart';
 
 class GeneratorCard extends ConsumerStatefulWidget {
   final int generatorIndex;
@@ -93,7 +92,7 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
       final generator = coinGenerators[widget.generatorIndex];
       final output = ref
           .read(generatorProvider.notifier)
-          .tapGenerator(generator);
+          .tapGenerator(generator, ref);
       _showFloatingText(toLettersNotation(output));
       CurrentCoins.triggerAnimation();
     });
@@ -231,7 +230,7 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
           buttonText: 'Add Rep',
           onButtonPressed:
               coins.count >= generator.cost
-                  ? () => coinGeneratorNotifier.buyCoinGenerator(generator)
+                  ? () => coinGeneratorNotifier.buyCoinGenerator(generator, ref)
                   : null,
           onTapDown: showProgress || generator.count < 1 ? null : startProgress,
           progressIndicator:

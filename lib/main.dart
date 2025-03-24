@@ -1,17 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:idlefit/screens/game_home_screen.dart';
-import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'services/health_service.dart';
 import 'services/object_box.dart';
-
-// Create providers for our services
-final healthServiceProvider = Provider<HealthService>(
-  (ref) => throw UnimplementedError('Initialize in main'),
-);
-final objectBoxProvider = Provider<ObjectBox>(
-  (ref) => throw UnimplementedError('Initialize in main'),
-);
+import 'package:idlefit/providers/providers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

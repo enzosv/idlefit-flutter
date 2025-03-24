@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
-import 'package:idlefit/providers/currency_provider.dart';
-import 'package:idlefit/providers/generator_provider.dart';
 import 'package:idlefit/helpers/util.dart';
 import 'common_card.dart';
+import 'package:idlefit/providers/providers.dart';
 
 class GeneratorUpgradeCard extends ConsumerWidget {
   final CoinGenerator generator;
@@ -58,7 +57,7 @@ class GeneratorUpgradeCard extends ConsumerWidget {
       onButtonPressed:
           (isMaxLevel || space.count < generator.upgradeCost)
               ? null
-              : () => coinGeneratorNotifier.upgradeGenerator(generator),
+              : () => coinGeneratorNotifier.upgradeGenerator(generator, ref),
     );
   }
 }

@@ -1,9 +1,8 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/providers/currency_provider.dart';
-import 'package:idlefit/providers/generator_provider.dart';
 import 'package:idlefit/widgets/generator_card.dart';
+import 'package:idlefit/providers/providers.dart';
 
 class FlameBackground extends FlameGame {
   @override

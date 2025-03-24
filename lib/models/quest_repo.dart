@@ -324,21 +324,3 @@ class QuestRepository {
     }
   }
 }
-
-// class QuestNotifier extends StateNotifier<Quest> {
-//   final GameStats stats;
-//   final QuestRepository repository;
-
-//   QuestNotifier(this.stats, this.repository, super.state);
-// }
-
-final questRepositoryProvider = Provider<QuestRepository>((ref) {
-  final box = ref.read(objectBoxProvider).store.box<Quest>();
-  return QuestRepository(box);
-});
-
-// final questProvider = StateNotifierProvider<QuestNotifier, Quest>((ref) {
-//   final repository = ref.read(questRepositoryProvider);
-//   final gameStats = ref.read(gameStatsProvider);
-//   return QuestNotifier(gameStats, repository, Quest());
-// });

@@ -3,10 +3,9 @@ import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/quest_repo.dart';
-import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/services/ad_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/providers/game_state_provider.dart';
+import 'package:idlefit/providers/providers.dart';
 
 class BoostButton extends ConsumerWidget {
   const BoostButton({super.key});

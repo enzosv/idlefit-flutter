@@ -4,18 +4,14 @@ import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/helpers/util.dart';
-import 'package:idlefit/main.dart';
 import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/quest_repo.dart';
-import 'package:idlefit/models/quest_stats.dart';
-import 'package:idlefit/providers/currency_provider.dart';
-import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:objectbox/objectbox.dart';
+import 'package:idlefit/providers/providers.dart';
 
 class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
   final Box<CoinGenerator> box;
-  final Ref ref;
-  CoinGeneratorNotifier(this.ref, this.box, super.state);
+  CoinGeneratorNotifier(this.box, super.state);
 
   Future<void> initialize() async {
     state = await _parseCoinGenerators('assets/coin_generators.json');
@@ -26,7 +22,7 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
         0;
   }
 
-  bool buyCoinGenerator(CoinGenerator generator) {
+  bool buyCoinGenerator(CoinGenerator generator, WidgetRef ref) {
     final coins = ref.read(coinProvider);
     if (coins.count < generator.cost) return false;
     final coinsNotifier = ref.read(coinProvider.notifier);
@@ -80,7 +76,7 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
     return true;
   }
 
-  bool upgradeGenerator(CoinGenerator generator) {
+  bool upgradeGenerator(CoinGenerator generator, WidgetRef ref) {
     final space = ref.read(spaceProvider);
     if (space.count < generator.upgradeCost ||
         generator.count < 10 ||
@@ -103,7 +99,7 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
     return true;
   }
 
-  double tapGenerator(CoinGenerator generator) {
+  double tapGenerator(CoinGenerator generator, WidgetRef ref) {
     final double output = max(generator.tier * 15, generator.singleOutput);
     ref.read(coinProvider.notifier).earn(output);
     ref
@@ -145,14 +141,3 @@ class CoinGeneratorNotifier extends StateNotifier<List<CoinGenerator>> {
     initialize();
   }
 }
-
-final generatorProvider =
-    StateNotifierProvider<CoinGeneratorNotifier, List<CoinGenerator>>((ref) {
-      final notifier = CoinGeneratorNotifier(
-        ref,
-        ref.read(objectBoxProvider).store.box<CoinGenerator>(),
-        [],
-      );
-      notifier.initialize();
-      return notifier;
-    });

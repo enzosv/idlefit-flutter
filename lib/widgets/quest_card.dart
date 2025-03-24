@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/quest_repo.dart';
-import 'package:idlefit/models/quest_stats.dart';
+import 'package:idlefit/providers/providers.dart';
 
 class QuestCard extends ConsumerWidget {
   final Quest quest;

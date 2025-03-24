@@ -4,12 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/helpers/util.dart';
-import 'package:idlefit/main.dart';
 import 'package:idlefit/models/quest_repo.dart';
-import 'package:idlefit/models/quest_stats.dart';
 import 'package:idlefit/models/shop_items.dart';
-import 'package:idlefit/providers/currency_provider.dart';
 import 'package:objectbox/objectbox.dart';
+import 'package:idlefit/providers/providers.dart';
 
 class ShopItemNotifier extends StateNotifier<List<ShopItem>> {
   final Box<ShopItem> box;
@@ -88,13 +86,3 @@ class ShopItemNotifier extends StateNotifier<List<ShopItem>> {
     initialize();
   }
 }
-
-final shopItemProvider =
-    StateNotifierProvider<ShopItemNotifier, List<ShopItem>>((ref) {
-      final notifier = ShopItemNotifier(
-        ref.read(objectBoxProvider).store.box<ShopItem>(),
-        [],
-      );
-      notifier.initialize();
-      return notifier;
-    });

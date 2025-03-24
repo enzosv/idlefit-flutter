@@ -155,8 +155,3 @@ class QuestStatsRepository {
     return progress;
   }
 }
-
-final questStatsRepositoryProvider = Provider<QuestStatsRepository>((ref) {
-  final box = ref.read(objectBoxProvider).store.box<QuestStats>();
-  return QuestStatsRepository(box);
-});

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
-import 'package:idlefit/providers/currency_provider.dart';
-import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:idlefit/widgets/boost_button.dart';
 import 'package:idlefit/widgets/current_coins.dart';
 import '../helpers/util.dart';
+import 'package:idlefit/providers/providers.dart';
 
 const _smallStyle = TextStyle(fontSize: 12, color: Colors.white70);
 

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
-import 'package:idlefit/providers/currency_provider.dart';
-import 'package:idlefit/providers/shop_item_provider.dart';
 import '../models/shop_items.dart';
 import 'common_card.dart';
+import 'package:idlefit/providers/providers.dart';
 
 class ShopItemCard extends ConsumerWidget {
   final ShopItem item;

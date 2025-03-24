@@ -1,4 +1,5 @@
 import 'package:idlefit/providers/currency_provider.dart';
+import 'package:idlefit/providers/providers.dart';
 import 'package:objectbox/objectbox.dart';
 import 'currency.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -52,10 +53,10 @@ class CurrencyRepo {
 
   Future<void> reset(Ref ref) async {
     box.removeAll();
-    _initialize(ref);
+    initialize(ref);
   }
 
-  Future<void> _initialize(Ref ref) async {
+  Future<void> initialize(Ref ref) async {
     _ensureDefaultCurrencies();
     final currencies = _loadCurrencies();
 
@@ -69,10 +70,3 @@ class CurrencyRepo {
     ref.read(coinProvider.notifier).initialize(currencies[CurrencyType.coin]!);
   }
 }
-
-final currencyRepoProvider = Provider<CurrencyRepo>((ref) {
-  final box = ref.read(objectBoxProvider).store.box<Currency>();
-  final repo = CurrencyRepo(box: box);
-  repo._initialize(ref);
-  return repo;
-});
