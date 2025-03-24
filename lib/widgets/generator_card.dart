@@ -92,7 +92,7 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
       final generator = coinGenerators[widget.generatorIndex];
       final output = ref
           .read(generatorProvider.notifier)
-          .tapGenerator(generator, ref);
+          .tapGenerator(generator);
       _showFloatingText(toLettersNotation(output));
       CurrentCoins.triggerAnimation();
     });
@@ -230,7 +230,7 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
           buttonText: 'Add Rep',
           onButtonPressed:
               coins.count >= generator.cost
-                  ? () => coinGeneratorNotifier.buyCoinGenerator(generator, ref)
+                  ? () => coinGeneratorNotifier.buyCoinGenerator(generator)
                   : null,
           onTapDown: showProgress || generator.count < 1 ? null : startProgress,
           progressIndicator:

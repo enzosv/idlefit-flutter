@@ -57,7 +57,7 @@ class GeneratorUpgradeCard extends ConsumerWidget {
       onButtonPressed:
           (isMaxLevel || space.count < generator.upgradeCost)
               ? null
-              : () => coinGeneratorNotifier.upgradeGenerator(generator, ref),
+              : () => coinGeneratorNotifier.upgradeGenerator(generator),
     );
   }
 }

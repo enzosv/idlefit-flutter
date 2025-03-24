@@ -26,7 +26,7 @@ class CoinGeneratorNotifier extends Notifier<List<CoinGenerator>> {
         0;
   }
 
-  bool buyCoinGenerator(CoinGenerator generator, WidgetRef ref) {
+  bool buyCoinGenerator(CoinGenerator generator) {
     final coins = ref.read(coinProvider);
     if (coins.count < generator.cost) return false;
     final coinsNotifier = ref.read(coinProvider.notifier);
@@ -80,7 +80,7 @@ class CoinGeneratorNotifier extends Notifier<List<CoinGenerator>> {
     return true;
   }
 
-  bool upgradeGenerator(CoinGenerator generator, WidgetRef ref) {
+  bool upgradeGenerator(CoinGenerator generator) {
     final space = ref.read(spaceProvider);
     if (space.count < generator.upgradeCost ||
         generator.count < 10 ||
@@ -103,7 +103,7 @@ class CoinGeneratorNotifier extends Notifier<List<CoinGenerator>> {
     return true;
   }
 
-  double tapGenerator(CoinGenerator generator, WidgetRef ref) {
+  double tapGenerator(CoinGenerator generator) {
     final double output = max(generator.tier * 15, generator.singleOutput);
     ref.read(coinProvider.notifier).earn(output);
     ref
