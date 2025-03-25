@@ -99,13 +99,15 @@ class HealthStatsCard extends ConsumerWidget {
   const HealthStatsCard({super.key});
 
   Future<void> _syncHealthData(WidgetRef ref) async {
+    final gameStateNotifier = ref.read(gameStateProvider.notifier);
     await ref
         .read(healthServiceProvider)
         .syncHealthData(
-          ref.read(gameStateProvider.notifier),
+          gameStateNotifier,
           ref.read(questStatsRepositoryProvider),
           days: 1,
         );
+    gameStateNotifier.setIsPaused(false);
   }
 
   @override
