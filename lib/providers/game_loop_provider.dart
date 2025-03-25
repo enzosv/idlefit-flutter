@@ -41,17 +41,17 @@ class GameLoopNotifier extends Notifier<void> {
       const Duration(milliseconds: Constants.tickTime),
       (_) => _processGenerators(),
     );
-
-    // TODO: reset background activity
   }
 
   void pause() {
+    if (_isPaused) return;
     _gameLoopTimer?.cancel();
     _isPaused = true;
     print("paused");
     _scheduleCoinCapacityNotification();
-    // TODO: reset background activity
-    // TODO: save game state
+    final gameStateNotifier = ref.read(gameStateProvider.notifier);
+    gameStateNotifier.resetBackgroundActivity();
+    gameStateNotifier.save();
   }
 
   void _processGenerators() {
@@ -93,7 +93,10 @@ class GameLoopNotifier extends Notifier<void> {
     final energyNotifier = ref.read(energyProvider.notifier);
     energyNotifier.spend(dif.toDouble());
     // track energy spent for popup
-    gameStateNotifier.updateBackgroundActivity(dif.toDouble(), coinsGenerated);
+    gameStateNotifier.updateBackgroundActivity(
+      energySpent: dif.toDouble(),
+      coinsEarned: coinsGenerated,
+    );
   }
 
   /// **Calculate Valid Time Since Last Generate**
@@ -102,14 +105,13 @@ class GameLoopNotifier extends Notifier<void> {
       return Constants.tickTime;
     }
     final dif = now - previous;
-    if (dif < 0) {
-      return Constants.tickTime;
-    }
+    assert(dif > 0, "previous should not be in the future");
 
     if (dif < Constants.inactiveThreshold) {
       // even if app became inactive, it wasn't long enough. don't limit to energy
       return dif;
     }
+    // TODO: what if energy is synced late?
     // limit to energy
     // if dif > energy
     // take note of this attempt

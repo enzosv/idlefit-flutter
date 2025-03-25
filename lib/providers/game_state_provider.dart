@@ -82,14 +82,6 @@ class GameStateNotifier extends Notifier<GameState> {
     // not saving generators and shopitems. only changes on buy anyway
   }
 
-  void updateBackgroundActivity(double energySpent, double coinsEarned) {
-    final newBackgroundActivity = state.backgroundActivity.copyWith(
-      energySpent: energySpent,
-      coinsEarned: coinsEarned,
-    );
-    state = state.copyWith(backgroundActivity: newBackgroundActivity);
-  }
-
   Future<void> convertHealthStats(int steps, double calories) async {
     if (steps <= 0 && calories <= 0) {
       state = state.copyWith(
@@ -118,19 +110,23 @@ class GameStateNotifier extends Notifier<GameState> {
       save();
       return;
     }
-    print("generating background activity");
-    final newBackgroundActivity = state.backgroundActivity.copyWith(
-      energyEarned: energyGain,
-      spaceEarned: spaceGain,
-    );
-    print('newBackgroundActivity: $newBackgroundActivity');
-
-    state = state.copyWith(
-      backgroundActivity: newBackgroundActivity,
-      healthLastSynced: DateTime.now().millisecondsSinceEpoch,
-    );
-    print("updated state");
+    updateBackgroundActivity(energyEarned: energyGain, spaceEarned: spaceGain);
     save();
+  }
+
+  Future<void> updateBackgroundActivity({
+    double? energyEarned,
+    double? spaceEarned,
+    double? energySpent,
+    double? coinsEarned,
+  }) async {
+    final newBackgroundActivity = state.backgroundActivity.copyWith(
+      energyEarned: energyEarned ?? 0,
+      spaceEarned: spaceEarned ?? 0,
+      energySpent: energySpent ?? 0,
+      coinsEarned: coinsEarned ?? 0,
+    );
+    state = state.copyWith(backgroundActivity: newBackgroundActivity);
   }
 
   void setDoubleCoinExpiry(int expiry) {
