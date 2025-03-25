@@ -21,14 +21,18 @@ class _BannerAdWidgetState extends ConsumerState<BannerAdWidget> {
     _loadAd();
   }
 
-  void _loadAd() {
-    _bannerAd =
-        AdService.createBannerAd()
-          ..load().then((value) {
-            setState(() {
-              _isAdLoaded = true;
-            });
-          });
+  Future<void> _loadAd() async {
+    final highestTier = ref.read(
+      generatorProvider.notifier.select((value) => value.highestTier),
+    );
+    if (highestTier < 9) {
+      return;
+    }
+    _bannerAd = AdService.createBannerAd();
+    await _bannerAd?.load();
+    setState(() {
+      _isAdLoaded = true;
+    });
   }
 
   @override
