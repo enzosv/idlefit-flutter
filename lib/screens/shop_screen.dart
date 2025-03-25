@@ -33,7 +33,7 @@ class ShopScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                     Text(
                       'Add Weight',
-                      style: Theme.of(context).textTheme.headlineMedium,
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 16),
                     ...upgradableGenerators.map((generator) {

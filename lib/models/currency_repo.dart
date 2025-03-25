@@ -1,6 +1,5 @@
 import 'package:objectbox/objectbox.dart';
 import 'currency.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/objectbox.g.dart';
 
 class CurrencyRepo {
