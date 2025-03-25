@@ -32,12 +32,17 @@ class GameStateNotifier extends Notifier<GameState> {
       healthLastSynced: savedState['healthLastSynced'] ?? 0,
       backgroundActivity: BackgroundActivity(),
     );
-    // have to wait for double coin expiry to be part of state before computing
-    recomputePassiveOutput();
+    /**
+     * not initializing passiveoutput yet
+     * have to wait for
+     * double coin expiry
+     * generators to load
+     * shop items to load
+     */
   }
 
   double computePassiveOutput() {
-    final generators = ref.watch(generatorProvider);
+    final generators = ref.read(generatorProvider);
     double output = generators.fold(
       0,
       (sum, generator) => sum + generator.output,
@@ -63,26 +68,9 @@ class GameStateNotifier extends Notifier<GameState> {
     save();
   }
 
-  // void setIsPaused(bool isPaused) {
-  //   state = state.copyWith(isPaused: isPaused);
-  //   if (!isPaused) {
-  //     return;
-  //   }
-  //   resetBackgroundActivity();
-  //   save();
-  //   _scheduleCoinCapacityNotification();
-  // }
-
   void resetBackgroundActivity() {
     state = state.copyWith(backgroundActivity: BackgroundActivity());
   }
-
-  // void _startGenerators() {
-  //   final duration = Duration(milliseconds: Constants.tickTime);
-  //   _generatorTimer = Timer.periodic(duration, (_) {
-  //     _processGenerators();
-  //   });
-  // }
 
   void save() async {
     state.saveGameState();

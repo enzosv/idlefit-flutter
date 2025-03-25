@@ -17,6 +17,7 @@ class ShopItemNotifier extends Notifier<List<ShopItem>> {
 
   Future<void> _loadShopItems() async {
     state = await _repo.loadShopItems('assets/shop_items.json');
+    ref.read(gameStateProvider.notifier).recomputePassiveOutput();
   }
 
   bool upgradeShopItem(ShopItem item) {
@@ -36,6 +37,8 @@ class ShopItemNotifier extends Notifier<List<ShopItem>> {
         ref.read(energyProvider.notifier).updateMaxMultiplier(item.effectValue);
       case ShopItemEffect.offlineCoinMultiplier:
         //handled simply by updating level
+        ref.read(gameStateProvider.notifier).recomputePassiveOutput();
+
         break;
       case ShopItemEffect.coinCapacity:
         final coinsNotifier = ref.read(coinProvider.notifier);
@@ -47,8 +50,6 @@ class ShopItemNotifier extends Notifier<List<ShopItem>> {
     newState[item.id - 1] = item;
     state = newState;
     _repo.saveShopItem(item);
-    ref.read(gameStateProvider.notifier).recomputePassiveOutput();
-
     ref
         .read(questStatsRepositoryProvider)
         .progressTowards(

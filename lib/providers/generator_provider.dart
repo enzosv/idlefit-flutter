@@ -19,6 +19,7 @@ class CoinGeneratorNotifier extends Notifier<List<CoinGenerator>> {
 
   Future<void> _loadCoinGenerators() async {
     state = await _repo.loadCoinGenerators('assets/coin_generators.json');
+    ref.read(gameStateProvider.notifier).recomputePassiveOutput();
   }
 
   int get highestTier {
@@ -41,6 +42,8 @@ class CoinGeneratorNotifier extends Notifier<List<CoinGenerator>> {
           todayTimestamp,
           1,
         );
+    ref.read(gameStateProvider.notifier).recomputePassiveOutput();
+
     if (generator.count > 1) {
       // nothing to unlock
       return true;
@@ -76,7 +79,6 @@ class CoinGeneratorNotifier extends Notifier<List<CoinGenerator>> {
         spaceNotifier.addMax(500);
       }
     }
-    ref.read(gameStateProvider.notifier).recomputePassiveOutput();
     return true;
   }
 

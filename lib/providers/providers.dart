@@ -24,10 +24,6 @@ final energyProvider = NotifierProvider<CurrencyNotifier, Currency>(() {
   return CurrencyNotifier(CurrencyType.energy);
 });
 
-final gameStateProvider = NotifierProvider<GameStateNotifier, GameState>(() {
-  return GameStateNotifier();
-});
-
 final shopItemProvider = NotifierProvider<ShopItemNotifier, List<ShopItem>>(() {
   return ShopItemNotifier();
 });
@@ -57,6 +53,10 @@ final objectBoxProvider = Provider<ObjectBox>(
 final questRepositoryProvider = Provider<QuestRepository>((ref) {
   final box = ref.read(objectBoxProvider).store.box<Quest>();
   return QuestRepository(box);
+});
+
+final gameStateProvider = NotifierProvider<GameStateNotifier, GameState>(() {
+  return GameStateNotifier();
 });
 
 final gameLoopProvider = NotifierProvider<GameLoopNotifier, void>(() {
