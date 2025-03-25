@@ -105,33 +105,37 @@ class CurrencyBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        IconButton(
-          icon: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: Icon(
-              isSidebarOpen ? Icons.close : Icons.menu,
-              key: ValueKey(isSidebarOpen),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          IconButton(
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: Icon(
+                isSidebarOpen ? Icons.close : Icons.menu,
+                key: ValueKey(isSidebarOpen),
+              ),
+            ),
+            iconSize: 28,
+            onPressed: onMenuPressed,
+          ),
+          const SizedBox(width: 8),
+          const Expanded(flex: 3, child: CoinsDisplay()),
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                CurrencyWidget(currencyType: CurrencyType.energy),
+                CurrencyWidget(currencyType: CurrencyType.space),
+              ],
             ),
           ),
-          iconSize: 28,
-          onPressed: onMenuPressed,
-        ),
-        const SizedBox(width: 8),
-        const Expanded(flex: 3, child: CoinsDisplay()),
-        Expanded(
-          flex: 2,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: const [
-              CurrencyWidget(currencyType: CurrencyType.energy),
-              CurrencyWidget(currencyType: CurrencyType.space),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

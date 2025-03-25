@@ -120,7 +120,6 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
 
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 80,
         backgroundColor: Constants.barColor,
         elevation: 0,
         automaticallyImplyLeading: false,
