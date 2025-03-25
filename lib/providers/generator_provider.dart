@@ -79,6 +79,7 @@ class CoinGeneratorNotifier extends Notifier<List<CoinGenerator>> {
         spaceNotifier.addMax(500);
       }
     }
+    ref.read(gameStateProvider.notifier).save();
     return true;
   }
 
