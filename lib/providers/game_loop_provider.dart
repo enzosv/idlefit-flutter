@@ -9,7 +9,8 @@ import '../services/notification_service.dart';
 
 class GameLoopNotifier extends Notifier<void> {
   Timer? _gameLoopTimer;
-  int _lastGenerated = 0;
+  int _lastGenerated =
+      0; // not in gamestate because we dont want to update state every second
   bool _isPaused = true;
 
   @override
