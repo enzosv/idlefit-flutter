@@ -14,23 +14,24 @@ class BannerAdWidget extends ConsumerStatefulWidget {
 class _BannerAdWidgetState extends ConsumerState<BannerAdWidget> {
   BannerAd? _bannerAd;
   bool _isAdLoaded = false;
+  late final int _highestTier;
 
   @override
   void initState() {
     super.initState();
+    _highestTier = ref.read(
+      generatorProvider.notifier.select((value) => value.highestTier),
+    );
+    if (_highestTier < 9) return;
     _loadAd();
   }
 
   Future<void> _loadAd() async {
-    final highestTier = ref.read(
-      generatorProvider.notifier.select((value) => value.highestTier),
-    );
-    if (highestTier < 9) {
-      return;
-    }
-    _bannerAd = AdService.createBannerAd();
-    await _bannerAd?.load();
+    final bannerAd = AdService.createBannerAd();
+    await bannerAd.load();
     setState(() {
+      if (!mounted) return;
+      _bannerAd = bannerAd;
       _isAdLoaded = true;
     });
   }
@@ -43,16 +44,14 @@ class _BannerAdWidgetState extends ConsumerState<BannerAdWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final highestTier = ref.read(
-      generatorProvider.notifier.select((value) => value.highestTier),
-    );
-    if (highestTier < 9) {
+    if (_highestTier < 9) {
       return SizedBox.shrink();
     }
+    print("happen");
     if (!_isAdLoaded || _bannerAd == null) {
       return SizedBox(
         height: 32,
-        width: MediaQuery.of(context).size.width,
+        // width: MediaQuery.of(context).size.width,
       ); // Placeholder height for the ad
     }
 
