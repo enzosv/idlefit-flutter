@@ -22,6 +22,7 @@ class GameStateNotifier extends Notifier<GameState> {
       isPaused: true,
       lastGenerated: 0,
       doubleCoinExpiry: 0,
+      healthLastSynced: 0,
       backgroundActivity: BackgroundActivity(),
     );
   }
@@ -33,6 +34,7 @@ class GameStateNotifier extends Notifier<GameState> {
     state = state.copyWith(
       lastGenerated: savedState['lastGenerated'] ?? 0,
       doubleCoinExpiry: savedState['doubleCoinExpiry'] ?? 0,
+      healthLastSynced: savedState['healthLastSynced'] ?? 0,
       backgroundActivity: BackgroundActivity(),
     );
   }
@@ -115,6 +117,9 @@ class GameStateNotifier extends Notifier<GameState> {
 
   Future<void> convertHealthStats(int steps, double calories) async {
     if (steps <= 0 && calories <= 0) {
+      state = state.copyWith(
+        healthLastSynced: DateTime.now().millisecondsSinceEpoch,
+      );
       return;
     }
     final healthMultiplier = ref
@@ -132,8 +137,10 @@ class GameStateNotifier extends Notifier<GameState> {
       ref.read(energyProvider.notifier).earn(energyGain);
     }
     if (state.backgroundActivity.energySpent <= 0) {
+      state = state.copyWith(
+        healthLastSynced: DateTime.now().millisecondsSinceEpoch,
+      );
       save();
-
       return;
     }
     print("generating background activity");
@@ -143,7 +150,10 @@ class GameStateNotifier extends Notifier<GameState> {
     );
     print('newBackgroundActivity: $newBackgroundActivity');
 
-    state = state.copyWith(backgroundActivity: newBackgroundActivity);
+    state = state.copyWith(
+      backgroundActivity: newBackgroundActivity,
+      healthLastSynced: DateTime.now().millisecondsSinceEpoch,
+    );
     print("updated state");
     save();
   }
@@ -237,6 +247,7 @@ class GameStateNotifier extends Notifier<GameState> {
     state = state.copyWith(
       lastGenerated: 0,
       doubleCoinExpiry: 0,
+      healthLastSynced: 0,
       backgroundActivity: null,
       isPaused: true,
     );
