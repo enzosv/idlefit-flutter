@@ -19,6 +19,7 @@ class GameStateNotifier extends Notifier<GameState> {
     return GameState(
       doubleCoinExpiry: 0,
       healthLastSynced: 0,
+      passiveOutput: 0,
       backgroundActivity: BackgroundActivity(),
     );
   }
@@ -26,12 +27,40 @@ class GameStateNotifier extends Notifier<GameState> {
   Future<void> initialize(Store objectBoxService) async {
     // Try to load saved state
     final savedState = await state.loadGameState();
-
     state = state.copyWith(
       doubleCoinExpiry: savedState['doubleCoinExpiry'] ?? 0,
       healthLastSynced: savedState['healthLastSynced'] ?? 0,
       backgroundActivity: BackgroundActivity(),
     );
+    // have to wait for double coin expiry to be part of state before computing
+    recomputePassiveOutput();
+  }
+
+  double computePassiveOutput() {
+    final generators = ref.watch(generatorProvider);
+    double output = generators.fold(
+      0,
+      (sum, generator) => sum + generator.output,
+    );
+    double coinMultiplier = ref
+        .read(shopItemProvider.notifier)
+        .multiplier(ShopItemEffect.coinMultiplier);
+    if (state.doubleCoinExpiry >= DateTime.now().millisecondsSinceEpoch) {
+      // TODO: what if doubler is active for part of the time?
+      coinMultiplier += 1;
+    }
+    return output * coinMultiplier;
+  }
+
+  /// must be recomputed after every generator, shop, upgrade, buy
+  /// must be recomputed after ad watch
+  void recomputePassiveOutput() {
+    final passiveOutput = computePassiveOutput();
+    if (passiveOutput == state.passiveOutput) {
+      return;
+    }
+    state = state.copyWith(passiveOutput: passiveOutput);
+    save();
   }
 
   // void setIsPaused(bool isPaused) {
@@ -118,7 +147,7 @@ class GameStateNotifier extends Notifier<GameState> {
 
   void setDoubleCoinExpiry(int expiry) {
     state = state.copyWith(doubleCoinExpiry: expiry);
-    save();
+    recomputePassiveOutput();
   }
 
   Future<void> fullReset() async {

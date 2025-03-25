@@ -47,6 +47,8 @@ class ShopItemNotifier extends Notifier<List<ShopItem>> {
     newState[item.id - 1] = item;
     state = newState;
     _repo.saveShopItem(item);
+    ref.read(gameStateProvider.notifier).recomputePassiveOutput();
+
     ref
         .read(questStatsRepositoryProvider)
         .progressTowards(

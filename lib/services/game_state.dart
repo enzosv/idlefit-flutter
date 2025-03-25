@@ -7,6 +7,7 @@ class GameState {
   // Game state
   final int _doubleCoinExpiry;
   final int _healthLastSynced;
+  final double _passiveOutput;
 
   static const _gameStateKey = 'game_state';
 
@@ -16,25 +17,30 @@ class GameState {
   GameState({
     required int doubleCoinExpiry,
     required int healthLastSynced,
+    required double passiveOutput,
     BackgroundActivity? backgroundActivity,
   }) : _doubleCoinExpiry = doubleCoinExpiry,
        _healthLastSynced = healthLastSynced,
+       _passiveOutput = passiveOutput,
        _backgroundActivity = backgroundActivity ?? BackgroundActivity();
 
   /// **Public Getters (Encapsulation)**
   int get doubleCoinExpiry => _doubleCoinExpiry;
   int get healthLastSynced => _healthLastSynced;
+  double get passiveOutput => _passiveOutput;
   BackgroundActivity get backgroundActivity => _backgroundActivity;
 
   /// **CopyWith (Immutable Updates)**
   GameState copyWith({
     int? doubleCoinExpiry,
     int? healthLastSynced,
+    double? passiveOutput,
     BackgroundActivity? backgroundActivity,
   }) {
     return GameState(
       doubleCoinExpiry: doubleCoinExpiry ?? _doubleCoinExpiry,
       healthLastSynced: healthLastSynced ?? _healthLastSynced,
+      passiveOutput: passiveOutput ?? _passiveOutput,
       backgroundActivity: backgroundActivity ?? _backgroundActivity,
     );
   }

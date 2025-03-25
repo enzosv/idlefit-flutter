@@ -63,7 +63,12 @@ class GameLoopNotifier extends Notifier<void> {
     final dif = _calculateValidTimeSinceLastGenerate(now, _lastGenerated);
 
     // Handle coin generation
-    double coinsGenerated = passiveOutput;
+    double coinsGenerated = ref.read(gameStateProvider).passiveOutput;
+    assert(
+      coinsGenerated ==
+          ref.read(gameStateProvider.notifier).computePassiveOutput(),
+      "coin generation is inconsistent",
+    );
     if (coinsGenerated <= 0) {
       // no coins generated, skip
       return;
@@ -115,22 +120,6 @@ class GameLoopNotifier extends Notifier<void> {
   }
 
   /// **Calculate Passive Output**
-  double get passiveOutput {
-    final generators = ref.watch(generatorProvider);
-    double output = generators.fold(
-      0,
-      (sum, generator) => sum + generator.output,
-    );
-    double coinMultiplier = ref
-        .read(shopItemProvider.notifier)
-        .multiplier(ShopItemEffect.coinMultiplier);
-    final doubleCoinExpiry = ref.read(gameStateProvider).doubleCoinExpiry;
-    if (doubleCoinExpiry >= DateTime.now().millisecondsSinceEpoch) {
-      // TODO: what if doubler is active for part of the time?
-      coinMultiplier += 1;
-    }
-    return output * coinMultiplier;
-  }
 
   void _scheduleCoinCapacityNotification() {
     final coins = ref.read(coinProvider);
@@ -138,6 +127,7 @@ class GameLoopNotifier extends Notifier<void> {
 
     final coinsToFill = coins.max - coins.count;
 
+    final passiveOutput = ref.read(gameStateProvider).passiveOutput;
     final effectiveOutput =
         passiveOutput *
         ref
