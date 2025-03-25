@@ -180,18 +180,22 @@ class HealthService {
 
   Future<void> syncHealthData(
     GameStateNotifier gameStateNotifier,
-    QuestStatsRepository questStatsRepository,
-  ) async {
+    QuestStatsRepository questStatsRepository, {
+    int days = 0,
+  }) async {
     final iosService = Platform.isIOS ? IosHealthService() : null;
     final now = DateTime.now();
-    await [
-      syncDay(now, gameStateNotifier, questStatsRepository, iosService),
-      syncDay(
-        now.subtract(const Duration(days: 1)),
-        gameStateNotifier,
-        questStatsRepository,
-        iosService,
-      ),
-    ].wait;
+    final syncs = <Future<void>>[];
+    for (var i = 0; i < days; i++) {
+      syncs.add(
+        syncDay(
+          now.subtract(Duration(days: i)),
+          gameStateNotifier,
+          questStatsRepository,
+          iosService,
+        ),
+      );
+    }
+    await syncs.wait;
   }
 }

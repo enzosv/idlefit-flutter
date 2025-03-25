@@ -100,6 +100,7 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
         await healthService.syncHealthData(
           gameStateNotifier,
           questStatsRepository,
+          days: 1,
         );
       }
       gameStateNotifier.setIsPaused(false);

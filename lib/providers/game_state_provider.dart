@@ -254,7 +254,7 @@ class GameStateNotifier extends Notifier<GameState> {
 
     await ref
         .read(healthServiceProvider)
-        .syncHealthData(this, ref.read(questStatsRepositoryProvider));
+        .syncHealthData(this, ref.read(questStatsRepositoryProvider), days: 1);
 
     setIsPaused(false);
   }

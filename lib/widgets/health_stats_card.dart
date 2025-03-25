@@ -104,6 +104,7 @@ class HealthStatsCard extends ConsumerWidget {
         .syncHealthData(
           ref.read(gameStateProvider.notifier),
           ref.read(questStatsRepositoryProvider),
+          days: 1,
         );
   }
 
