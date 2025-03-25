@@ -107,7 +107,6 @@ class HealthStatsCard extends ConsumerWidget {
           ref.read(questStatsRepositoryProvider),
           days: 1,
         );
-    gameStateNotifier.setIsPaused(false);
   }
 
   @override
@@ -131,7 +130,11 @@ class HealthStatsCard extends ConsumerWidget {
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     _HealthDateLabels(
-                      latest: ref.read(gameStateProvider).healthLastSynced,
+                      latest: ref.watch(
+                        gameStateProvider.select(
+                          (state) => state.healthLastSynced,
+                        ),
+                      ),
                       earliestFetch: repository.firstHealthDay(),
                     ),
                   ],
