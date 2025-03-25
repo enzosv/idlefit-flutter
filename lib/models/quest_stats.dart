@@ -82,6 +82,10 @@ class QuestStatsRepository {
     int dayTimestamp,
     double value,
   ) async {
+    assert(
+      action == QuestAction.walk || action == QuestAction.burn,
+      "set progress should only be used for health stats",
+    );
     final stats = await _getOrCreateQuestStats(action, unit, dayTimestamp);
     final oldValue = stats.value;
     if (value == oldValue) {
@@ -105,25 +109,16 @@ class QuestStatsRepository {
         : null;
   }
 
-  Future<DateTime?> lastHealthDay() async {
-    final lastStep =
-        await box
-            .query(QuestStats_.unit.equals(QuestUnit.steps.index))
-            .order(QuestStats_.dayTimestamp, flags: Order.descending)
-            .build()
-            .findFirstAsync();
-    final lastDay = lastStep?.dayTimestamp;
-    return lastDay != null
-        ? DateTime.fromMillisecondsSinceEpoch(lastDay)
-        : null;
-  }
-
   Future<void> progressTowards(
     QuestAction action,
     QuestUnit unit,
     int dayTimestamp,
     double value,
   ) async {
+    assert(
+      action != QuestAction.walk && action != QuestAction.burn,
+      "set progress should be used for health stats",
+    );
     final stats = await _getOrCreateQuestStats(action, unit, dayTimestamp);
     stats.value += value;
     box.putAsync(stats);
