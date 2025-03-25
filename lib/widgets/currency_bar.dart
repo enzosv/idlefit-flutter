@@ -14,7 +14,7 @@ class CoinsDisplay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final coins = ref.watch(coinProvider);
-    final gameStateNotifier = ref.watch(gameStateProvider.notifier);
+    final gameLoop = ref.watch(gameLoopProvider.notifier);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -41,7 +41,7 @@ class CoinsDisplay extends ConsumerWidget {
                 Row(
                   children: [
                     Text(
-                      '${toLettersNotation(gameStateNotifier.passiveOutput)}/s ',
+                      '${toLettersNotation(gameLoop.passiveOutput)}/s ',
                       style: const TextStyle(
                         fontSize: 14,
                         color: Colors.white70,

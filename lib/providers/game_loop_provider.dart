@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/helpers/constants.dart';
 import 'package:idlefit/providers/providers.dart';
 import '../models/shop_items.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/notification_service.dart';
 
 class GameLoopNotifier extends Notifier<void> {
   Timer? _gameLoopTimer;
@@ -24,6 +26,11 @@ class GameLoopNotifier extends Notifier<void> {
     _lastGenerated = prefs.getInt('lastGenerated') ?? 0;
   }
 
+  Future<void> save() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('lastGenerated', _lastGenerated);
+  }
+
   void resume() {
     if (!_isPaused) return;
     print("resumed");
@@ -42,6 +49,9 @@ class GameLoopNotifier extends Notifier<void> {
     _gameLoopTimer?.cancel();
     _isPaused = true;
     print("paused");
+    _scheduleCoinCapacityNotification();
+    // TODO: reset background activity
+    // TODO: save game state
   }
 
   void _processGenerators() {
@@ -50,13 +60,10 @@ class GameLoopNotifier extends Notifier<void> {
     final realDif = now - _lastGenerated;
 
     final gameStateNotifier = ref.read(gameStateProvider.notifier);
-    final dif = gameStateNotifier.calculateValidTimeSinceLastGenerate(
-      now,
-      _lastGenerated,
-    );
+    final dif = _calculateValidTimeSinceLastGenerate(now, _lastGenerated);
 
     // Handle coin generation
-    double coinsGenerated = gameStateNotifier.passiveOutput;
+    double coinsGenerated = passiveOutput;
     if (coinsGenerated <= 0) {
       // no coins generated, skip
       return;
@@ -82,5 +89,75 @@ class GameLoopNotifier extends Notifier<void> {
     energyNotifier.spend(dif.toDouble());
     // track energy spent for popup
     gameStateNotifier.updateBackgroundActivity(dif.toDouble(), coinsGenerated);
+  }
+
+  /// **Calculate Valid Time Since Last Generate**
+  int _calculateValidTimeSinceLastGenerate(int now, int previous) {
+    if (previous <= 0) {
+      return Constants.tickTime;
+    }
+    final dif = now - previous;
+    if (dif < 0) {
+      return Constants.tickTime;
+    }
+
+    if (dif < Constants.inactiveThreshold) {
+      // even if app became inactive, it wasn't long enough. don't limit to energy
+      return dif;
+    }
+    // limit to energy
+    // if dif > energy
+    // take note of this attempt
+    // when new health data is synced
+    // compare if calorie burn time is within this attempt time
+    // if so, grant user coins based on current passive output and available energy
+    return min(dif, ref.read(energyProvider).count.floor());
+  }
+
+  /// **Calculate Passive Output**
+  double get passiveOutput {
+    final generators = ref.watch(generatorProvider);
+    double output = generators.fold(
+      0,
+      (sum, generator) => sum + generator.output,
+    );
+    double coinMultiplier = ref
+        .read(shopItemProvider.notifier)
+        .multiplier(ShopItemEffect.coinMultiplier);
+    final doubleCoinExpiry = ref.read(gameStateProvider).doubleCoinExpiry;
+    if (doubleCoinExpiry >= DateTime.now().millisecondsSinceEpoch) {
+      // TODO: what if doubler is active for part of the time?
+      coinMultiplier += 1;
+    }
+    return output * coinMultiplier;
+  }
+
+  void _scheduleCoinCapacityNotification() {
+    final coins = ref.read(coinProvider);
+    if (coins.count >= coins.max) return;
+
+    final coinsToFill = coins.max - coins.count;
+
+    final effectiveOutput =
+        passiveOutput *
+        ref
+            .read(shopItemProvider.notifier)
+            .multiplier(ShopItemEffect.offlineCoinMultiplier);
+    if (effectiveOutput <= 0) return;
+
+    final secondsToFill = coinsToFill / effectiveOutput;
+    if (secondsToFill <= 0) return;
+
+    final notificationTime = DateTime.now().add(
+      Duration(seconds: secondsToFill.ceil()),
+    );
+
+    NotificationService.scheduleCoinCapacityNotification(
+      id: Constants.notificationId,
+      scheduledDate: notificationTime,
+      title: 'Coin Capacity Full',
+      body:
+          'Your coins have reached maximum capacity! Time to upgrade or spend.',
+    );
   }
 }
