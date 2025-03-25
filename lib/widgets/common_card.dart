@@ -3,6 +3,52 @@ import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/widgets/card_button.dart';
 
+class _CardBody extends StatelessWidget {
+  final String? description;
+  final List<Widget> additionalInfo;
+  final Widget? animation;
+
+  const _CardBody({
+    required this.description,
+    required this.additionalInfo,
+    required this.animation,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (animation != null) {
+      return Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (description != null) ...[
+                  const SizedBox(height: 8),
+                  Text(description!),
+                ],
+                ...additionalInfo,
+              ],
+            ),
+          ),
+          Expanded(flex: 1, child: animation!),
+        ],
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (description != null) ...[
+          const SizedBox(height: 8),
+          Text(description!),
+        ],
+        ...additionalInfo,
+      ],
+    );
+  }
+}
+
 class CommonCard extends StatelessWidget {
   final String title;
   final String rightText;
@@ -17,6 +63,7 @@ class CommonCard extends StatelessWidget {
   final bool affordable;
   final bool disabled;
   final CurrencyType? costCurrency;
+  final Widget? animation;
 
   const CommonCard({
     super.key,
@@ -33,6 +80,7 @@ class CommonCard extends StatelessWidget {
     this.onTapDown,
     this.affordable = false,
     this.disabled = true,
+    this.animation,
   });
 
   @override
@@ -54,11 +102,11 @@ class CommonCard extends StatelessWidget {
                   Text(rightText),
                 ],
               ),
-              if (description != null) ...[
-                const SizedBox(height: 8),
-                Text(description!),
-              ],
-              ...additionalInfo,
+              _CardBody(
+                description: description,
+                additionalInfo: additionalInfo,
+                animation: animation,
+              ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/widgets/current_coins.dart';
+import 'package:lottie/lottie.dart';
 import 'common_card.dart';
 import 'package:idlefit/providers/providers.dart';
 
@@ -213,6 +214,7 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
         ),
       );
     }
+
     return Stack(
       clipBehavior: Clip.none, // Allow animations to move outside bounds
       children: [
@@ -222,6 +224,17 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
           description: generator.description,
           additionalInfo: additionalInfo,
           cost: generator.cost,
+          animation:
+              generator.count > 0
+                  ? Lottie.asset(
+                    'assets/lottie/walk.json',
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.contain,
+                    repeat: true,
+                    animate: true,
+                  )
+                  : null,
           affordable:
               coins.count >=
               generator
