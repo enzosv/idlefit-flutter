@@ -59,16 +59,44 @@ class _HealthStatsTile extends StatelessWidget {
   }
 }
 
+class _HealthDateLabels extends StatelessWidget {
+  final Future<DateTime?> earliestFetch;
+  final int latest;
+
+  const _HealthDateLabels({required this.latest, required this.earliestFetch});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<DateTime?>(
+      future: earliestFetch,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Text('Loading...');
+        } else if (snapshot.hasError || !snapshot.hasData) {
+          return const Text('Error loading health data');
+        }
+        final earliest = snapshot.data;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Last synced: ${formatRelativeTime(DateTime.fromMillisecondsSinceEpoch(latest))}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            if (earliest != null)
+              Text(
+                'Started: ${formatRelativeTime(earliest)}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
 class HealthStatsCard extends ConsumerWidget {
   const HealthStatsCard({super.key});
-
-  Future<(DateTime?, DateTime?)> _fetchHealthStats(
-    QuestStatsRepository repository,
-  ) async {
-    final earliest = await repository.firstHealthDay();
-    final latest = await repository.lastHealthDay();
-    return (latest, earliest);
-  }
 
   Future<void> _syncHealthData(WidgetRef ref) async {
     await ref
@@ -99,37 +127,9 @@ class HealthStatsCard extends ConsumerWidget {
                       'Health Stats',
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
-                    FutureBuilder<(DateTime?, DateTime?)>(
-                      future: _fetchHealthStats(repository),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Text('Loading...');
-                        } else if (snapshot.hasError || !snapshot.hasData) {
-                          return const Text('Error loading health data');
-                        }
-                        final (latest, earliest) = snapshot.data!;
-                        if (latest == null) {
-                          return Text(
-                            'Last sync: Never',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          );
-                        }
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Last synced: ${formatRelativeTime(latest)}',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                            if (earliest != null)
-                              Text(
-                                'Started: ${formatRelativeTime(earliest)}',
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                          ],
-                        );
-                      },
+                    _HealthDateLabels(
+                      latest: ref.read(gameStateProvider).healthLastSynced,
+                      earliestFetch: repository.firstHealthDay(),
                     ),
                   ],
                 ),
