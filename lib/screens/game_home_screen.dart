@@ -43,7 +43,7 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
 
     if (state == AppLifecycleState.paused) {
       // going to background
-      gameStateNotifier.setIsPaused(true);
+      ref.read(gameLoopProvider.notifier).pause();
       return;
     }
 
@@ -58,7 +58,7 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
           ref.read(questStatsRepositoryProvider),
         );
     NotificationService.cancelAllNotifications();
-    gameStateNotifier.setIsPaused(false);
+    ref.read(gameLoopProvider.notifier).resume();
 
     await Future.delayed(const Duration(milliseconds: 1200)).then((_) {
       if (!mounted) {
@@ -103,7 +103,7 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
           days: 1,
         );
       }
-      gameStateNotifier.setIsPaused(false);
+      ref.read(gameLoopProvider.notifier).resume();
     });
 
     // Initialize ads

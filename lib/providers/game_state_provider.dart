@@ -10,14 +10,14 @@ import '../services/notification_service.dart';
 import 'package:idlefit/providers/providers.dart';
 
 class GameStateNotifier extends Notifier<GameState> {
-  Timer? _generatorTimer;
+  // Timer? _generatorTimer;
 
   @override
   GameState build() {
-    _startGenerators();
-    ref.onDispose(() {
-      _generatorTimer?.cancel();
-    });
+    // _startGenerators();
+    // ref.onDispose(() {
+    //   _generatorTimer?.cancel();
+    // });
     return GameState(
       isPaused: true,
       lastGenerated: 0,
@@ -39,26 +39,26 @@ class GameStateNotifier extends Notifier<GameState> {
     );
   }
 
-  void setIsPaused(bool isPaused) {
-    state = state.copyWith(isPaused: isPaused);
-    if (!isPaused) {
-      return;
-    }
-    resetBackgroundActivity();
-    save();
-    _scheduleCoinCapacityNotification();
-  }
+  // void setIsPaused(bool isPaused) {
+  //   state = state.copyWith(isPaused: isPaused);
+  //   if (!isPaused) {
+  //     return;
+  //   }
+  //   resetBackgroundActivity();
+  //   save();
+  //   _scheduleCoinCapacityNotification();
+  // }
 
   void resetBackgroundActivity() {
     state = state.copyWith(backgroundActivity: BackgroundActivity());
   }
 
-  void _startGenerators() {
-    final duration = Duration(milliseconds: Constants.tickTime);
-    _generatorTimer = Timer.periodic(duration, (_) {
-      _processGenerators();
-    });
-  }
+  // void _startGenerators() {
+  //   final duration = Duration(milliseconds: Constants.tickTime);
+  //   _generatorTimer = Timer.periodic(duration, (_) {
+  //     _processGenerators();
+  //   });
+  // }
 
   void save() async {
     state.saveGameState();
@@ -70,50 +70,58 @@ class GameStateNotifier extends Notifier<GameState> {
     // not saving generators and shopitems. only changes on buy anyway
   }
 
-  // main run loop
-  void _processGenerators() {
-    if (state.isPaused) return;
-    final now = DateTime.now().millisecondsSinceEpoch;
-    final realDif = now - state.lastGenerated;
-    final dif = _calculateValidTimeSinceLastGenerate(now, state.lastGenerated);
-
-    // Handle coin generation
-    double coinsGenerated = passiveOutput;
-    if (coinsGenerated <= 0) {
-      // no coins generated, skip
-      return;
-    }
-    coinsGenerated *= (dif / Constants.tickTime);
-    final coinsNotifier = ref.read(coinProvider.notifier);
-    if (realDif < Constants.inactiveThreshold) {
-      // don't use energy
-      // earn coins
-      coinsNotifier.earn(coinsGenerated);
-      state = state.copyWith(lastGenerated: now);
-      return;
-    }
-    // use energy
-    // reduce coins generated offline
-    coinsGenerated *= ref
-        .read(shopItemProvider.notifier)
-        .multiplier(ShopItemEffect.offlineCoinMultiplier);
-    coinsNotifier.earn(coinsGenerated);
-
-    // consume energy
-    final energyNotifier = ref.read(energyProvider.notifier);
-    energyNotifier.spend(dif.toDouble());
-    // track energy spent for popup
+  void updateBackgroundActivity(double energySpent, double coinsEarned) {
     final newBackgroundActivity = state.backgroundActivity.copyWith(
-      energySpent: dif.toDouble(),
-      coinsEarned: coinsGenerated,
+      energySpent: energySpent,
+      coinsEarned: coinsEarned,
     );
-
-    // update state
-    state = state.copyWith(
-      backgroundActivity: newBackgroundActivity,
-      lastGenerated: now,
-    );
+    state = state.copyWith(backgroundActivity: newBackgroundActivity);
   }
+
+  // main run loop
+  // void _processGenerators() {
+  //   if (state.isPaused) return;
+  //   final now = DateTime.now().millisecondsSinceEpoch;
+  //   final realDif = now - state.lastGenerated;
+  //   final dif = _calculateValidTimeSinceLastGenerate(now, state.lastGenerated);
+
+  //   // Handle coin generation
+  //   double coinsGenerated = passiveOutput;
+  //   if (coinsGenerated <= 0) {
+  //     // no coins generated, skip
+  //     return;
+  //   }
+  //   coinsGenerated *= (dif / Constants.tickTime);
+  //   final coinsNotifier = ref.read(coinProvider.notifier);
+  //   if (realDif < Constants.inactiveThreshold) {
+  //     // don't use energy
+  //     // earn coins
+  //     coinsNotifier.earn(coinsGenerated);
+  //     state = state.copyWith(lastGenerated: now);
+  //     return;
+  //   }
+  //   // use energy
+  //   // reduce coins generated offline
+  //   coinsGenerated *= ref
+  //       .read(shopItemProvider.notifier)
+  //       .multiplier(ShopItemEffect.offlineCoinMultiplier);
+  //   coinsNotifier.earn(coinsGenerated);
+
+  //   // consume energy
+  //   final energyNotifier = ref.read(energyProvider.notifier);
+  //   energyNotifier.spend(dif.toDouble());
+  //   // track energy spent for popup
+  //   final newBackgroundActivity = state.backgroundActivity.copyWith(
+  //     energySpent: dif.toDouble(),
+  //     coinsEarned: coinsGenerated,
+  //   );
+
+  //   // update state
+  //   state = state.copyWith(
+  //     backgroundActivity: newBackgroundActivity,
+  //     lastGenerated: now,
+  //   );
+  // }
 
   Future<void> convertHealthStats(int steps, double calories) async {
     if (steps <= 0 && calories <= 0) {
@@ -210,7 +218,7 @@ class GameStateNotifier extends Notifier<GameState> {
   }
 
   /// **Calculate Valid Time Since Last Generate**
-  int _calculateValidTimeSinceLastGenerate(int now, int previous) {
+  int calculateValidTimeSinceLastGenerate(int now, int previous) {
     if (previous <= 0) {
       return Constants.tickTime;
     }
@@ -233,6 +241,7 @@ class GameStateNotifier extends Notifier<GameState> {
   }
 
   Future<void> fullReset() async {
+    ref.read(gameLoopProvider.notifier).pause();
     [
       ref.read(generatorProvider.notifier).reset(),
       ref.read(questStatsRepositoryProvider).box.removeAllAsync(),
@@ -256,6 +265,6 @@ class GameStateNotifier extends Notifier<GameState> {
         .read(healthServiceProvider)
         .syncHealthData(this, ref.read(questStatsRepositoryProvider), days: 1);
 
-    setIsPaused(false);
+    ref.read(gameLoopProvider.notifier).resume();
   }
 }

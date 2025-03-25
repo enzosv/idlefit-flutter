@@ -9,6 +9,7 @@ import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/providers/game_state_provider.dart';
 import 'package:idlefit/providers/generator_provider.dart';
 import 'package:idlefit/providers/shop_item_provider.dart';
+import 'package:idlefit/providers/game_loop_provider.dart';
 import 'package:idlefit/services/health_service.dart';
 import 'package:idlefit/services/object_box.dart';
 import 'package:idlefit/services/game_state.dart';
@@ -56,4 +57,8 @@ final objectBoxProvider = Provider<ObjectBox>(
 final questRepositoryProvider = Provider<QuestRepository>((ref) {
   final box = ref.read(objectBoxProvider).store.box<Quest>();
   return QuestRepository(box);
+});
+
+final gameLoopProvider = NotifierProvider<GameLoopNotifier, void>(() {
+  return GameLoopNotifier();
 });
