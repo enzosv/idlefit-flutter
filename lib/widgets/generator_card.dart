@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/helpers/util.dart';
 import 'package:idlefit/widgets/current_coins.dart';
@@ -179,6 +180,20 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
     super.dispose();
   }
 
+  Widget? _animation(CoinGenerator generator) {
+    if (generator.count < 1) {
+      return null;
+    }
+    return Lottie.asset(
+      generator.animationPath,
+      width: 80,
+      height: 80,
+      fit: BoxFit.contain,
+      repeat: true,
+      animate: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final coinGenerators = ref.watch(generatorProvider);
@@ -224,17 +239,7 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
           description: generator.description,
           additionalInfo: additionalInfo,
           cost: generator.cost,
-          animation:
-              generator.count > 0
-                  ? Lottie.asset(
-                    'assets/lottie/walk.json',
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.contain,
-                    repeat: true,
-                    animate: true,
-                  )
-                  : null,
+          animation: _animation(generator),
           affordable:
               coins.count >=
               generator

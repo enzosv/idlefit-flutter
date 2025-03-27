@@ -71,6 +71,13 @@ class CoinGenerator {
     return 1000; // Fixed space cost for unlocking upgrades
   }
 
+  String get animationPath {
+    if (name.contains('Dumbbell')) {
+      return 'assets/lottie/dumbbell.json';
+    }
+    return 'assets/lottie/walk.json';
+  }
+
   factory CoinGenerator.fromJson(Map<String, dynamic> json) {
     return CoinGenerator(
       tier: json['tier'],

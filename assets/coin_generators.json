@@ -38,7 +38,7 @@
   },
   {
     "tier": 6,
-    "name": "Deadlifts",
+    "name": "Power Lifts",
     "description": "The art of picking up heavy things while your face looks like you're defusing a bomb.",
     "cost": 1200000,
     "output": 1200
@@ -52,15 +52,15 @@
   },
   {
     "tier": 8,
-    "name": "Decathlon",
-    "description": "We do everything now.",
+    "name": "Olympic Lifts",
+    "description": "",
     "cost": 280000000,
     "output": 37500
   },
   {
     "tier": 9,
-    "name": "Seafloor Sprints",
-    "description": "Air didn't provide enough resistance, so you're using the ocean.",
+    "name": "Marathon Sprints",
+    "description": "Fast and steady wins the race.",
     "cost": 4200000000,
     "output": 220000
   },
@@ -68,7 +68,6 @@
     "tier": 10,
     "name": "Mountain Range Circuit",
     "description": "Nothing like a quick jog up Everest to start the day.",
-    
     "cost": 61000000000,
     "output": 1300000
   },
