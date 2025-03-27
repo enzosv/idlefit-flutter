@@ -83,12 +83,13 @@ class GameStateNotifier extends Notifier<GameState> {
   }
 
   Future<void> convertHealthStats(int steps, double calories) async {
-    if (steps <= 0 && calories <= 0) {
-      state = state.copyWith(
-        healthLastSynced: DateTime.now().millisecondsSinceEpoch,
-      );
-      return;
-    }
+    assert(
+      steps > 0 || calories > 0,
+      "do not convert when there is nothing to convert",
+    );
+    state = state.copyWith(
+      healthLastSynced: DateTime.now().millisecondsSinceEpoch,
+    );
     final healthMultiplier = ref
         .read(shopItemProvider.notifier)
         .multiplier(ShopItemEffect.healthMultiplier);
