@@ -2,16 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/quest_repo.dart';
-import 'package:idlefit/models/quest_stats.dart';
 import '../helpers/util.dart';
 import 'package:idlefit/providers/providers.dart';
+
+// Cache providers for stats data
+final _generatorStatsProvider = FutureProvider<(int, int, int)>((ref) async {
+  final repo = ref.read(questStatsRepositoryProvider);
+  final values = await Future.wait([
+    repo.getTotalProgress(QuestAction.purchase, QuestUnit.generator),
+    repo.getTotalProgress(QuestAction.upgrade, QuestUnit.generator),
+    repo.getTotalProgress(QuestAction.tap, QuestUnit.generator),
+  ]);
+  return (values[0].floor(), values[1].floor(), values[2].floor());
+});
+
+final _otherStatsProvider = FutureProvider<(int, int)>((ref) async {
+  final repo = ref.read(questStatsRepositoryProvider);
+  final values = await Future.wait([
+    repo.getTotalProgress(QuestAction.upgrade, QuestUnit.shopItem),
+    repo.getTotalProgress(QuestAction.watch, QuestUnit.ad),
+  ]);
+  return (values[0].floor(), values[1].floor());
+});
 
 class GameStatsCard extends ConsumerWidget {
   const GameStatsCard({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final questStatsRepo = ref.read(questStatsRepositoryProvider);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -27,9 +45,9 @@ class GameStatsCard extends ConsumerWidget {
             _CurrencyListTile(currency: ref.watch(energyProvider)),
             _CurrencyListTile(currency: ref.watch(spaceProvider)),
             const Divider(),
-            _GeneratorStatsListTile(repo: questStatsRepo),
+            _GeneratorStatsListTile(),
             const Divider(),
-            _OtherStatsListTile(repo: questStatsRepo),
+            _OtherStatsListTile(),
           ],
         ),
       ),
@@ -37,67 +55,65 @@ class GameStatsCard extends ConsumerWidget {
   }
 }
 
-class _OtherStatsListTile extends StatelessWidget {
-  const _OtherStatsListTile({required this.repo});
+class _OtherStatsListTile extends ConsumerWidget {
+  const _OtherStatsListTile();
 
-  final QuestStatsRepository repo;
+  Widget _tile(int? upgrades, int? ads) {
+    return ListTile(
+      title: const Text("Others"),
+      subtitle: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("Upgrades: ${upgrades ?? ""}"),
+          Text("Ads Watched: ${ads ?? ""}"),
+        ],
+      ),
+    );
+  }
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<(int, int)>(
-      future: Future.wait([
-        repo.getTotalProgress(QuestAction.upgrade, QuestUnit.shopItem),
-        repo.getTotalProgress(QuestAction.watch, QuestUnit.ad),
-      ]).then((values) => (values[0].floor(), values[1].floor())),
-      builder: (context, AsyncSnapshot<(int, int)> snapshot) {
-        if (!snapshot.hasData) {
-          return const SizedBox.shrink();
-        }
-        final (shop, ads) = snapshot.data!;
-        return ListTile(
-          title: Text("Others"),
-          subtitle: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [Text("Upgrades: $shop"), Text("Ads Watched: $ads")],
-          ),
-        );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final statsAsync = ref.read(_otherStatsProvider);
+
+    return statsAsync.when(
+      data: (data) {
+        final (shop, ads) = data;
+        return _tile(shop, ads);
       },
+      loading: () => _tile(null, null),
+      error: (_, __) => _tile(null, null),
     );
   }
 }
 
-class _GeneratorStatsListTile extends StatelessWidget {
-  const _GeneratorStatsListTile({required this.repo});
+class _GeneratorStatsListTile extends ConsumerWidget {
+  const _GeneratorStatsListTile();
 
-  final QuestStatsRepository repo;
+  Widget _tile(int? purchase, int? upgrade, int? tap) {
+    return ListTile(
+      title: const Text("Exercises"),
+      subtitle: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("Reps: ${purchase ?? ""}"),
+          Text("Upgrades: ${upgrade ?? ""}"),
+          Text("Taps: ${tap ?? ""}"),
+        ],
+      ),
+    );
+  }
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<(int, int, int)>(
-      future: Future.wait([
-        repo.getTotalProgress(QuestAction.purchase, QuestUnit.generator),
-        repo.getTotalProgress(QuestAction.upgrade, QuestUnit.generator),
-        repo.getTotalProgress(QuestAction.tap, QuestUnit.generator),
-      ]).then(
-        (values) => (values[0].floor(), values[1].floor(), values[2].floor()),
-      ),
-      builder: (context, AsyncSnapshot<(int, int, int)> snapshot) {
-        if (!snapshot.hasData) {
-          return const SizedBox.shrink();
-        }
-        final (purchase, upgrade, tap) = snapshot.data!;
-        return ListTile(
-          title: Text("Exercises"),
-          subtitle: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Reps: $purchase"),
-              Text("Upgrades: $upgrade"),
-              Text("Taps: $tap"),
-            ],
-          ),
-        );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final statsAsync = ref.read(_generatorStatsProvider);
+
+    return statsAsync.when(
+      data: (data) {
+        final (purchase, upgrade, tap) = data;
+        return _tile(purchase, upgrade, tap);
       },
+      loading: () => _tile(null, null, null),
+      error: (_, __) => _tile(null, null, null),
     );
   }
 }
