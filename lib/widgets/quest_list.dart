@@ -17,12 +17,14 @@ class QuestList extends ConsumerWidget {
   final QuestType questType;
   const QuestList({super.key, required this.questType});
 
-  CurrencyNotifier rewardNotifier(WidgetRef ref, Quest quest) {
+  CurrencyNotifier _rewardNotifier(WidgetRef ref, Quest quest) {
     switch (quest.rewardCurrency) {
       case CurrencyType.coin:
         return ref.read(coinProvider.notifier);
       case CurrencyType.space:
         return ref.read(spaceProvider.notifier);
+      case CurrencyType.energy:
+        return ref.read(energyProvider.notifier);
       default:
         assert(
           false,
@@ -33,7 +35,7 @@ class QuestList extends ConsumerWidget {
   }
 
   void _onClaim(WidgetRef ref, Quest quest) {
-    final currencyProvider = rewardNotifier(ref, quest);
+    final currencyProvider = _rewardNotifier(ref, quest);
 
     Future(
       () => ref
