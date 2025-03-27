@@ -18,7 +18,7 @@ class HealthService {
             HealthDataType.STEPS,
             HealthDataType.TOTAL_CALORIES_BURNED,
             HealthDataType.BASAL_ENERGY_BURNED,
-          ];
+          ]; // use total calories burned and basal energy burned as fallback to compute active energy burned if unavailable
 
   HealthService();
 
@@ -186,6 +186,7 @@ class HealthService {
     final iosService = Platform.isIOS ? IosHealthService() : null;
     final now = DateTime.now();
     final syncs = <Future<void>>[];
+    assert(days > -1, "do not attempt to sync negative days");
     for (var i = 0; i <= days; i++) {
       syncs.add(
         syncDay(
