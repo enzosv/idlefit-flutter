@@ -10,26 +10,23 @@ class StatsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final spacer = SizedBox(height: 16);
     return Column(
       children: [
         Expanded(
           child: ListView(
             padding: const EdgeInsets.all(16),
-            children: [
-              const HealthStatsCard(),
-              spacer,
-              // Daily quests
-              const QuestList(questType: QuestType.daily),
-              spacer,
-              // Achievement list
-              const QuestList(questType: QuestType.achievement),
-              spacer,
-              const GameStatsCard(),
+            children: const [
+              HealthStatsCard(),
+              SizedBox(height: 16),
+              QuestList(questType: QuestType.daily),
+              SizedBox(height: 16),
+              QuestList(questType: QuestType.achievement),
+              SizedBox(height: 16),
+              GameStatsCard(),
             ],
           ),
         ),
-        const BannerAdWidget(),
+        BannerAdWidget(),
       ],
     );
   }
