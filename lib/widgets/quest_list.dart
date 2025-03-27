@@ -13,9 +13,19 @@ final _questsProvider = FutureProvider.family
       return repository.getQuests(questType);
     });
 
-class QuestList extends ConsumerWidget {
-  final QuestType questType;
+class QuestList extends ConsumerStatefulWidget {
   const QuestList({super.key, required this.questType});
+
+  final QuestType questType;
+
+  @override
+  ConsumerState<QuestList> createState() => _QuestListState();
+}
+
+class _QuestListState extends ConsumerState<QuestList>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true; // Prevent unnecessary rebuilds
 
   CurrencyNotifier _rewardNotifier(WidgetRef ref, Quest quest) {
     switch (quest.rewardCurrency) {
@@ -47,14 +57,16 @@ class QuestList extends ConsumerWidget {
           ),
     ).then((_) {
       // Invalidate both quests and stats to force refresh
-      ref.invalidate(_questsProvider(questType));
+      ref.invalidate(_questsProvider(widget.questType));
       ref.invalidate(questStatsRepositoryProvider);
     });
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final questsAsync = ref.watch(_questsProvider(questType));
+  Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
+
+    final questsAsync = ref.watch(_questsProvider(widget.questType));
 
     return Card(
       child: Padding(
@@ -63,7 +75,7 @@ class QuestList extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              questType.displayName,
+              widget.questType.displayName,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const Divider(),
