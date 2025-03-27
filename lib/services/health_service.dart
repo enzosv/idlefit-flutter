@@ -143,10 +143,19 @@ class HealthService {
     double steps = 0;
     double calories = 0;
     if (iosService != null) {
-      (steps, calories) = await iosService.queryHealthForRange(
-        start: startOfDay,
-        end: endOfDay,
-      );
+      [steps, calories] =
+          await [
+            iosService.queryHealthForRange(
+              startOfDay,
+              endOfDay,
+              HealthDataType.STEPS.name,
+            ),
+            iosService.queryHealthForRange(
+              startOfDay,
+              endOfDay,
+              HealthDataType.ACTIVE_ENERGY_BURNED.name,
+            ),
+          ].wait;
     } else {
       [steps, calories] =
           await [
@@ -183,10 +192,10 @@ class HealthService {
     QuestStatsRepository questStatsRepository, {
     int days = 0,
   }) async {
+    assert(days > -1, "do not attempt to sync negative days");
     final iosService = Platform.isIOS ? IosHealthService() : null;
     final now = DateTime.now();
     final syncs = <Future<void>>[];
-    assert(days > -1, "do not attempt to sync negative days");
     for (var i = 0; i <= days; i++) {
       syncs.add(
         syncDay(

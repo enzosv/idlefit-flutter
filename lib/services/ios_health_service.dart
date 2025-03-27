@@ -5,27 +5,11 @@ class IosHealthService {
     'com.idlefit/health_statistics',
   );
 
-  Future<(double, double)> queryHealthForRange({
-    required DateTime start,
-    required DateTime end,
-  }) async {
-    final [steps, calories] =
-        await [
-          _queryStatistics(start: start, end: end, type: "STEPS"),
-          _queryStatistics(
-            start: start,
-            end: end,
-            type: "ACTIVE_ENERGY_BURNED",
-          ),
-        ].wait;
-    return (steps, calories);
-  }
-
-  Future<double> _queryStatistics({
-    required DateTime start,
-    required DateTime end,
-    required String type,
-  }) async {
+  Future<double> queryHealthForRange(
+    DateTime start,
+    DateTime end,
+    String type,
+  ) async {
     assert(
       ["ACTIVE_ENERGY_BURNED", "STEPS"].contains(type),
       "Unsupported health data type $type",
