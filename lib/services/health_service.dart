@@ -186,7 +186,7 @@ class HealthService {
     final iosService = Platform.isIOS ? IosHealthService() : null;
     final now = DateTime.now();
     final syncs = <Future<void>>[];
-    for (var i = 0; i < days; i++) {
+    for (var i = 0; i <= days; i++) {
       syncs.add(
         syncDay(
           now.subtract(Duration(days: i)),

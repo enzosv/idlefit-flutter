@@ -19,6 +19,10 @@ class CurrencyNotifier extends Notifier<Currency> {
   }
 
   void earn(double amount, {bool allowExcess = false}) {
+    assert(
+      type == CurrencyType.space && amount > 40000,
+      "doubtable steps earned $amount",
+    );
     state = state.earn(amount, allowExcess);
     ref
         .read(questStatsRepositoryProvider)
