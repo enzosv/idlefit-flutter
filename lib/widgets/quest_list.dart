@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/quest_repo.dart';
+import 'package:idlefit/providers/currency_provider.dart';
 import 'package:idlefit/widgets/quest_card.dart';
 import 'package:idlefit/providers/providers.dart';
 
@@ -16,11 +17,23 @@ class QuestList extends ConsumerWidget {
   final QuestType questType;
   const QuestList({super.key, required this.questType});
 
+  CurrencyNotifier rewardNotifier(WidgetRef ref, Quest quest) {
+    switch (quest.rewardCurrency) {
+      case CurrencyType.coin:
+        return ref.read(coinProvider.notifier);
+      case CurrencyType.space:
+        return ref.read(spaceProvider.notifier);
+      default:
+        assert(
+          false,
+          "unhandled reward notifier for currency type ${quest.rewardCurrency}",
+        );
+        return ref.read(coinProvider.notifier);
+    }
+  }
+
   void _onClaim(WidgetRef ref, Quest quest) {
-    final currencyProvider =
-        quest.rewardCurrency == CurrencyType.coin
-            ? ref.read(coinProvider.notifier)
-            : ref.read(spaceProvider.notifier);
+    final currencyProvider = rewardNotifier(ref, quest);
 
     Future(
       () => ref
