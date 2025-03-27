@@ -165,7 +165,9 @@ class HealthService {
       // android active_energy_burned might be unavailable
       calories = await getActiveEnergyBurned(startOfDay, endOfDay) ?? 0;
     }
-
+    if (steps <= 0 && calories <= 0) {
+      return;
+    }
     final dayTimestamp = startOfDay.millisecondsSinceEpoch;
 
     final [stepsDif, caloriesDif] =
@@ -183,7 +185,10 @@ class HealthService {
             calories,
           ),
         ].wait;
-    gameStateNotifier.convertHealthStats(stepsDif.toInt(), caloriesDif);
+    if (caloriesDif <= 0 && stepsDif <= 0) {
+      return;
+    }
+    await gameStateNotifier.convertHealthStats(stepsDif.toInt(), caloriesDif);
   }
 
   Future<void> syncHealthData(
