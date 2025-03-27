@@ -90,10 +90,14 @@ class HealthService {
   }
 
   Future<double> _getDailyHealth(
+    IosHealthService? iosService,
     DateTime startOfDay,
     DateTime endOfDay,
     HealthDataType type,
   ) async {
+    if (iosService != null) {
+      return iosService.queryHealthForRange(startOfDay, endOfDay, type.name);
+    }
     final data = await health.getHealthDataFromTypes(
       startTime: startOfDay,
       endTime: endOfDay,
@@ -142,48 +146,43 @@ class HealthService {
 
     double steps = 0;
     double calories = 0;
-    if (iosService != null) {
-      [steps, calories] =
-          await [
-            iosService.queryHealthForRange(
-              startOfDay,
-              endOfDay,
-              HealthDataType.STEPS.name,
-            ),
-            iosService.queryHealthForRange(
-              startOfDay,
-              endOfDay,
-              HealthDataType.ACTIVE_ENERGY_BURNED.name,
-            ),
-          ].wait;
-    } else {
-      [steps, calories] =
-          await [
-            _getDailyHealth(startOfDay, endOfDay, HealthDataType.STEPS),
-            _getDailyHealth(
-              startOfDay,
-              endOfDay,
-              HealthDataType.ACTIVE_ENERGY_BURNED,
-            ),
-          ].wait;
-      if (calories == 0) {
-        calories = await getActiveEnergyBurned(startOfDay, endOfDay) ?? 0;
-      }
+    [steps, calories] =
+        await [
+          _getDailyHealth(
+            iosService,
+            startOfDay,
+            endOfDay,
+            HealthDataType.STEPS,
+          ),
+          _getDailyHealth(
+            iosService,
+            startOfDay,
+            endOfDay,
+            HealthDataType.ACTIVE_ENERGY_BURNED,
+          ),
+        ].wait;
+    if (calories == 0 && iosService == null) {
+      // android active_energy_burned might be unavailable
+      calories = await getActiveEnergyBurned(startOfDay, endOfDay) ?? 0;
     }
+
     final dayTimestamp = startOfDay.millisecondsSinceEpoch;
 
-    final stepsDif = await questStatsRepository.setProgress(
-      QuestAction.walk,
-      QuestUnit.steps,
-      dayTimestamp,
-      steps,
-    );
-    final caloriesDif = await questStatsRepository.setProgress(
-      QuestAction.burn,
-      QuestUnit.calories,
-      dayTimestamp,
-      calories,
-    );
+    final [stepsDif, caloriesDif] =
+        await [
+          questStatsRepository.setProgress(
+            QuestAction.walk,
+            QuestUnit.steps,
+            dayTimestamp,
+            steps,
+          ),
+          questStatsRepository.setProgress(
+            QuestAction.burn,
+            QuestUnit.calories,
+            dayTimestamp,
+            calories,
+          ),
+        ].wait;
     gameStateNotifier.convertHealthStats(stepsDif.toInt(), caloriesDif);
   }
 
