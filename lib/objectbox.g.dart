@@ -24,170 +24,199 @@ export 'package:objectbox/objectbox.dart'; // so that callers only have to impor
 
 final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
-      id: const obx_int.IdUid(1, 8970713413303252018),
-      name: 'Currency',
-      lastPropertyId: const obx_int.IdUid(9, 1103942004918786733),
-      flags: 0,
-      properties: <obx_int.ModelProperty>[
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 411610756409811407),
-            name: 'count',
-            type: 8,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(4, 4769501277755131512),
-            name: 'totalEarned',
-            type: 8,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(6, 4916751470591575964),
-            name: 'id',
-            type: 6,
-            flags: 129),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(8, 6709896111414846563),
-            name: 'baseMax',
-            type: 8,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(9, 1103942004918786733),
-            name: 'maxMultiplier',
-            type: 8,
-            flags: 0)
-      ],
-      relations: <obx_int.ModelRelation>[],
-      backlinks: <obx_int.ModelBacklink>[]),
+    id: const obx_int.IdUid(1, 8970713413303252018),
+    name: 'Currency',
+    lastPropertyId: const obx_int.IdUid(9, 1103942004918786733),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 411610756409811407),
+        name: 'count',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 4769501277755131512),
+        name: 'totalEarned',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 4916751470591575964),
+        name: 'id',
+        type: 6,
+        flags: 129,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 6709896111414846563),
+        name: 'baseMax',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 1103942004918786733),
+        name: 'maxMultiplier',
+        type: 8,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
   obx_int.ModelEntity(
-      id: const obx_int.IdUid(3, 7897766162698443189),
-      name: 'CoinGenerator',
-      lastPropertyId: const obx_int.IdUid(5, 2457321709930163773),
-      flags: 0,
-      properties: <obx_int.ModelProperty>[
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 8997851123245017231),
-            name: 'count',
-            type: 6,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(3, 5801636019966271860),
-            name: 'level',
-            type: 6,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(4, 3181080062182307300),
-            name: 'tier',
-            type: 6,
-            flags: 129)
-      ],
-      relations: <obx_int.ModelRelation>[],
-      backlinks: <obx_int.ModelBacklink>[]),
+    id: const obx_int.IdUid(3, 7897766162698443189),
+    name: 'CoinGenerator',
+    lastPropertyId: const obx_int.IdUid(5, 2457321709930163773),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 8997851123245017231),
+        name: 'count',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 5801636019966271860),
+        name: 'level',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 3181080062182307300),
+        name: 'tier',
+        type: 6,
+        flags: 129,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
   obx_int.ModelEntity(
-      id: const obx_int.IdUid(6, 3093373672220765882),
-      name: 'ShopItem',
-      lastPropertyId: const obx_int.IdUid(8, 2249982543274755836),
-      flags: 0,
-      properties: <obx_int.ModelProperty>[
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 677716417256338725),
-            name: 'id',
-            type: 6,
-            flags: 129),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(8, 2249982543274755836),
-            name: 'level',
-            type: 6,
-            flags: 0)
-      ],
-      relations: <obx_int.ModelRelation>[],
-      backlinks: <obx_int.ModelBacklink>[]),
+    id: const obx_int.IdUid(6, 3093373672220765882),
+    name: 'ShopItem',
+    lastPropertyId: const obx_int.IdUid(8, 2249982543274755836),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 677716417256338725),
+        name: 'id',
+        type: 6,
+        flags: 129,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 2249982543274755836),
+        name: 'level',
+        type: 6,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
   obx_int.ModelEntity(
-      id: const obx_int.IdUid(13, 2350846937776369818),
-      name: 'Quest',
-      lastPropertyId: const obx_int.IdUid(9, 4062908151799617486),
-      flags: 0,
-      properties: <obx_int.ModelProperty>[
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 8896872525305970670),
-            name: 'id',
-            type: 6,
-            flags: 1),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 1588350365785122035),
-            name: 'dayTimestamp',
-            type: 6,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(3, 4282291348858888894),
-            name: 'action',
-            type: 6,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(4, 6250565454144484206),
-            name: 'unit',
-            type: 6,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(5, 3497061908798785311),
-            name: 'rewardUnit',
-            type: 6,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(6, 1074688234730917148),
-            name: 'type',
-            type: 6,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(7, 842234281523857787),
-            name: 'requirement',
-            type: 8,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(8, 821905277989780379),
-            name: 'reward',
-            type: 8,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(9, 4062908151799617486),
-            name: 'dateClaimed',
-            type: 6,
-            flags: 0)
-      ],
-      relations: <obx_int.ModelRelation>[],
-      backlinks: <obx_int.ModelBacklink>[]),
+    id: const obx_int.IdUid(13, 2350846937776369818),
+    name: 'Quest',
+    lastPropertyId: const obx_int.IdUid(9, 4062908151799617486),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 8896872525305970670),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 1588350365785122035),
+        name: 'dayTimestamp',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 4282291348858888894),
+        name: 'action',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 6250565454144484206),
+        name: 'unit',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 3497061908798785311),
+        name: 'rewardUnit',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 1074688234730917148),
+        name: 'type',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 842234281523857787),
+        name: 'requirement',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 821905277989780379),
+        name: 'reward',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 4062908151799617486),
+        name: 'dateClaimed',
+        type: 6,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
   obx_int.ModelEntity(
-      id: const obx_int.IdUid(16, 6563305574869105231),
-      name: 'QuestStats',
-      lastPropertyId: const obx_int.IdUid(5, 6670363758319306538),
-      flags: 0,
-      properties: <obx_int.ModelProperty>[
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 5986711946609123957),
-            name: 'id',
-            type: 6,
-            flags: 1),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 5009405304573859521),
-            name: 'dayTimestamp',
-            type: 6,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(3, 5709058180525905970),
-            name: 'action',
-            type: 6,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(4, 5440853034836776749),
-            name: 'unit',
-            type: 6,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(5, 6670363758319306538),
-            name: 'value',
-            type: 8,
-            flags: 0)
-      ],
-      relations: <obx_int.ModelRelation>[],
-      backlinks: <obx_int.ModelBacklink>[])
+    id: const obx_int.IdUid(16, 6563305574869105231),
+    name: 'QuestStats',
+    lastPropertyId: const obx_int.IdUid(5, 6670363758319306538),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 5986711946609123957),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 5009405304573859521),
+        name: 'dayTimestamp',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 5709058180525905970),
+        name: 'action',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 5440853034836776749),
+        name: 'unit',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 6670363758319306538),
+        name: 'value',
+        type: 8,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -201,341 +230,445 @@ final _entities = <obx_int.ModelEntity>[
 /// For Flutter apps, also calls `loadObjectBoxLibraryAndroidCompat()` from
 /// the ObjectBox Flutter library to fix loading the native ObjectBox library
 /// on Android 6 and older.
-Future<obx.Store> openStore(
-    {String? directory,
-    int? maxDBSizeInKB,
-    int? maxDataSizeInKB,
-    int? fileMode,
-    int? maxReaders,
-    bool queriesCaseSensitiveDefault = true,
-    String? macosApplicationGroup}) async {
+Future<obx.Store> openStore({
+  String? directory,
+  int? maxDBSizeInKB,
+  int? maxDataSizeInKB,
+  int? fileMode,
+  int? maxReaders,
+  bool queriesCaseSensitiveDefault = true,
+  String? macosApplicationGroup,
+}) async {
   await loadObjectBoxLibraryAndroidCompat();
-  return obx.Store(getObjectBoxModel(),
-      directory: directory ?? (await defaultStoreDirectory()).path,
-      maxDBSizeInKB: maxDBSizeInKB,
-      maxDataSizeInKB: maxDataSizeInKB,
-      fileMode: fileMode,
-      maxReaders: maxReaders,
-      queriesCaseSensitiveDefault: queriesCaseSensitiveDefault,
-      macosApplicationGroup: macosApplicationGroup);
+  return obx.Store(
+    getObjectBoxModel(),
+    directory: directory ?? (await defaultStoreDirectory()).path,
+    maxDBSizeInKB: maxDBSizeInKB,
+    maxDataSizeInKB: maxDataSizeInKB,
+    fileMode: fileMode,
+    maxReaders: maxReaders,
+    queriesCaseSensitiveDefault: queriesCaseSensitiveDefault,
+    macosApplicationGroup: macosApplicationGroup,
+  );
 }
 
 /// Returns the ObjectBox model definition for this project for use with
 /// [obx.Store.new].
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
-      entities: _entities,
-      lastEntityId: const obx_int.IdUid(16, 6563305574869105231),
-      lastIndexId: const obx_int.IdUid(3, 6040811636614335896),
-      lastRelationId: const obx_int.IdUid(0, 0),
-      lastSequenceId: const obx_int.IdUid(0, 0),
-      retiredEntityUids: const [
-        2493137042954685248,
-        219102169117428336,
-        8235573318783332755,
-        604859576841525103,
-        7990607732704873599,
-        9167584311080985965,
-        5789196000044242359,
-        5523549602957263386,
-        2119159745219438621,
-        2872500768702225295,
-        4968479201989030587
-      ],
-      retiredIndexUids: const [],
-      retiredPropertyUids: const [
-        1612088624750524307,
-        1221735629759989076,
-        7739014744985074402,
-        2465340859862322629,
-        2427394359739034951,
-        3598368693352972001,
-        3238954471475910745,
-        7990707600546979225,
-        8940347419837491692,
-        7308206853943299864,
-        1298175783779309702,
-        5086729266335392220,
-        5407859144525862516,
-        4297493175054291291,
-        944104226892207343,
-        2037289546189049172,
-        2255176740307486357,
-        745509794462133064,
-        6946102241664551198,
-        5678817004169731437,
-        167161125635220021,
-        4278904461843222799,
-        4060410116606726424,
-        5122690587257086689,
-        7633385983348480139,
-        5727768307727832225,
-        2592235923790219212,
-        2545780716478496970,
-        9183427040770090315,
-        4000991215743677351,
-        2450008997855178603,
-        7085483785093773366,
-        5366385903808278580,
-        4743794405710996085,
-        2032882936729661744,
-        3449366289436579614,
-        6172183544316569837,
-        4745966459735341277,
-        81048633074782967,
-        7708077465627102502,
-        4892005414219992245,
-        6816389771923756793,
-        5977650328934603192,
-        2457321709930163773,
-        6107178178149087951,
-        2153748619588745951,
-        7395256442398087384,
-        3636950130054854433,
-        5941042730006913138,
-        6401985155255348427,
-        1947505247340656277,
-        6427921272852062060,
-        2365859853779989432,
-        893166884544179862,
-        6351126629942900671,
-        9094248306034783738,
-        8942034238772045237,
-        8401614619360643531,
-        2985438957966859538,
-        3380051234714815596,
-        4771168237768332620,
-        628362880589176493,
-        5250183945066197420,
-        4011021572361102775,
-        3541445096573348319,
-        2417318308218713701,
-        265469865007037488,
-        8642844963959802391,
-        1793398252997816722,
-        60503497721018850,
-        3783688117025317780,
-        37781412133150881,
-        2084831577797524984,
-        6913876187873743667,
-        759831562113825008,
-        5316489849535110872,
-        1164489260566563423,
-        3835421408976486463,
-        4944879687934267496,
-        7110615956344477289,
-        4782504977527956134,
-        5425488138789149553,
-        1716198483539255863,
-        7768261059786321014,
-        1479415377058000520,
-        8038445437539640718,
-        6621040444297598263,
-        5845348372971182723,
-        8147819285923682787,
-        265861408054198287,
-        775025276072193566,
-        3241915458477813626
-      ],
-      retiredRelationUids: const [],
-      modelVersion: 5,
-      modelVersionParserMinimum: 5,
-      version: 1);
+    entities: _entities,
+    lastEntityId: const obx_int.IdUid(16, 6563305574869105231),
+    lastIndexId: const obx_int.IdUid(3, 6040811636614335896),
+    lastRelationId: const obx_int.IdUid(0, 0),
+    lastSequenceId: const obx_int.IdUid(0, 0),
+    retiredEntityUids: const [
+      2493137042954685248,
+      219102169117428336,
+      8235573318783332755,
+      604859576841525103,
+      7990607732704873599,
+      9167584311080985965,
+      5789196000044242359,
+      5523549602957263386,
+      2119159745219438621,
+      2872500768702225295,
+      4968479201989030587,
+    ],
+    retiredIndexUids: const [],
+    retiredPropertyUids: const [
+      1612088624750524307,
+      1221735629759989076,
+      7739014744985074402,
+      2465340859862322629,
+      2427394359739034951,
+      3598368693352972001,
+      3238954471475910745,
+      7990707600546979225,
+      8940347419837491692,
+      7308206853943299864,
+      1298175783779309702,
+      5086729266335392220,
+      5407859144525862516,
+      4297493175054291291,
+      944104226892207343,
+      2037289546189049172,
+      2255176740307486357,
+      745509794462133064,
+      6946102241664551198,
+      5678817004169731437,
+      167161125635220021,
+      4278904461843222799,
+      4060410116606726424,
+      5122690587257086689,
+      7633385983348480139,
+      5727768307727832225,
+      2592235923790219212,
+      2545780716478496970,
+      9183427040770090315,
+      4000991215743677351,
+      2450008997855178603,
+      7085483785093773366,
+      5366385903808278580,
+      4743794405710996085,
+      2032882936729661744,
+      3449366289436579614,
+      6172183544316569837,
+      4745966459735341277,
+      81048633074782967,
+      7708077465627102502,
+      4892005414219992245,
+      6816389771923756793,
+      5977650328934603192,
+      2457321709930163773,
+      6107178178149087951,
+      2153748619588745951,
+      7395256442398087384,
+      3636950130054854433,
+      5941042730006913138,
+      6401985155255348427,
+      1947505247340656277,
+      6427921272852062060,
+      2365859853779989432,
+      893166884544179862,
+      6351126629942900671,
+      9094248306034783738,
+      8942034238772045237,
+      8401614619360643531,
+      2985438957966859538,
+      3380051234714815596,
+      4771168237768332620,
+      628362880589176493,
+      5250183945066197420,
+      4011021572361102775,
+      3541445096573348319,
+      2417318308218713701,
+      265469865007037488,
+      8642844963959802391,
+      1793398252997816722,
+      60503497721018850,
+      3783688117025317780,
+      37781412133150881,
+      2084831577797524984,
+      6913876187873743667,
+      759831562113825008,
+      5316489849535110872,
+      1164489260566563423,
+      3835421408976486463,
+      4944879687934267496,
+      7110615956344477289,
+      4782504977527956134,
+      5425488138789149553,
+      1716198483539255863,
+      7768261059786321014,
+      1479415377058000520,
+      8038445437539640718,
+      6621040444297598263,
+      5845348372971182723,
+      8147819285923682787,
+      265861408054198287,
+      775025276072193566,
+      3241915458477813626,
+    ],
+    retiredRelationUids: const [],
+    modelVersion: 5,
+    modelVersionParserMinimum: 5,
+    version: 1,
+  );
 
   final bindings = <Type, obx_int.EntityDefinition>{
     Currency: obx_int.EntityDefinition<Currency>(
-        model: _entities[0],
-        toOneRelations: (Currency object) => [],
-        toManyRelations: (Currency object) => {},
-        getId: (Currency object) => object.id,
-        setId: (Currency object, int id) {
-          if (object.id != id) {
-            throw ArgumentError('Field Currency.id is read-only '
-                '(final or getter-only) and it was declared to be self-assigned. '
-                'However, the currently inserted object (.id=${object.id}) '
-                "doesn't match the inserted ID (ID $id). "
-                'You must assign an ID before calling [box.put()].');
-          }
-        },
-        objectToFB: (Currency object, fb.Builder fbb) {
-          fbb.startTable(10);
-          fbb.addFloat64(1, object.count);
-          fbb.addFloat64(3, object.totalEarned);
-          fbb.addInt64(5, object.id);
-          fbb.addFloat64(7, object.baseMax);
-          fbb.addFloat64(8, object.maxMultiplier);
-          fbb.finish(fbb.endTable());
-          return object.id;
-        },
-        objectFromFB: (obx.Store store, ByteData fbData) {
-          final buffer = fb.BufferContext(fbData);
-          final rootOffset = buffer.derefObject(0);
-          final idParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0);
-          final countParam =
-              const fb.Float64Reader().vTableGet(buffer, rootOffset, 6, 0);
-          final totalEarnedParam =
-              const fb.Float64Reader().vTableGet(buffer, rootOffset, 10, 0);
-          final baseMaxParam =
-              const fb.Float64Reader().vTableGet(buffer, rootOffset, 18, 0);
-          final maxMultiplierParam =
-              const fb.Float64Reader().vTableGet(buffer, rootOffset, 20, 0);
-          final object = Currency(
-              id: idParam,
-              count: countParam,
-              totalEarned: totalEarnedParam,
-              baseMax: baseMaxParam,
-              maxMultiplier: maxMultiplierParam);
+      model: _entities[0],
+      toOneRelations: (Currency object) => [],
+      toManyRelations: (Currency object) => {},
+      getId: (Currency object) => object.id,
+      setId: (Currency object, int id) {
+        if (object.id != id) {
+          throw ArgumentError(
+            'Field Currency.id is read-only '
+            '(final or getter-only) and it was declared to be self-assigned. '
+            'However, the currently inserted object (.id=${object.id}) '
+            "doesn't match the inserted ID (ID $id). "
+            'You must assign an ID before calling [box.put()].',
+          );
+        }
+      },
+      objectToFB: (Currency object, fb.Builder fbb) {
+        fbb.startTable(10);
+        fbb.addFloat64(1, object.count);
+        fbb.addFloat64(3, object.totalEarned);
+        fbb.addInt64(5, object.id);
+        fbb.addFloat64(7, object.baseMax);
+        fbb.addFloat64(8, object.maxMultiplier);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          14,
+          0,
+        );
+        final countParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          6,
+          0,
+        );
+        final totalEarnedParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          0,
+        );
+        final baseMaxParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          18,
+          0,
+        );
+        final maxMultiplierParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          20,
+          0,
+        );
+        final object = Currency(
+          id: idParam,
+          count: countParam,
+          totalEarned: totalEarnedParam,
+          baseMax: baseMaxParam,
+          maxMultiplier: maxMultiplierParam,
+        );
 
-          return object;
-        }),
+        return object;
+      },
+    ),
     CoinGenerator: obx_int.EntityDefinition<CoinGenerator>(
-        model: _entities[1],
-        toOneRelations: (CoinGenerator object) => [],
-        toManyRelations: (CoinGenerator object) => {},
-        getId: (CoinGenerator object) => object.tier,
-        setId: (CoinGenerator object, int id) {
-          object.tier = id;
-        },
-        objectToFB: (CoinGenerator object, fb.Builder fbb) {
-          fbb.startTable(6);
-          fbb.addInt64(1, object.count);
-          fbb.addInt64(2, object.level);
-          fbb.addInt64(3, object.tier);
-          fbb.finish(fbb.endTable());
-          return object.tier;
-        },
-        objectFromFB: (obx.Store store, ByteData fbData) {
-          final buffer = fb.BufferContext(fbData);
-          final rootOffset = buffer.derefObject(0);
-          final tierParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0);
-          final countParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
-          final levelParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
-          final object = CoinGenerator(
-              tier: tierParam, count: countParam, level: levelParam);
+      model: _entities[1],
+      toOneRelations: (CoinGenerator object) => [],
+      toManyRelations: (CoinGenerator object) => {},
+      getId: (CoinGenerator object) => object.tier,
+      setId: (CoinGenerator object, int id) {
+        object.tier = id;
+      },
+      objectToFB: (CoinGenerator object, fb.Builder fbb) {
+        fbb.startTable(6);
+        fbb.addInt64(1, object.count);
+        fbb.addInt64(2, object.level);
+        fbb.addInt64(3, object.tier);
+        fbb.finish(fbb.endTable());
+        return object.tier;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final tierParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          0,
+        );
+        final countParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          6,
+          0,
+        );
+        final levelParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          8,
+          0,
+        );
+        final object = CoinGenerator(
+          tier: tierParam,
+          count: countParam,
+          level: levelParam,
+        );
 
-          return object;
-        }),
+        return object;
+      },
+    ),
     ShopItem: obx_int.EntityDefinition<ShopItem>(
-        model: _entities[2],
-        toOneRelations: (ShopItem object) => [],
-        toManyRelations: (ShopItem object) => {},
-        getId: (ShopItem object) => object.id,
-        setId: (ShopItem object, int id) {
-          object.id = id;
-        },
-        objectToFB: (ShopItem object, fb.Builder fbb) {
-          fbb.startTable(9);
-          fbb.addInt64(0, object.id);
-          fbb.addInt64(7, object.level);
-          fbb.finish(fbb.endTable());
-          return object.id;
-        },
-        objectFromFB: (obx.Store store, ByteData fbData) {
-          final buffer = fb.BufferContext(fbData);
-          final rootOffset = buffer.derefObject(0);
-          final idParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
-          final levelParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0);
-          final object = ShopItem(id: idParam, level: levelParam);
+      model: _entities[2],
+      toOneRelations: (ShopItem object) => [],
+      toManyRelations: (ShopItem object) => {},
+      getId: (ShopItem object) => object.id,
+      setId: (ShopItem object, int id) {
+        object.id = id;
+      },
+      objectToFB: (ShopItem object, fb.Builder fbb) {
+        fbb.startTable(9);
+        fbb.addInt64(0, object.id);
+        fbb.addInt64(7, object.level);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final levelParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          18,
+          0,
+        );
+        final object = ShopItem(id: idParam, level: levelParam);
 
-          return object;
-        }),
+        return object;
+      },
+    ),
     Quest: obx_int.EntityDefinition<Quest>(
-        model: _entities[3],
-        toOneRelations: (Quest object) => [],
-        toManyRelations: (Quest object) => {},
-        getId: (Quest object) => object.id,
-        setId: (Quest object, int id) {
-          object.id = id;
-        },
-        objectToFB: (Quest object, fb.Builder fbb) {
-          fbb.startTable(10);
-          fbb.addInt64(0, object.id);
-          fbb.addInt64(1, object.dayTimestamp);
-          fbb.addInt64(2, object.action);
-          fbb.addInt64(3, object.unit);
-          fbb.addInt64(4, object.rewardUnit);
-          fbb.addInt64(5, object.type);
-          fbb.addFloat64(6, object.requirement);
-          fbb.addFloat64(7, object.reward);
-          fbb.addInt64(8, object.dateClaimed);
-          fbb.finish(fbb.endTable());
-          return object.id;
-        },
-        objectFromFB: (obx.Store store, ByteData fbData) {
-          final buffer = fb.BufferContext(fbData);
-          final rootOffset = buffer.derefObject(0);
-          final actionParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
-          final unitParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0);
-          final rewardUnitParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0);
-          final typeParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0);
-          final dayTimestampParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
-          final requirementParam =
-              const fb.Float64Reader().vTableGet(buffer, rootOffset, 16, 0);
-          final rewardParam =
-              const fb.Float64Reader().vTableGet(buffer, rootOffset, 18, 0);
-          final dateClaimedParam =
-              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 20);
-          final object = Quest(
-              action: actionParam,
-              unit: unitParam,
-              rewardUnit: rewardUnitParam,
-              type: typeParam,
-              dayTimestamp: dayTimestampParam,
-              requirement: requirementParam,
-              reward: rewardParam,
-              dateClaimed: dateClaimedParam)
-            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+      model: _entities[3],
+      toOneRelations: (Quest object) => [],
+      toManyRelations: (Quest object) => {},
+      getId: (Quest object) => object.id,
+      setId: (Quest object, int id) {
+        object.id = id;
+      },
+      objectToFB: (Quest object, fb.Builder fbb) {
+        fbb.startTable(10);
+        fbb.addInt64(0, object.id);
+        fbb.addInt64(1, object.dayTimestamp);
+        fbb.addInt64(2, object.action);
+        fbb.addInt64(3, object.unit);
+        fbb.addInt64(4, object.rewardUnit);
+        fbb.addInt64(5, object.type);
+        fbb.addFloat64(6, object.requirement);
+        fbb.addFloat64(7, object.reward);
+        fbb.addInt64(8, object.dateClaimed);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final actionParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          8,
+          0,
+        );
+        final unitParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          0,
+        );
+        final rewardUnitParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          12,
+          0,
+        );
+        final typeParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          14,
+          0,
+        );
+        final dayTimestampParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          6,
+          0,
+        );
+        final requirementParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          16,
+          0,
+        );
+        final rewardParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          18,
+          0,
+        );
+        final dateClaimedParam = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          20,
+        );
+        final object = Quest(
+          action: actionParam,
+          unit: unitParam,
+          rewardUnit: rewardUnitParam,
+          type: typeParam,
+          dayTimestamp: dayTimestampParam,
+          requirement: requirementParam,
+          reward: rewardParam,
+          dateClaimed: dateClaimedParam,
+        )..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
 
-          return object;
-        }),
+        return object;
+      },
+    ),
     QuestStats: obx_int.EntityDefinition<QuestStats>(
-        model: _entities[4],
-        toOneRelations: (QuestStats object) => [],
-        toManyRelations: (QuestStats object) => {},
-        getId: (QuestStats object) => object.id,
-        setId: (QuestStats object, int id) {
-          object.id = id;
-        },
-        objectToFB: (QuestStats object, fb.Builder fbb) {
-          fbb.startTable(6);
-          fbb.addInt64(0, object.id);
-          fbb.addInt64(1, object.dayTimestamp);
-          fbb.addInt64(2, object.action);
-          fbb.addInt64(3, object.unit);
-          fbb.addFloat64(4, object.value);
-          fbb.finish(fbb.endTable());
-          return object.id;
-        },
-        objectFromFB: (obx.Store store, ByteData fbData) {
-          final buffer = fb.BufferContext(fbData);
-          final rootOffset = buffer.derefObject(0);
-          final actionParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
-          final unitParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0);
-          final dayTimestampParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
-          final object = QuestStats(
-              action: actionParam,
-              unit: unitParam,
-              dayTimestamp: dayTimestampParam)
-            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
-            ..value =
-                const fb.Float64Reader().vTableGet(buffer, rootOffset, 12, 0);
+      model: _entities[4],
+      toOneRelations: (QuestStats object) => [],
+      toManyRelations: (QuestStats object) => {},
+      getId: (QuestStats object) => object.id,
+      setId: (QuestStats object, int id) {
+        object.id = id;
+      },
+      objectToFB: (QuestStats object, fb.Builder fbb) {
+        fbb.startTable(6);
+        fbb.addInt64(0, object.id);
+        fbb.addInt64(1, object.dayTimestamp);
+        fbb.addInt64(2, object.action);
+        fbb.addInt64(3, object.unit);
+        fbb.addFloat64(4, object.value);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final actionParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          8,
+          0,
+        );
+        final unitParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          0,
+        );
+        final dayTimestampParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          6,
+          0,
+        );
+        final object =
+            QuestStats(
+                action: actionParam,
+                unit: unitParam,
+                dayTimestamp: dayTimestampParam,
+              )
+              ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
+              ..value = const fb.Float64Reader().vTableGet(
+                buffer,
+                rootOffset,
+                12,
+                0,
+              );
 
-          return object;
-        })
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -544,50 +677,60 @@ obx_int.ModelDefinition getObjectBoxModel() {
 /// [Currency] entity fields to define ObjectBox queries.
 class Currency_ {
   /// See [Currency.count].
-  static final count =
-      obx.QueryDoubleProperty<Currency>(_entities[0].properties[0]);
+  static final count = obx.QueryDoubleProperty<Currency>(
+    _entities[0].properties[0],
+  );
 
   /// See [Currency.totalEarned].
-  static final totalEarned =
-      obx.QueryDoubleProperty<Currency>(_entities[0].properties[1]);
+  static final totalEarned = obx.QueryDoubleProperty<Currency>(
+    _entities[0].properties[1],
+  );
 
   /// See [Currency.id].
-  static final id =
-      obx.QueryIntegerProperty<Currency>(_entities[0].properties[2]);
+  static final id = obx.QueryIntegerProperty<Currency>(
+    _entities[0].properties[2],
+  );
 
   /// See [Currency.baseMax].
-  static final baseMax =
-      obx.QueryDoubleProperty<Currency>(_entities[0].properties[3]);
+  static final baseMax = obx.QueryDoubleProperty<Currency>(
+    _entities[0].properties[3],
+  );
 
   /// See [Currency.maxMultiplier].
-  static final maxMultiplier =
-      obx.QueryDoubleProperty<Currency>(_entities[0].properties[4]);
+  static final maxMultiplier = obx.QueryDoubleProperty<Currency>(
+    _entities[0].properties[4],
+  );
 }
 
 /// [CoinGenerator] entity fields to define ObjectBox queries.
 class CoinGenerator_ {
   /// See [CoinGenerator.count].
-  static final count =
-      obx.QueryIntegerProperty<CoinGenerator>(_entities[1].properties[0]);
+  static final count = obx.QueryIntegerProperty<CoinGenerator>(
+    _entities[1].properties[0],
+  );
 
   /// See [CoinGenerator.level].
-  static final level =
-      obx.QueryIntegerProperty<CoinGenerator>(_entities[1].properties[1]);
+  static final level = obx.QueryIntegerProperty<CoinGenerator>(
+    _entities[1].properties[1],
+  );
 
   /// See [CoinGenerator.tier].
-  static final tier =
-      obx.QueryIntegerProperty<CoinGenerator>(_entities[1].properties[2]);
+  static final tier = obx.QueryIntegerProperty<CoinGenerator>(
+    _entities[1].properties[2],
+  );
 }
 
 /// [ShopItem] entity fields to define ObjectBox queries.
 class ShopItem_ {
   /// See [ShopItem.id].
-  static final id =
-      obx.QueryIntegerProperty<ShopItem>(_entities[2].properties[0]);
+  static final id = obx.QueryIntegerProperty<ShopItem>(
+    _entities[2].properties[0],
+  );
 
   /// See [ShopItem.level].
-  static final level =
-      obx.QueryIntegerProperty<ShopItem>(_entities[2].properties[1]);
+  static final level = obx.QueryIntegerProperty<ShopItem>(
+    _entities[2].properties[1],
+  );
 }
 
 /// [Quest] entity fields to define ObjectBox queries.
@@ -596,57 +739,70 @@ class Quest_ {
   static final id = obx.QueryIntegerProperty<Quest>(_entities[3].properties[0]);
 
   /// See [Quest.dayTimestamp].
-  static final dayTimestamp =
-      obx.QueryIntegerProperty<Quest>(_entities[3].properties[1]);
+  static final dayTimestamp = obx.QueryIntegerProperty<Quest>(
+    _entities[3].properties[1],
+  );
 
   /// See [Quest.action].
-  static final action =
-      obx.QueryIntegerProperty<Quest>(_entities[3].properties[2]);
+  static final action = obx.QueryIntegerProperty<Quest>(
+    _entities[3].properties[2],
+  );
 
   /// See [Quest.unit].
-  static final unit =
-      obx.QueryIntegerProperty<Quest>(_entities[3].properties[3]);
+  static final unit = obx.QueryIntegerProperty<Quest>(
+    _entities[3].properties[3],
+  );
 
   /// See [Quest.rewardUnit].
-  static final rewardUnit =
-      obx.QueryIntegerProperty<Quest>(_entities[3].properties[4]);
+  static final rewardUnit = obx.QueryIntegerProperty<Quest>(
+    _entities[3].properties[4],
+  );
 
   /// See [Quest.type].
-  static final type =
-      obx.QueryIntegerProperty<Quest>(_entities[3].properties[5]);
+  static final type = obx.QueryIntegerProperty<Quest>(
+    _entities[3].properties[5],
+  );
 
   /// See [Quest.requirement].
-  static final requirement =
-      obx.QueryDoubleProperty<Quest>(_entities[3].properties[6]);
+  static final requirement = obx.QueryDoubleProperty<Quest>(
+    _entities[3].properties[6],
+  );
 
   /// See [Quest.reward].
-  static final reward =
-      obx.QueryDoubleProperty<Quest>(_entities[3].properties[7]);
+  static final reward = obx.QueryDoubleProperty<Quest>(
+    _entities[3].properties[7],
+  );
 
   /// See [Quest.dateClaimed].
-  static final dateClaimed =
-      obx.QueryIntegerProperty<Quest>(_entities[3].properties[8]);
+  static final dateClaimed = obx.QueryIntegerProperty<Quest>(
+    _entities[3].properties[8],
+  );
 }
 
 /// [QuestStats] entity fields to define ObjectBox queries.
 class QuestStats_ {
   /// See [QuestStats.id].
-  static final id =
-      obx.QueryIntegerProperty<QuestStats>(_entities[4].properties[0]);
+  static final id = obx.QueryIntegerProperty<QuestStats>(
+    _entities[4].properties[0],
+  );
 
   /// See [QuestStats.dayTimestamp].
-  static final dayTimestamp =
-      obx.QueryIntegerProperty<QuestStats>(_entities[4].properties[1]);
+  static final dayTimestamp = obx.QueryIntegerProperty<QuestStats>(
+    _entities[4].properties[1],
+  );
 
   /// See [QuestStats.action].
-  static final action =
-      obx.QueryIntegerProperty<QuestStats>(_entities[4].properties[2]);
+  static final action = obx.QueryIntegerProperty<QuestStats>(
+    _entities[4].properties[2],
+  );
 
   /// See [QuestStats.unit].
-  static final unit =
-      obx.QueryIntegerProperty<QuestStats>(_entities[4].properties[3]);
+  static final unit = obx.QueryIntegerProperty<QuestStats>(
+    _entities[4].properties[3],
+  );
 
   /// See [QuestStats.value].
-  static final value =
-      obx.QueryDoubleProperty<QuestStats>(_entities[4].properties[4]);
+  static final value = obx.QueryDoubleProperty<QuestStats>(
+    _entities[4].properties[4],
+  );
 }
