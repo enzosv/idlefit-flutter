@@ -6,20 +6,67 @@ import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/quest_repo.dart';
 import 'package:idlefit/providers/providers.dart';
 
+final _questProgressProvider = FutureProvider.family.autoDispose<double, Quest>(
+  (ref, quest) async {
+    return quest.progress(ref.read(questStatsRepositoryProvider));
+  },
+);
+
 class QuestCard extends ConsumerWidget {
   final Quest quest;
   final VoidCallback onClaim;
 
   const QuestCard({super.key, required this.quest, required this.onClaim});
 
+  Widget _progressBar(double progress, ThemeData theme) {
+    final double progressPercent = (progress / quest.requirement).clamp(0, 1);
+    return Column(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: progressPercent,
+            minHeight: 8,
+            color: quest.rewardCurrency.color,
+            backgroundColor: theme.colorScheme.surfaceContainerHighest,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '${((progressPercent) * 100).toInt()}%',
+              style: theme.textTheme.bodySmall,
+            ),
+            if (quest.dateClaimed != null)
+              Text('Claimed', style: theme.textTheme.bodySmall)
+            else if ((progressPercent) >= 100)
+              ElevatedButton(onPressed: onClaim, child: const Text('Claim')),
+          ],
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    double? progressPercent;
+    final progressAsync = ref.watch(_questProgressProvider(quest));
 
     return Opacity(
-      opacity:
-          quest.dateClaimed != null ? 0.6 : max(0.8, progressPercent ?? 0.8),
+      opacity: progressAsync.when(
+        // change opacity based on progress
+        data: (progress) {
+          final progressPercent = (progress / quest.requirement).clamp(
+            0.0,
+            1.0,
+          );
+          return quest.dateClaimed != null ? 0.6 : max(0.8, progressPercent);
+        },
+        loading: () => 0.8,
+        error: (_, __) => 0.8,
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -66,49 +113,15 @@ class QuestCard extends ConsumerWidget {
             ),
 
             const SizedBox(height: 16),
-            FutureBuilder<double>(
-              future: quest.progress(ref.read(questStatsRepositoryProvider)),
-              builder: (context, snapshot) {
-                final progress = snapshot.data ?? 0.0;
-                progressPercent = (progress / quest.requirement).clamp(
-                  0.0,
-                  1.0,
-                );
-
-                return Column(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: snapshot.hasData ? progressPercent : null,
-                        minHeight: 8,
-                        color: quest.rewardCurrency.color,
-                        backgroundColor:
-                            theme.colorScheme.surfaceContainerHighest,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          snapshot.hasData
-                              ? '${((progressPercent ?? 0.0) * 100).toInt()}%'
-                              : 'Loading...',
-                          style: theme.textTheme.bodySmall,
-                        ),
-                        if (quest.dateClaimed != null)
-                          Text('Claimed', style: theme.textTheme.bodySmall)
-                        else if (snapshot.hasData &&
-                            progress >= quest.requirement)
-                          ElevatedButton(
-                            onPressed: onClaim,
-                            child: const Text('Claim'),
-                          ),
-                      ],
-                    ),
-                  ],
-                );
+            progressAsync.when(
+              data: (progress) {
+                return _progressBar(progress, theme);
+              },
+              loading: () {
+                return _progressBar(0, theme);
+              },
+              error: (_, __) {
+                return _progressBar(0, theme);
               },
             ),
           ],
