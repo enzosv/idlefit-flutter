@@ -18,8 +18,7 @@ class QuestCard extends ConsumerWidget {
 
   const QuestCard({super.key, required this.quest, required this.onClaim});
 
-  Widget _progressBar(double progress, ThemeData theme) {
-    final double progressPercent = (progress / quest.requirement).clamp(0, 1);
+  Widget _progressBar(double progressPercent, ThemeData theme) {
     return Column(
       children: [
         ClipRRect(
@@ -36,12 +35,12 @@ class QuestCard extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '${((progressPercent) * 100).toInt()}%',
+              '${(progressPercent * 100).toInt()}%',
               style: theme.textTheme.bodySmall,
             ),
             if (quest.dateClaimed != null)
               Text('Claimed', style: theme.textTheme.bodySmall)
-            else if ((progressPercent) >= 100)
+            else if (progressPercent >= 1.0)
               ElevatedButton(onPressed: onClaim, child: const Text('Claim')),
           ],
         ),
@@ -54,19 +53,21 @@ class QuestCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final progressAsync = ref.watch(_questProgressProvider(quest));
 
+    return progressAsync.when(
+      data: (progress) {
+        final progressPercent = (progress / quest.requirement).clamp(0.0, 1.0);
+        return _card(progressPercent, theme);
+      },
+      loading: () => _card(0.0, theme),
+      error: (_, __) => _card(0.0, theme),
+    );
+  }
+
+  Widget _card(double progressPercent, ThemeData theme) {
+    final opacity = quest.dateClaimed != null ? 0.6 : max(0.8, progressPercent);
+
     return Opacity(
-      opacity: progressAsync.when(
-        // change opacity based on progress
-        data: (progress) {
-          final progressPercent = (progress / quest.requirement).clamp(
-            0.0,
-            1.0,
-          );
-          return quest.dateClaimed != null ? 0.6 : max(0.8, progressPercent);
-        },
-        loading: () => 0.8,
-        error: (_, __) => 0.8,
-      ),
+      opacity: opacity,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -99,10 +100,7 @@ class QuestCard extends ConsumerWidget {
                       children: [
                         Text(
                           quest.rewardText,
-                          style: TextStyle(
-                            // fontWeight: FontWeight.bold,
-                            color: quest.rewardCurrency.color,
-                          ),
+                          style: TextStyle(color: quest.rewardCurrency.color),
                         ),
                         quest.rewardCurrency.iconWithSize(20),
                       ],
@@ -111,19 +109,8 @@ class QuestCard extends ConsumerWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 16),
-            progressAsync.when(
-              data: (progress) {
-                return _progressBar(progress, theme);
-              },
-              loading: () {
-                return _progressBar(0, theme);
-              },
-              error: (_, __) {
-                return _progressBar(0, theme);
-              },
-            ),
+            _progressBar(progressPercent, theme),
           ],
         ),
       ),
