@@ -14,6 +14,18 @@ class _HealthStatsTile extends StatelessWidget {
   final Color? iconColor;
   final QuestStatsRepository repository;
 
+  final _healthStatsProvider =
+      FutureProvider.family<(double, double), (QuestAction, QuestUnit)>((
+        ref,
+        params,
+      ) async {
+        final (action, unit) = params;
+        final repository = ref.read(questStatsRepositoryProvider);
+        final today = repository.getProgress(action, unit, todayTimestamp);
+        final total = repository.getTotalProgress(action, unit);
+        return (today, total).wait;
+      });
+
   const _HealthStatsTile({
     required this.action,
     required this.unit,
@@ -23,38 +35,29 @@ class _HealthStatsTile extends StatelessWidget {
     this.iconColor,
   });
 
-  Future<(double, double)> _fetchStats(QuestStatsRepository repository) async {
-    final today = repository.getProgress(action, unit, todayTimestamp);
-    final total = repository.getTotalProgress(action, unit);
-    return (today, total).wait;
-  }
-
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<(double, double)>(
-      future: _fetchStats(repository),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return ListTile(
-            leading: Icon(icon, color: iconColor),
+    final statsAsync = ref.watch(_healthStatsProvider((action, unit)));
+    return statsAsync.when(
+      loading:
+          () => ListTile(
+            leading: Icon(icon, color: iconColor, size: 28),
             title: Text(title),
             subtitle: const Text('Today: loading...'),
-          );
-        } else if (snapshot.hasError || !snapshot.hasData) {
-          return ListTile(
-            leading: Icon(icon, color: iconColor),
+          ),
+      error:
+          (error, _) => ListTile(
+            leading: Icon(icon, color: iconColor, size: 28),
             title: Text(title),
             subtitle: const Text('Error loading'),
-          );
-        }
-        final (today, total) = snapshot.data!;
-        return ListTile(
-          leading: Icon(icon, color: iconColor, size: 28),
-          title: Text(title),
-          subtitle: Text('Today: ${toLettersNotation(today)}'),
-          trailing: Text('Total: ${toLettersNotation(total)}'),
-        );
-      },
+          ),
+      data:
+          (today, total) => ListTile(
+            leading: Icon(icon, color: iconColor, size: 28),
+            title: Text(title),
+            subtitle: Text('Today: ${toLettersNotation(today)}'),
+            trailing: Text('Total: ${toLettersNotation(total)}'),
+          ),
     );
   }
 }
