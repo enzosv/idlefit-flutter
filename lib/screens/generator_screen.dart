@@ -1,6 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/widgets/generator_card.dart';
 import 'package:idlefit/providers/providers.dart';
 
@@ -39,7 +40,9 @@ class _GeneratorsScreenState extends State<GeneratorsScreen> {
               // Get affordable generators and sort them
               final affordableGenerators =
                   coinGenerators
-                      .where((generator) => generator.cost <= coins.max)
+                      .where(
+                        (generator) => generator.cost <= max(coins.max, 1000),
+                      )
                       .toList()
                     ..sort((a, b) => b.tier.compareTo(a.tier));
 
@@ -50,10 +53,16 @@ class _GeneratorsScreenState extends State<GeneratorsScreen> {
                 final previousOffset = _scrollController.offset;
 
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  final newCardHeight = _measureNewCardHeight();
-                  if (_scrollController.hasClients) {
-                    _scrollController.jumpTo(previousOffset + newCardHeight);
+                  if (!_scrollController.hasClients) {
+                    return;
                   }
+                  final newCardHeight = _measureNewCardHeight();
+                  _scrollController.jumpTo(previousOffset + newCardHeight);
+                  _scrollController.animateTo(
+                    0,
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeInOutBack,
+                  );
                 });
               }
 
