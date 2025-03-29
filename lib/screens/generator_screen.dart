@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/widgets/generator_card.dart';
 import 'package:idlefit/providers/providers.dart';
 
@@ -15,7 +16,7 @@ class _GeneratorsScreenState extends State<GeneratorsScreen> {
   int _previousGeneratorCount = 0;
   final GlobalKey _newGeneratorKey = GlobalKey();
 
-  /// Measures the height of the new generator card
+  /// Measures the height of the newly added generator card
   double _measureNewCardHeight() {
     final context = _newGeneratorKey.currentContext;
     if (context != null) {
@@ -46,12 +47,12 @@ class _GeneratorsScreenState extends State<GeneratorsScreen> {
                   affordableGenerators.length > _previousGeneratorCount;
 
               if (_scrollController.hasClients && newGeneratorAdded) {
+                final previousOffset = _scrollController.offset;
+
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   final newCardHeight = _measureNewCardHeight();
                   if (_scrollController.hasClients) {
-                    _scrollController.jumpTo(
-                      _scrollController.offset + newCardHeight,
-                    );
+                    _scrollController.jumpTo(previousOffset + newCardHeight);
                   }
                 });
               }

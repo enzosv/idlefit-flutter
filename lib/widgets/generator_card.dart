@@ -215,20 +215,20 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
         ],
       ),
     ];
-    if (generator.count > 0) {
-      additionalInfo.add(
-        Row(
-          children: [
-            Text(
-              'Output: ${toLettersNotation(generator.output)} ',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            icon,
-            Text('/s', style: Theme.of(context).textTheme.bodyMedium),
-          ],
-        ),
-      );
-    }
+    // if (generator.count > 0) {
+    additionalInfo.add(
+      Row(
+        children: [
+          Text(
+            'Output: ${toLettersNotation(generator.output)} ',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          icon,
+          Text('/s', style: Theme.of(context).textTheme.bodyMedium),
+        ],
+      ),
+    );
+    // }
 
     return Stack(
       clipBehavior: Clip.none, // Allow animations to move outside bounds
