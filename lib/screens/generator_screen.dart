@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:idlefit/models/coin_generator.dart';
 import 'package:idlefit/widgets/generator_card.dart';
 import 'package:idlefit/providers/providers.dart';
 
@@ -13,7 +12,18 @@ class GeneratorsScreen extends StatefulWidget {
 
 class _GeneratorsScreenState extends State<GeneratorsScreen> {
   final ScrollController _scrollController = ScrollController();
-  CoinGenerator? _previousTopGenerator;
+  int _previousGeneratorCount = 0;
+  final GlobalKey _newGeneratorKey = GlobalKey();
+
+  /// Measures the height of the new generator card
+  double _measureNewCardHeight() {
+    final context = _newGeneratorKey.currentContext;
+    if (context != null) {
+      final renderBox = context.findRenderObject() as RenderBox?;
+      return renderBox?.size.height ?? 0;
+    }
+    return 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,28 +42,21 @@ class _GeneratorsScreenState extends State<GeneratorsScreen> {
                       .toList()
                     ..sort((a, b) => b.tier.compareTo(a.tier));
 
-              // Identify the new top generator
-              final newTopGenerator =
-                  affordableGenerators.isNotEmpty
-                      ? affordableGenerators.first
-                      : null;
+              final newGeneratorAdded =
+                  affordableGenerators.length > _previousGeneratorCount;
 
-              // If the top generator has changed, adjust the scroll position
-              if (_previousTopGenerator != null &&
-                  newTopGenerator != null &&
-                  _previousTopGenerator != newTopGenerator &&
-                  _scrollController.hasClients) {
+              if (_scrollController.hasClients && newGeneratorAdded) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  // Scroll down slightly to keep the second generator at the top
+                  final newCardHeight = _measureNewCardHeight();
                   if (_scrollController.hasClients) {
                     _scrollController.jumpTo(
-                      _scrollController.position.minScrollExtent + 100,
+                      _scrollController.offset + newCardHeight,
                     );
                   }
                 });
-                // Update previous top generator
-                _previousTopGenerator = newTopGenerator;
               }
+
+              _previousGeneratorCount = affordableGenerators.length;
 
               return ListView.builder(
                 controller: _scrollController,
@@ -61,6 +64,10 @@ class _GeneratorsScreenState extends State<GeneratorsScreen> {
                 itemCount: affordableGenerators.length,
                 itemBuilder: (context, index) {
                   return GeneratorCard(
+                    key:
+                        index == 0
+                            ? _newGeneratorKey
+                            : null, // Track first item
                     generatorIndex: coinGenerators.indexOf(
                       affordableGenerators[index],
                     ),
