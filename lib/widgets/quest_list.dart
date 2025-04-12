@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/quest_repo.dart';
 import 'package:idlefit/providers/currency_provider.dart';
+import 'package:idlefit/utils/animation_utils.dart';
 import 'package:idlefit/widgets/quest_card.dart';
 import 'package:idlefit/providers/providers.dart';
 
@@ -23,7 +24,7 @@ class QuestList extends ConsumerStatefulWidget {
 }
 
 class _QuestListState extends ConsumerState<QuestList>
-    with AutomaticKeepAliveClientMixin {
+    with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   @override
   bool get wantKeepAlive => true; // Prevent unnecessary rebuilds
 
@@ -44,7 +45,7 @@ class _QuestListState extends ConsumerState<QuestList>
     }
   }
 
-  void _onClaim(WidgetRef ref, Quest quest) {
+  void _executeClaim(WidgetRef ref, Quest quest) {
     final currencyProvider = _rewardNotifier(ref, quest);
 
     Future(
@@ -60,6 +61,25 @@ class _QuestListState extends ConsumerState<QuestList>
       ref.invalidate(_questsProvider(widget.questType));
       ref.invalidate(questStatsRepositoryProvider);
     });
+  }
+
+  void _claimAndAnimate(Offset buttonPosition, WidgetRef ref, Quest quest) {
+    // Start animation immediately
+    AnimationUtils.startFlyingCurrencyAnimation(
+      context: context,
+      vsync: this,
+      startPosition: buttonPosition,
+      currencyType: quest.rewardCurrency,
+    );
+
+    // Execute the actual claim logic
+    _executeClaim(ref, quest);
+  }
+
+  @override
+  void dispose() {
+    // AnimationUtils.disposeController(); // Clean up if needed
+    super.dispose();
   }
 
   @override
@@ -87,9 +107,12 @@ class _QuestListState extends ConsumerState<QuestList>
                 return Column(
                   children:
                       quests.map((quest) {
+                        // Unique key for potential animation targeting later
+                        final cardKey = ValueKey('quest_${quest.id}');
                         return QuestCard(
+                          key: cardKey,
                           quest: quest,
-                          onClaim: () => _onClaim(ref, quest),
+                          onClaim: (pos) => _claimAndAnimate(pos, ref, quest),
                         );
                       }).toList(),
                 );

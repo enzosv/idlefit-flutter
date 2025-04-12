@@ -62,6 +62,10 @@ class CurrencyWidget extends ConsumerWidget {
   final CurrencyType currencyType;
   const CurrencyWidget({super.key, required this.currencyType});
 
+  // Add static GlobalKeys
+  static final energyGlobalKey = GlobalKey();
+  static final spaceGlobalKey = GlobalKey();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final provider =
@@ -76,7 +80,17 @@ class CurrencyWidget extends ConsumerWidget {
         currencyType == CurrencyType.space
             ? toLettersNotation(provider.max)
             : durationNotation(provider.max);
+
+    // Determine the correct key
+    final Key? key =
+        currencyType == CurrencyType.energy
+            ? energyGlobalKey
+            : currencyType == CurrencyType.space
+            ? spaceGlobalKey
+            : null; // Assign the key to the root widget of this currency display
+
     return Row(
+      key: key, // Use the key here
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/quest_repo.dart';
 import 'package:idlefit/providers/providers.dart';
+import '../helpers/util.dart';
 
 final _questProgressProvider = FutureProvider.family.autoDispose<double, Quest>(
   (ref, quest) async {
@@ -12,9 +13,11 @@ final _questProgressProvider = FutureProvider.family.autoDispose<double, Quest>(
   },
 );
 
+typedef ClaimButtonCallback = void Function(Offset globalPosition);
+
 class QuestCard extends ConsumerWidget {
   final Quest quest;
-  final VoidCallback onClaim;
+  final ClaimButtonCallback onClaim;
 
   const QuestCard({super.key, required this.quest, required this.onClaim});
 
@@ -41,7 +44,11 @@ class QuestCard extends ConsumerWidget {
             if (quest.dateClaimed != null)
               Text('Claimed', style: theme.textTheme.bodySmall)
             else if (progressPercent >= 1.0)
-              ElevatedButton(onPressed: onClaim, child: const Text('Claim')),
+              ElevatedButton(
+                key: GlobalKey(),
+                onPressed: () => onClaim(Offset(0, 0)),
+                child: const Text('Claim'),
+              ),
           ],
         ),
       ],
