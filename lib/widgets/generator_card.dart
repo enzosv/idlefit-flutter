@@ -7,6 +7,7 @@ import 'package:idlefit/widgets/current_coins.dart';
 import 'package:lottie/lottie.dart';
 import 'common_card.dart';
 import 'package:idlefit/providers/providers.dart';
+import 'dart:math';
 
 class GeneratorCard extends ConsumerStatefulWidget {
   final int generatorIndex;
@@ -18,51 +19,39 @@ class GeneratorCard extends ConsumerStatefulWidget {
 }
 
 class _GeneratorCardState extends ConsumerState<GeneratorCard>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   double progress = 0.0;
   bool showProgress = false;
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _opacityAnimation;
-  late Animation<Offset> _positionAnimation;
-  final duration = 500;
+  late AnimationController _progressController;
+  late AnimationController _coinController;
+  final progressDuration = 500;
+  final coinAnimDuration = 800;
   Offset? _tapLocation;
   OverlayEntry? _overlayEntry;
+  List<Animation<Offset>> _coinAnimations = [];
+  List<Animation<double>> _coinOpacityAnimations = [];
+  Offset? _targetPosition;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
+    _progressController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: Duration(milliseconds: progressDuration),
     );
 
-    _scaleAnimation = Tween<double>(begin: 1.2, end: 0.8).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-      ),
+    _coinController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: coinAnimDuration),
     );
 
-    _opacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
-      ),
-    );
-
-    _positionAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(0, -1.5),
-    ).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
-    );
-
-    _animationController.addStatusListener((status) {
+    _coinController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         _overlayEntry?.remove();
         _overlayEntry = null;
-        _animationController.reset();
+        _coinController.reset();
+        _coinAnimations = [];
+        _coinOpacityAnimations = [];
       }
     });
   }
@@ -73,102 +62,135 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
       return;
     }
 
-    // Store tap location
     _tapLocation = details.localPosition;
 
+    final RenderBox? targetBox =
+        CurrentCoins.globalKey.currentContext?.findRenderObject() as RenderBox?;
+    if (targetBox != null) {
+      _targetPosition = targetBox.localToGlobal(
+        targetBox.size.center(Offset.zero),
+      );
+    }
+
     setState(() {
-      progress = 0.0; // Reset progress
-      showProgress = true; // Show progress bar
+      progress = 0.0;
+      showProgress = true;
     });
     Future.delayed(Duration(milliseconds: 50), () {
-      // Ensure animation starts
+      if (!mounted) return;
       setState(() => progress = 1.0);
     });
 
-    Future.delayed(Duration(milliseconds: duration), () {
+    // hide progress bar and trigger animation
+    Future.delayed(Duration(milliseconds: progressDuration), () {
       if (!mounted) return;
       setState(() {
         showProgress = false;
-      }); // Hide bar after animation completes
+      });
 
       final generator = coinGenerators[widget.generatorIndex];
       final output = ref
           .read(generatorProvider.notifier)
           .tapGenerator(generator);
-      _showFloatingText(toLettersNotation(output));
+      _startCoinAnimation(toLettersNotation(output));
       CurrentCoins.triggerAnimation();
     });
   }
 
-  void _showFloatingText(String text) {
-    if (!mounted || _tapLocation == null || !context.mounted) return;
+  void _startCoinAnimation(String amount) {
+    if (!mounted ||
+        _tapLocation == null ||
+        !context.mounted ||
+        _targetPosition == null) {
+      return;
+    }
 
     final RenderBox? cardRenderBox = context.findRenderObject() as RenderBox?;
     if (cardRenderBox == null) return;
 
-    // Get global positions
-    final cardPosition = cardRenderBox.localToGlobal(Offset.zero);
+    final globalTapPosition = cardRenderBox.localToGlobal(_tapLocation!);
 
-    // Calculate start position
-    final startX = cardPosition.dx + _tapLocation!.dx;
-    final startY = cardPosition.dy + _tapLocation!.dy;
-
-    // Remove existing overlay if any
     _overlayEntry?.remove();
+    _coinAnimations = [];
+    _coinOpacityAnimations = [];
+
+    final int numberOfCoins = (5 + (amount.length / 2)).clamp(5, 15).toInt();
+    final random = Random();
+
+    for (int i = 0; i < numberOfCoins; i++) {
+      final startOffset = Offset(
+        globalTapPosition.dx + random.nextDouble() * 30 - 15,
+        globalTapPosition.dy + random.nextDouble() * 20 - 10,
+      );
+
+      final endOffset = Offset(
+        _targetPosition!.dx + random.nextDouble() * 20 - 10,
+        _targetPosition!.dy + random.nextDouble() * 10 - 5,
+      );
+
+      final startDelay = i * (coinAnimDuration * 0.3 / numberOfCoins);
+      final endDelay = coinAnimDuration;
+      final intervalStart = startDelay / endDelay;
+      final intervalEnd = 0.8;
+
+      final curve = CurvedAnimation(
+        parent: _coinController,
+        curve: Interval(
+          intervalStart,
+          intervalEnd,
+          curve: Curves.easeInOutQuad,
+        ),
+      );
+
+      _coinAnimations.add(
+        Tween<Offset>(begin: startOffset, end: endOffset).animate(curve),
+      );
+
+      _coinOpacityAnimations.add(
+        Tween<double>(begin: 1.0, end: 0.0).animate(
+          CurvedAnimation(
+            parent: _coinController,
+            curve: Interval(
+              intervalStart + (intervalEnd - intervalStart) * 0.7,
+              1.0,
+              curve: Curves.easeIn,
+            ),
+          ),
+        ),
+      );
+    }
 
     _overlayEntry = OverlayEntry(
       builder: (context) {
         return AnimatedBuilder(
-          animation: _animationController,
+          animation: _coinController,
           builder: (context, child) {
-            return Positioned(
-              left: startX - 40, // Center the text around tap point
-              top: startY,
-              child: SlideTransition(
-                position: _positionAnimation,
-                child: ScaleTransition(
-                  scale: _scaleAnimation,
+            return Stack(
+              children: List.generate(numberOfCoins, (index) {
+                if (index >= _coinAnimations.length ||
+                    index >= _coinOpacityAnimations.length) {
+                  return const SizedBox.shrink();
+                }
+                final position = _coinAnimations[index].value;
+                final opacity = _coinOpacityAnimations[index].value;
+                return Positioned(
+                  left: position.dx - 8,
+                  top: position.dy - 8,
                   child: FadeTransition(
-                    opacity: _opacityAnimation,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.amber.withAlpha(50),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.amber, width: 1),
-                      ),
-                      child: DefaultTextStyle(
-                        style: const TextStyle(
-                          color: Colors.amber,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black54,
-                              offset: Offset(1, 1),
-                              blurRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: Text('+$text'),
-                      ),
-                    ),
+                    opacity: AlwaysStoppedAnimation(opacity),
+                    child: CurrencyType.coin.iconWithSize(16),
                   ),
-                ),
-              ),
+                );
+              }),
             );
           },
         );
       },
     );
 
-    // Insert the overlay entry
     if (context.mounted) {
       Overlay.of(context).insert(_overlayEntry!);
-      _animationController.forward(from: 0.0);
+      _coinController.forward(from: 0.0);
     }
   }
 
@@ -176,7 +198,8 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
   void dispose() {
     _overlayEntry?.remove();
     _overlayEntry = null;
-    _animationController.dispose();
+    _progressController.dispose();
+    _coinController.dispose();
     super.dispose();
   }
 
@@ -215,7 +238,6 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
         ],
       ),
     ];
-    // if (generator.count > 0) {
     additionalInfo.add(
       Row(
         children: [
@@ -228,10 +250,9 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
         ],
       ),
     );
-    // }
 
     return Stack(
-      clipBehavior: Clip.none, // Allow animations to move outside bounds
+      clipBehavior: Clip.none,
       children: [
         CommonCard(
           title: generator.name,
@@ -240,10 +261,8 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
           additionalInfo: additionalInfo,
           cost: generator.cost,
           animation: _animation(generator),
-          affordable:
-              coins.count >=
-              generator
-                  .cost, // TODO: sometimes visually enough but not mathematically enough
+          // TODO: sometimes visually affordable but not mathematically avaoidable
+          affordable: coins.count >= generator.cost,
           costCurrency: CurrencyType.coin,
           buttonText: 'Add Rep',
           onButtonPressed:
@@ -254,7 +273,7 @@ class _GeneratorCardState extends ConsumerState<GeneratorCard>
           progressIndicator:
               showProgress
                   ? AnimatedContainer(
-                    duration: Duration(milliseconds: duration),
+                    duration: Duration(milliseconds: progressDuration),
                     height: 5,
                     width: progress * (screenWidth - 32),
                     color: Colors.blue,
