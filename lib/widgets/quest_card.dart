@@ -5,11 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/models/currency.dart';
 import 'package:idlefit/models/quest_repo.dart';
 import 'package:idlefit/providers/providers.dart';
-import '../helpers/util.dart';
 
 final _questProgressProvider = FutureProvider.family.autoDispose<double, Quest>(
   (ref, quest) async {
-    return quest.progress(ref.read(questStatsRepositoryProvider));
+    return quest.progress(ref.watch(questStatsRepositoryProvider));
   },
 );
 
