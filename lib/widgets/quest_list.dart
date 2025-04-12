@@ -78,13 +78,13 @@ class _QuestListState extends ConsumerState<QuestList>
 
   @override
   void dispose() {
-    // AnimationUtils.disposeController(); // Clean up if needed
+    AnimationUtils.disposeController();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); // Required for AutomaticKeepAliveClientMixin
+    super.build(context);
 
     final questsAsync = ref.watch(_questsProvider(widget.questType));
 
