@@ -22,6 +22,7 @@ class QuestCard extends ConsumerWidget {
   const QuestCard({super.key, required this.quest, required this.onClaim});
 
   Widget _progressBar(double progressPercent, ThemeData theme) {
+    final buttonKey = GlobalKey();
     return Column(
       children: [
         ClipRRect(
@@ -45,8 +46,22 @@ class QuestCard extends ConsumerWidget {
               Text('Claimed', style: theme.textTheme.bodySmall)
             else if (progressPercent >= 1.0)
               ElevatedButton(
-                key: GlobalKey(),
-                onPressed: () => onClaim(Offset(0, 0)),
+                key: buttonKey,
+                onPressed: () {
+                  final context = buttonKey.currentContext;
+                  if (context == null) return;
+                  // Get the button's render box
+                  final RenderBox? buttonBox =
+                      context.findRenderObject() as RenderBox?;
+                  if (buttonBox == null) return;
+
+                  // Calculate the center of the button in global coordinates
+                  final position = buttonBox.localToGlobal(
+                    Offset(buttonBox.size.width / 2, buttonBox.size.height / 2),
+                  );
+
+                  onClaim(position);
+                },
                 child: const Text('Claim'),
               ),
           ],
