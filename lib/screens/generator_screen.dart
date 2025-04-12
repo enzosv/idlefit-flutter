@@ -52,6 +52,7 @@ class _GeneratorsScreenState extends State<GeneratorsScreen> {
               if (_scrollController.hasClients && newGeneratorAdded) {
                 final previousOffset = _scrollController.offset;
 
+                // Animate entry of new generator card
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (!_scrollController.hasClients) {
                     return;
@@ -60,7 +61,7 @@ class _GeneratorsScreenState extends State<GeneratorsScreen> {
                   _scrollController.jumpTo(previousOffset + newCardHeight);
                   _scrollController.animateTo(
                     0,
-                    duration: Duration(milliseconds: 300),
+                    duration: Duration(milliseconds: 600),
                     curve: Curves.easeInOutBack,
                   );
                 });
