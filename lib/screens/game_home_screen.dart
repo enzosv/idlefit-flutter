@@ -199,18 +199,18 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
             ),
             actions: [
               TextButton(
-                child: const Text('Force sync'),
+                child: const Text('Open Fitness'),
                 onPressed: () async {
                   Navigator.of(context).pop();
 
                   if (Platform.isIOS) {
                     // Open Apple Health app (deep linking is limited on iOS)
-                    final uri = Uri.parse('x-apple-health://');
+                    final uri = Uri.parse('fitnessapp://');
                     if (await canLaunchUrl(uri)) {
                       await launchUrl(uri);
-                    } else {
-                      debugPrint("Can't open Apple Health.");
+                      return;
                     }
+                    debugPrint("Can't open Apple Fitness.");
                     return;
                   }
                   if (Platform.isAndroid) {
@@ -221,9 +221,9 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
                     );
                     if (await canLaunchUrl(intentUri)) {
                       await launchUrl(intentUri);
-                    } else {
-                      debugPrint("Can't open Health Connect.");
+                      return;
                     }
+                    debugPrint("Can't open Health Connect.");
                     return;
                   }
                 },
