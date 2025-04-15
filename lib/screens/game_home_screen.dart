@@ -10,6 +10,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:idlefit/widgets/currency_bar.dart';
 import 'package:idlefit/widgets/sidebar.dart';
 import 'package:idlefit/providers/providers.dart';
+import 'dart:io';
+import 'package:url_launcher/url_launcher.dart';
 
 final sidebarProvider = StateProvider<bool>((ref) => false);
 
@@ -103,7 +105,21 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
           days: 1,
         );
       }
-      ref.read(gameLoopProvider.notifier).resume();
+      final gameLoopNotifier = ref.read(gameLoopProvider.notifier);
+      if (gameLoopNotifier.isEnergySufficient()) {
+        gameLoopNotifier.resume();
+        return;
+      }
+      if (!mounted) {
+        return;
+      }
+      showEnergyDialog(
+        context: context,
+        onContinue: () {
+          gameLoopNotifier.resume();
+        },
+      );
+      // dialog to ask user to open fitness app and force sync
     });
 
     // Initialize ads
@@ -167,5 +183,60 @@ class _GameHomePageState extends ConsumerState<GameHomePage>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  void showEnergyDialog({
+    required BuildContext context,
+    required VoidCallback onContinue,
+  }) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Energy Insufficient'),
+            content: const Text(
+              'Try syncing health data to safeguard idle gains',
+            ),
+            actions: [
+              TextButton(
+                child: const Text('Force sync'),
+                onPressed: () async {
+                  Navigator.of(context).pop();
+
+                  if (Platform.isIOS) {
+                    // Open Apple Health app (deep linking is limited on iOS)
+                    final uri = Uri.parse('x-apple-health://');
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri);
+                    } else {
+                      debugPrint("Can't open Apple Health.");
+                    }
+                    return;
+                  }
+                  if (Platform.isAndroid) {
+                    // Open Health Connect (if installed)
+                    const packageName = 'com.google.android.apps.healthdata';
+                    final intentUri = Uri.parse(
+                      'intent://#Intent;package=$packageName;end',
+                    );
+                    if (await canLaunchUrl(intentUri)) {
+                      await launchUrl(intentUri);
+                    } else {
+                      debugPrint("Can't open Health Connect.");
+                    }
+                    return;
+                  }
+                },
+              ),
+              TextButton(
+                child: const Text('Continue'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  onContinue();
+                },
+              ),
+            ],
+          ),
+    );
   }
 }
