@@ -55,6 +55,21 @@ class GameLoopNotifier extends Notifier<void> {
     gameStateNotifier.save();
   }
 
+  bool isEnergySufficient() {
+    if (_lastGenerated <= 0) {
+      return true;
+    }
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final dif = now - _lastGenerated;
+    assert(dif > 0, "previous should not be in the future");
+
+    if (dif < Constants.inactiveThreshold) {
+      // even if app became inactive, it wasn't long enough. don't limit to energy
+      return true;
+    }
+    return ref.read(energyProvider).count >= dif;
+  }
+
   void _processGenerators() {
     if (_isPaused) return;
     final now = DateTime.now().millisecondsSinceEpoch;
